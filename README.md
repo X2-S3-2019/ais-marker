@@ -1,8 +1,8 @@
-install python 2.7
-install pip
+- install python 2.7
+- install pip
 
-Python Packages
+**Python Packages**
 
-pip install eel
-pip install python-docx
-pip install PyInstaller
+- pip install eel
+- pip install python-docx
+- pip install PyInstaller
