@@ -43,8 +43,6 @@ def createTemplate(template_id):
                 temp_criterion.addField(temp_field)
             template.addCriterionToGroup(temp_criterion, temp_group)
 
-    print(template)
-
     return template
 
 # Create the class version of the JSON template
@@ -56,7 +54,6 @@ def deserializeJSONDummyTemplate(JSONTemplate):
     
     for group in JSONTemplate['groupCriteria']:
         groupCriterionObj = GroupCriterion(-1, group['name'], group['icon'])
-        print(groupCriterionObj.name)
 
         for criterion in group['criteria']:
             criterionObj = Criterion(-1, criterion['name'], criterion['description'], criterion['icon'])
@@ -78,8 +75,6 @@ def deserializeJSONDummyTemplate(JSONTemplate):
 @eel.expose
 def saveJSONTemplateToDatabase(JSONTemplate):
 
-    print(JSONTemplate)
-
     template_id = databaseManager.addTemplate(JSONTemplate['name'], JSONTemplate['type'])
 
     for group in JSONTemplate['groupCriteria']:
@@ -91,25 +86,20 @@ def saveJSONTemplateToDatabase(JSONTemplate):
             for field in criterion['fields']:
                 databaseManager.addFieldToCriteria(criterion_id, field['name'], field['value'], field['description'], field['points'])
 
-    print(template_id)
-    print(JSONTemplate['name'])
-
     return template_id
 
 
 
-# Create JSON object of template
+# Create JSON object of template object
 @eel.expose
 def getTemplateJSON(template_id):
     template = createTemplate(template_id)
     templateJSON = json.dumps(template, default=lambda o: o.__dict__, indent=1)
-    print(templateJSON)
 
     return templateJSON
 
 @eel.expose
 def openDocument(document_name):
-    print('Open this document: ' + document_name)
     os.startfile(document_name + '.docx')   
 
 @eel.expose
@@ -127,6 +117,12 @@ def createAssessmentResultDocument(header_info, results, template_id, openDocume
     
     if openDocument:
         assessmentDocument.openResultsDocument()   
+
+# Prevents the connection time-out (hopefully). x is the name of the page accessing this function.
+@eel.expose
+def say_hello_py(x):
+   print('Hello from %s' % x)
+   time.sleep(0.9)
     
 # Main Function
 if __name__ == '__main__':
@@ -135,11 +131,11 @@ if __name__ == '__main__':
     databaseManager = datastore.DBManager()
     databaseManager.initDB('ais_marker')
 
+    web_app_options = {'mode': "chrome-app", 'host': '127.0.0.1'}
+
     # Create Default template
     #templateDocument = TemplateDocument('AIS_Default')
     #templateDocument.createTemplateDocument(createTemplate(1))
 
-    time.sleep(0.5) # Dianwen Wang have yet to explain what this is for
-
     eel.init('web')
-    eel.start('index.html', size=(1000, 600), disable_cache=True)
+    eel.start('index.html', size=(1000, 600), options=web_app_options)
