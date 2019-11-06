@@ -49,20 +49,21 @@ $(document).ready(function(){
         }
     });
 
-    $('.labeled-input-group label').blur(function(){
+    $('.labeled-input-group input').blur(function(){
         if($('.labeled-input-group input').val() != ''){
-            console.log('Input blurred');
-            $('.labeled-input-group label')
+
+            $(this).next().css({'top':'-18px', 'color':'black', 'font-size':'12px'});
         }
     });
+
 
     // Student ID input event
     $('#txtStudentID').on('change', function(){
         console.log('Changed');
         if($('#txtStudentID').val() === ''){
             $('#txtStudentID').css({'border-bottom': '1px solid grey'});
-            $('.labeled-input-group label').css('color', 'black');
-            $('.labeled-input-group label').text('Student ID');
+            $(this).next.css('color', 'black');
+            $(this).next().text('Student ID');
         }
     });
 
@@ -276,8 +277,6 @@ var assessment = {
 
                 console.log(results);
 
-                $('body').css('background', '#000');
-
                 eel.createAssessmentResultDocument(header_info, results, template, false)().then(function(){
                     // Show popup
                     $('#popupSuccessfulSave').modal('show');
@@ -291,7 +290,6 @@ var assessment = {
                     }
                 
                     console.log('Successfully created document.');
-                    $('body').css('background', 'red');
                 })
                 .catch(function(){
 
