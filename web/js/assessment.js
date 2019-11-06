@@ -331,7 +331,7 @@ function createScoreCards(){
 
 function createTemplateTable(template_id){
 
-    let templateJSON = eel.getTemplateJSON(template_id)(function (templateJSON){
+    eel.getTemplateJSON(template_id)().then(function(templateJSON){
         /* Organize the JSON object */
         let template = JSON.parse(templateJSON);
        console.log('Creating template...');
@@ -426,7 +426,9 @@ function createTemplateTable(template_id){
         $('.assessment-container').html(templateHTML);
 
         assessment.init();
+        assessment.template = template;
         assessment.enableSaveButton(assessment.results, template.id);
+
 
         createScoreCards();
     });

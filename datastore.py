@@ -71,6 +71,74 @@ class DBManager:
 
         return template
 
+    def addTemplate(self, name, template_type):
+        try:
+            con = sqlite3.connect(db)
+        except Error:
+            print(Error)
+            con.close()
+        
+        crs = con.cursor()
+
+        crs.execute('INSERT INTO templates VALUES (?, ?, ?)', (None, name, template_type))
+        template_id = crs.lastrowid
+
+        con.commit()
+        con.close()
+
+        return template_id
+
+    def addGroupCriterion(self, template_id, name, icon):
+        try:
+            con = sqlite3.connect(db)
+        except Error:
+            print(Error)
+            con.close()
+        
+        crs = con.cursor()
+
+        crs.execute('INSERT INTO groupCriteria VALUES (?, ?, ?, ?)', (None, template_id, name, icon))
+        group_criterion_id = crs.lastrowid
+
+        con.commit()
+        con.close()
+
+        return group_criterion_id
+
+    def addCriterionToGroup(self, group_criterion_id, name, description, icon):
+        try:
+            con = sqlite3.connect(db)
+        except Error:
+            print(Error)
+            con.close()
+        
+        crs = con.cursor()
+
+        crs.execute('INSERT INTO criteria VALUES (?, ?, ?, ?, ?)', (None, group_criterion_id, name, description, icon))
+        criterion_id = crs.lastrowid
+
+        con.commit()
+        con.close()
+
+        return criterion_id
+
+    def addFieldToCriteria(self, criterion_id, name, value, description, points):
+        try:
+            con = sqlite3.connect(db)
+        except Error:
+            print(Error)
+            con.close()
+        
+        crs = con.cursor()
+
+        crs.execute('INSERT INTO fields VALUES (?, ?, ?, ?, ?, ?)', (None, criterion_id, name, value, description, points))
+        field_id = crs.lastrowid
+
+        con.commit()
+        con.close()
+
+        return field_id
+
     def getTemplates(self):
         try:
             con = sqlite3.connect(db)

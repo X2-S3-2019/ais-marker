@@ -32,6 +32,7 @@ def createTemplate(template_id):
         temp_group = GroupCriterion(group[0], group[1], group[2])
         template.addGroupCriterion(temp_group)
         group_id = group[0]
+
         criteria = databaseManager.getCriteriaOfGroup(group_id)
         # For each criterion, get information and fields
         for criterion in criteria:
@@ -42,20 +43,74 @@ def createTemplate(template_id):
                 temp_criterion.addField(temp_field)
             template.addCriterionToGroup(temp_criterion, temp_group)
 
+    print(template)
+
     return template
+
+# Create the class version of the JSON template
+# For when the user doesn't want to save his/her template to the database
+@eel.expose
+def deserializeJSONDummyTemplate(JSONTemplate):
+
+    template = Template(-1, JSONTemplate['name'], JSONTemplate['type'])
+    
+    for group in JSONTemplate['groupCriteria']:
+        groupCriterionObj = GroupCriterion(-1, group['name'], group['icon'])
+        print(groupCriterionObj.name)
+
+        for criterion in group['criteria']:
+            criterionObj = Criterion(-1, criterion['name'], criterion['description'], criterion['icon'])
+            groupCriterionObj.addCriterion(criterionObj)
+
+            for field in criterion['fields']:
+                fieldObj = Field(-1, field['name'], field['value'], field['description'], field['points'])
+                criterionObj.addField(fieldObj)
+    
+        template.addGroupCriterion(groupCriterionObj)
+
+    doc = TemplateDocument('Ben')
+    doc.createTemplateDocument(template)
+    doc.openTemplateDocument()
+
+    return True
+    
+# Save the JSON object of the template to the database
+@eel.expose
+def saveJSONTemplateToDatabase(JSONTemplate):
+
+    print(JSONTemplate)
+
+    template_id = databaseManager.addTemplate(JSONTemplate['name'], JSONTemplate['type'])
+
+    for group in JSONTemplate['groupCriteria']:
+        group_criterion_id = databaseManager.addGroupCriterion(template_id, group['name'], group['icon'])
+
+        for criterion in group['criteria']:
+            criterion_id = databaseManager.addCriterionToGroup(group_criterion_id, criterion['name'], criterion['description'], group['icon'])
+
+            for field in criterion['fields']:
+                databaseManager.addFieldToCriteria(criterion_id, field['name'], field['value'], field['description'], field['points'])
+
+    print(template_id)
+    print(JSONTemplate['name'])
+
+    return template_id
+
+
 
 # Create JSON object of template
 @eel.expose
 def getTemplateJSON(template_id):
     template = createTemplate(template_id)
     templateJSON = json.dumps(template, default=lambda o: o.__dict__, indent=1)
+    print(templateJSON)
 
     return templateJSON
 
 @eel.expose
 def openDocument(document_name):
     print('Open this document: ' + document_name)
-    os.startfile(document_name + '.docx')
+    os.startfile(document_name + '.docx')   
 
 @eel.expose
 def createAssessmentResultDocument(header_info, results, template_id, openDocument):
