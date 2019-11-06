@@ -1,0 +1,96 @@
+body {
+	height: 100%;
+    padding:20px;
+}
+.index {
+    width: 100%;
+    display: flex;
+    justify-content: center;
+    padding-top:75px;
+    min-width:400px;
+}
+
+.cover {
+	height: 100%;
+	width: 60%;
+	background-image: url("./cover.jpg");
+	background-repeat: no-repeat;
+	background-size: auto;
+}
+
+.menu {
+	width: 80%;
+	display:flex;
+	justify-content: flex-start;
+	flex-direction: column;
+}
+
+.container-courses {
+    height: 210px!important;
+}
+
+.title {
+	margin-top: 10px;
+	display:flex;
+	justify-content:center;
+	flex-direction: column;
+	text-align: center;
+}
+
+.logo {
+	display:flex;
+	justify-content:center;
+}
+
+
+.buttons {
+	margin-top: 10px;
+	justify-content:space-between;
+  	text-align: center;
+}
+
+.buttons button {
+	margin: 10px auto;
+	width: 80%;
+}
+
+.header {
+	display: flex;
+	justify-content: flex-start;
+}
+
+.header h1 {
+	margin-left: 40px;
+	display: flex;
+	text-align: center;
+	justify-content:center;
+	flex-direction: column;
+  	text-align: center;
+}
+
+.btn-yellow {
+    background-color: #ffc107!important;
+}
+
+.btn-green {
+    background-color: #ffc107 !important;
+}
+.redtr {
+    border-color: red;
+}
+
+#intro-carusel {
+    background-color: rgba(255,255,2550.8);
+    height:200px;
+}
+.carousel-inner {
+    padding: 20px 80px 20px 80px;
+}
+.carousel-control-prev-icon, .carousel-control-next-icon {
+    color:red;
+    background-color:black!important;
+}
+
+
+
+

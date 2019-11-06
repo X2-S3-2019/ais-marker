@@ -1,0 +1,220 @@
+body {
+    background-color: rgb(209, 201, 201); 
+  }
+
+/****************************\
+  Text
+\****************************/
+
+  .heading-one {
+    font-size: 1.5em;
+    font-weight: 700;
+  }
+
+  .heading-two {
+    font-size: 1.2em;
+  }
+/****************************\
+  Containers
+\****************************/
+
+  header {
+    position: fixed;
+    top: 0;
+    left: 0;
+    background: white;
+    border-bottom: 1px solid #EDEDED;
+    height: 11em;
+    width: 100%;
+  }
+
+  .timer-container {
+    display: inline-block;
+    margin: 1em;
+  }
+
+  .heading-container {
+    display: inline-block;
+  }
+
+  .main-container {
+    background: white;
+    margin: 1em;
+    padding: 1em;
+    border: 1px solid grey;
+  }
+  
+/****************************\
+  Miscellaneous
+\****************************/
+
+.spaced-span {
+  padding-left: .5em;
+  padding-right: .5em;
+}
+
+.grey-bg {
+  background: #b1b2b3;
+}
+
+.light-grey-bg {
+  background: lightgrey;
+}
+
+.sticky-navigation {
+  position: fixed;
+    bottom: 0;
+    width: 100%;
+    text-align: center;
+    background: #dedede;
+}
+
+.padded {
+  padding: 2em;
+}
+
+.empty-space {
+  height: 50px;
+}
+
+.table-bordered {
+  cursor: pointer;
+}
+
+.tab {
+  margin: 10px;
+}
+
+.tab-pane {
+  margin: 1em;
+}
+  .small-logo {
+      width: 100px;
+  }
+
+  .app-title {
+    vertical-align: middle;
+    margin-left: 20px;
+    font-size: 2.5em;
+    font-weight: 500;
+    color: white;
+  }
+  
+  .app-subtitle {
+    position: absolute;
+    bottom: 3em;
+    font-size: 2em;
+    color: white;
+    font-family: 'Courgette', cursive;
+    text-align: center;
+    width: 100%;
+  }
+
+  .menu-item a {
+    width: inherit;
+    height: inherit;
+    color: rgba(0, 0, 0, 0.7);
+    background: rgba(255, 255, 255, 0.2);
+    text-align: center;
+    text-decoration: none;
+    cursor: pointer;
+    border-radius: 50%;            
+  }
+
+  .big-icon a {
+    line-height: 150px;
+    font-size: 80px;
+  }
+
+  .small-icon a {
+    line-height: 30px;
+    font-size: 20px;
+  }
+
+  .menu-item a:hover {
+    color: white;
+    text-decoration: none;
+    -webkit-transform: scale(1.1);
+        -ms-transform: scale(1.1);
+        transform: scale(1.1);
+        transition: 0.3s;
+  }
+
+  .menu-item label {
+    padding-top: 1em;
+    color: white;
+    font-size: 1.3em;
+  }
+
+  /* .menu-item:hover label {
+    display: inline-block;
+    padding-top: 1em;
+    color: white;
+    font-size: 1.3em;
+    opacity: 1;
+    transition: 0.5s;
+  } */
+
+  .big-circle-bg {
+    width: 150px;
+    height: 150px;
+  }
+
+  .small-circle-bg {
+    width: 30px;
+    height: 30px;
+  }
+
+  /* below by cheng */
+  .start{
+    display: flex;
+    justify-content: center;
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%,-50%);
+  }
+  
+  .navigation{
+    box-sizing: border-box;
+  }
+  .footer{
+    position: absolute;
+    top: 70%;
+    left: 0;
+    width: 100%;
+    box-sizing: border-box;
+  }
+  hr{
+    display: block;
+    width: 80%;
+    background-color: white;
+    border-style: solid;
+    border-width: 3px;
+  }
+  .footer .line{
+    display: inline-block;
+    width: 1px;
+    height: 30px;
+    line-height: 35px;
+    border: 1px solid white;
+  }
+  .footer ul{
+    display: flex;
+    margin: 0;
+    padding: 0;
+    justify-content: center;
+    align-items: center;
+  }
+  .footer ul li{
+    list-style: none;
+  }
+  .footer ul li a{
+    text-decoration: none;
+    padding: 0 50px;
+    color: white;
+    font-size: 1.5em;
+    height: 50px;
+    line-height: 50px;
+  }
+

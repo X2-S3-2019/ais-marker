@@ -1,0 +1,6 @@
+#for mac
+pyinstaller accessment.py --onefile --noconsole --hidden-import bottle_websocket --add-data /usr/local/lib/python2.7/site-packages/eel/eel.js:eel --add-data web:web 
+
+
+#for windows
+pyinstaller -y -F -w --add-data "C:/projects/ais-presentation-feedback-form-v1/template/Template.docx";"template" --add-data "C:/Users/Admin/scoop/apps/python27/current/Lib/site-packages/eel/eel.js";"eel" --add-data "C:/projects/ais-presentation-feedback-form-v1/web";"web/" --hidden-import bottle_websocket  "C:/projects/ais-presentation-feedback-form-v1/accessment.py"
