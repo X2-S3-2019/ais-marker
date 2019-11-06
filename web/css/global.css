@@ -1,0 +1,85 @@
+/* Contains styles that are used all over the pages */
+
+.black-link {
+    color: black;
+    cursor: pointer;
+}
+
+.full-width-table {
+    width: 100%;
+}
+
+button {
+    outline: none;
+}
+
+.border-bottom-only {
+    border-bottom: 1px solid #bbbbbb;
+    border-top: 0;
+    border-right: 0;
+    border-left: 0;
+}
+
+input {
+    text-indent: 5px;
+}
+
+.loader-container {
+    width: 100%;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.small-logo {
+    width: 100px;
+}
+
+.small-icon a {
+    line-height: 30px;
+    font-size: 20px;
+  }
+
+.app-title {
+  vertical-align: middle;
+  margin-left: 20px;
+  font-size: 25px;
+  font-weight: 700;
+  color: white;
+}
+
+.small-circle-bg {
+  width: 30px;
+  height: 30px;
+}
+
+.three-col-spaced {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.three-col-spaced div {
+    padding: 10px;
+}
+
+.menu-item a {
+    width: inherit;
+    height: inherit;
+    color: rgba(0, 0, 0, 0.7);
+    background: rgba(255, 255, 255, 0.2);
+    text-align: center;
+    text-decoration: none;
+    cursor: pointer;
+    border-radius: 50%;            
+  }
+
+.menu-item a:hover {
+    color: white;
+    text-decoration: none;
+    -webkit-transform: scale(1.1);
+        -ms-transform: scale(1.1);
+        transform: scale(1.1);
+        transition: 0.3s;
+  }
