@@ -2,21 +2,119 @@
     assessment.js
 
     File description: Contains functions related to assessment and navigation of assessment.html
+
+    TODO:
+    In initiliazeSelect, values are hard-coded. Make this dynamic.
+    Create a way to store course, presentation and student information directly to database from the assessment page.
 */
 
 $(document).ready(function(){
-    let template_id = 1;
+    let template_id = 2;
 
     console.log('In Assessment');
-    createTemplateTable(template_id);
+
+    // Show popup
+    $('#popupAddStudent').modal('show');
+
+    // When Show Additional Fields is clicked
+    $('#linkShowAdditionalFields').click(function(){
+        if($('#linkShowAdditionalFields').hasClass('hidden')){
+            toggleAdditionalFields('Hidden');
+        } else if($('#linkShowAdditionalFields').hasClass('shown')){
+            toggleAdditionalFields('Shown');
+        }
+    });
+
+    // When Evaluate button from popup is clicked
+    $('#btnEvaluate').click(function(){
+        
+        // Check if student ID was inputted
+        // Only the student ID is required
+        if($('#txtStudentID').val() === ''){
+            $('#txtStudentID').css({'border-bottom': '1px solid red'});
+            $('#txtStudentID').next().css('color', 'red');
+            $('#txtStudentID').text('Student ID (Required)');
+            $('#txtStudentID').focus();
+        } else {
+            $('#txtStudentID').removeClass('is-invalid');
+
+            let student_id = $('#txtStudentID').val();
+            let student_name = $('#txtStudentName').val();
+            let course = $('#txtCourse').val();
+            let presentation = $('#txtPresentation').val();
     
+            addHeaderDocument(student_id, student_name, course, presentation);
+    
+            $('#popupAddStudent').modal('toggle');
+        }
+    });
+
+    $('.labeled-input-group label').blur(function(){
+        if($('.labeled-input-group input').val() != ''){
+            console.log('Input blurred');
+            $('.labeled-input-group label')
+        }
+    });
+
+    // Student ID input event
+    $('#txtStudentID').on('change', function(){
+        console.log('Changed');
+        if($('#txtStudentID').val() === ''){
+            $('#txtStudentID').css({'border-bottom': '1px solid grey'});
+            $('.labeled-input-group label').css('color', 'black');
+            $('.labeled-input-group label').text('Student ID');
+        }
+    });
+
+    // When user wants to open recently created document
+    $('#linkOpenDocument').click(function(){
+        console.log('Link to open document is clicked');
+        eel.openDocument(assessment.documentName)(function(){
+            console.log('Document opened');
+        });
+    });
+
+        //TODO: Store values for adding to database
+
+
+    createTemplateTable(template_id);
 });
+
+
+function toggleAdditionalFields(status){
+    if(status === 'Hidden'){
+        $('#linkShowAdditionalFields').text("Hide additional fields");
+        $('#linkShowAdditionalFields').removeClass('hidden');
+        $('#linkShowAdditionalFields').addClass('shown');
+
+        $('.hidden-fields-container').show(500);
+    } else if (status === 'Shown'){
+        $('#linkShowAdditionalFields').text("Show additional fields");
+        $('#linkShowAdditionalFields').removeClass('shown');
+        $('#linkShowAdditionalFields').addClass('hidden');
+
+        $('.hidden-fields-container').hide(500);
+    }
+}
+
+function addHeaderDocument(student_id, student_name, course, presentation){
+    console.log('Adding header document...');
+
+    /* Add the document header containing student and assessment information */
+
+    $('.tableStudentID').val(student_id);
+    $('.tableStudentName').val(student_name);
+    $('.tablePresentation').val(presentation);
+}
 
 var assessment = {
     /* DOM elements */
-    saveButton: $('#btnSaveDocument'),
+    saveButton: $('.btnSaveDocument'),
     /* Data objects*/
     results: {},
+    scoreCriteria: {},  // { groupCriteria: [{ name, possibleScore, iconClass }, ...], totalPossibleScore: }
+    documentName: '',
+    template: {},
     /* Functions */
     init: function(){
         this.initializeSelect()
@@ -28,23 +126,25 @@ var assessment = {
             
 			$(e.target).parent().removeClass("table-danger");
 			let score = $(e.target).attr('data-score');
-			let type = $(e.target).attr('data-type');
-			let classname = "";
-			if ( score == 4 ) {
-				classname = "table-success";
-			} else if ( score == 3 ) {
-				classname = "table-primary";
-			} else if ( score == 2 ) {
-				classname = "table-warning";
-			} else if ( score == 1 ) {
-				classname = "table-danger";
-            } 
+            let type = $(e.target).attr('data-type');
+            let value = $(e.target).attr('data-value');
+            let classname = "";
+            let tmp = type.split('.')
+            
+            if( value == 'Excellent'){
+                classname = "table-success";
+            } else if ( value == 'Good'){
+                classname = "table-primary";
+            } else if( value == 'Fair'){
+                classname = "table-warning";
+            } else if( value == 'Poor'){
+                classname = "table-danger";
+            }
             
 			$('td[data-type="' + type + '"]').removeClass();
             $(e.target).addClass(classname);
             
-			let tmp = type.split('.')
-            assessment.results['groupCriteria'][tmp[0]]["criteria"][tmp[1]] = score;
+			assessment.results['groupCriteria'][tmp[0]]["criteria"][tmp[1]] = score;
 
             // Update assessment scores
             let groupTotalScore = 0;
@@ -61,21 +161,69 @@ var assessment = {
             // let currentAssessmentTotalScore = parseInt(that.results['assessmentTotalScore']);
 
             // that.printAssessmentJSON();
+
+            assessment.updateAssessmentScoresUI(tmp[0], groupTotalScore);
         });
     },
-    updateAssessmentScoresUI: function(){
+    updateAssessmentScoresUI: function(type, score){
         /* This is only to update the scores in the user interface */
+        
+        // Updating the individual score cards
+        $('.' + type).text(score);
+
+        // Update score card color based on percentage
+        // 50% below is red, 50% and above but below 74% is yellow, 75% above is green
+        let scorePercentage;
+
+        if(score > 0){
+            scorePercentage = score / assessment.scoreCriteria["groupCriteria"][type]["possibleTotalScore"] * 100;
+        }
+
+        if(scorePercentage < 50){
+            $('.' + type).parent('.small-score-card').css({'background': '#ff8686', 'color': '#a90000'});
+        } else if(scorePercentage >= 50 && scorePercentage < 74){
+            $('.' + type).parent('.small-score-card').css({'background': '#fff086', 'color': '#a9a400'}); 
+        } else if(scorePercentage >= 75){
+            $('.' + type).parent('.small-score-card').css({'background': '#88ff86', 'color': '#00a90d'});
+        }
+        
+
+        // Update the total of score cards
+        let totalScore = 0;
+        let groupCriteria = assessment.results.groupCriteria;
+
+        for(var key in groupCriteria){
+            totalScore += groupCriteria[key]["groupTotalScore"];
+        }
+
+        $('.total_score').text(totalScore);
+
+        if(totalScore > 0) // Prevent dividing by zero
+        {
+            scorePercentage = totalScore / assessment.scoreCriteria["totalPossibleScore"] * 100;
+        }
+
+        if(scorePercentage < 50){
+            $('.total_score').parent('.small-score-card').css({'background': '#ff8686', 'color': '#a90000'});
+        } else if(scorePercentage >= 50 && scorePercentage < 74){
+            $('.total_score').parent('.small-score-card').css({'background': '#fff086', 'color': '#a9a400'}); 
+        } else if(scorePercentage >= 75){
+            $('.total_score').parent('.small-score-card').css({'background': '#88ff86', 'color': '#00a90d'});
+        }
     },
     checkOptions: function() {
-		var that = this;
+        var that = this;
+        
+        console.log('Checking if criteria are selected...');
+
 		for (category in assessment.results['groupCriteria'] ) {
-			for ( subcate in assessment.results['groupCriteria'][category] ) {
-                console.log('Checking: ' + assessment.results['groupCriteria'][category]['criteria'][subcate]);
+			for ( subcate in assessment.results['groupCriteria'][category]['criteria'] ) {
 				if ( assessment.results['groupCriteria'][category]['criteria'][subcate] < 0 ) {
 					var tmp = $('tr[data-type="' + category + '.' + subcate + '"]');
-					tmp.addClass("table-danger");
+                    tmp.addClass("table-danger");
+                    let offset = tmp.offset().top - 50;
 					$('body, html').animate({
-						scrollTop: tmp.offset().top
+						scrollTop: offset
 					});
 					return false;
 				}
@@ -94,9 +242,11 @@ var assessment = {
             if(allAssessmentChecked){
 
                 let header_info = {};
-                header_info['studentName'] = 'Farrah';
-                header_info['studentId'] = '09185533';
-                header_info['presentationTopic'] = 'The Era of UX Designing';
+                header_info['studentName'] = $('.tableStudentName').val();;
+                header_info['studentId'] = $('.tableStudentID').val();
+                header_info['presentationTopic'] = $('.tablePresentation').val();
+
+                console.log('Header Info: ' + header_info);
 
                 let today = new Date();
                 let formatted_date = today.getDate() + "-" + today.getMonth() + "-" + today.getFullYear();
@@ -109,14 +259,12 @@ var assessment = {
                 let totalScore = 0;
 
                 for(var group in assessment.results['groupCriteria']){
-                    console.log(assessment.results['groupCriteria'][group].groupTotalScore);
                     totalScore += assessment.results['groupCriteria'][group].groupTotalScore;
                 }
 
                 let possibleTotalScore = 0;
 
                 for(var group in assessment.results['groupCriteria']){
-                    console.log(assessment.results['groupCriteria'][group].groupPossibleTotalScore);
                     possibleTotalScore += assessment.results['groupCriteria'][group].groupPossibleTotalScore;
                 }
 
@@ -128,8 +276,25 @@ var assessment = {
 
                 console.log(results);
 
-                eel.createAssessmentResultDocument(header_info, results, template, false)(function(){
+                $('body').css('background', '#000');
+
+                eel.createAssessmentResultDocument(header_info, results, template, false)().then(function(){
+                    // Show popup
+                    $('#popupSuccessfulSave').modal('show');
+                    
+                    // Store document name
+                    // TODO: This code is redundant to the one in main.py. Optimise this.
+                    if(header_info['studentName'] === ''){
+                        assessment.documentName = header_info['studentId'] + ' (' + header_info['presentationDate'] + ')';
+                    } else {
+                        assessment.documentName = header_info['studentName'] + ' - ' + header_info['studentId'] + ' (' + header_info['presentationDate'] + ')';
+                    }
+                
                     console.log('Successfully created document.');
+                    $('body').css('background', 'red');
+                })
+                .catch(function(){
+
                 });
             }
         });
@@ -140,6 +305,30 @@ var assessment = {
     }
 };
 
+function createScoreCards(){
+    let headerScoreContainer = $('.header-score-container');
+    let scoreCardsHTML = '';
+    let groupCriteria = assessment.scoreCriteria.groupCriteria;
+
+    // Add the total score cards
+
+    for (var key in groupCriteria) {
+        if (groupCriteria.hasOwnProperty(key)) {
+            scoreCardsHTML += '<div class="small-score-card" title="' + groupCriteria[key]["name"] + '">' +
+            '<i class="' + groupCriteria[key]["icon"] + '"></i>' +
+                '<span class="' + key + '"> 0</span>/<span class="score-text">' + groupCriteria[key]["possibleTotalScore"] + '</span>' +
+            '</div>';
+        }
+    }
+
+    scoreCardsHTML += '<div class="small-score-card" title="Total Score">' +
+        '<i class="fas fa-equals"></i>' +
+        '<span class="total_score"> 0</span>/<span  class="score-text">' + assessment.scoreCriteria['totalPossibleScore'] + '</span>' +
+    '</div>';
+
+    headerScoreContainer.html(scoreCardsHTML);
+}
+
 function createTemplateTable(template_id){
 
     let templateJSON = eel.getTemplateJSON(template_id)(function (templateJSON){
@@ -147,10 +336,14 @@ function createTemplateTable(template_id){
         let template = JSON.parse(templateJSON);
        console.log('Creating template...');
 
-        let templateHTML = '<h2>' + template.name + '</h2><br />';
+        let templateHTML = '';
         let group_keys = {}; 
+        let group_score_keys = {};
+        
+        let totalPossibleScore = 0;
 
         /* For each group criterion, create a table */
+        /* Developer's Notes: i is for groupCriteria, j is for first criterion fields, k is for criteria */
         for(var i = 0; i < template.groupCriteria.length; i++){
             let groupCriteria = template.groupCriteria;
 
@@ -174,6 +367,10 @@ function createTemplateTable(template_id){
             let temp_words = groupCriteria[i].name.split(" ");
             let data_type_group = temp_words[0].toLowerCase() + "_" + groupCriteria[i].id;
 
+            let temp_score_keys = {};
+            temp_score_keys["icon"] = groupCriteria[i].icon;
+            temp_score_keys["name"] = groupCriteria[i].name;
+
             let temp_keys = {};
             let criteria_keys = {}; /* Temporary holder for results object's criteria */
             let possible_total_score = 0;
@@ -195,33 +392,43 @@ function createTemplateTable(template_id){
                 /* Add fields' descriptions */
                 for(var l = 0; l < criteria[i].fields.length; l++){
                     let fields = criteria[k].fields;
-                    htmlTable += '<td data-score="' + fields[l].points + '" data-type="' + data_type + '">' 
+                    htmlTable += '<td data-score="' + fields[l].points + '" data-type="' + data_type + '" data-value="' + fields[l].value + '">' 
                     + fields[l].description + '</td>';
                 }
 
-                possible_total_score += criteria[i].fields[0].points; // Get highest possible points
+                possible_total_score += criteria[k].fields[0].points; // Get highest possible points
 
                 htmlTable += '</tr>';
             }
 
-
+            // For assessment.results data object
             temp_keys["groupTotalScore"] = 0;
             temp_keys["groupPossibleTotalScore"] = possible_total_score;
             temp_keys["criteria"] = criteria_keys;
             
             group_keys[data_type_group] = temp_keys;
+
+            // For assessment.scoreCriteria data object
+            totalPossibleScore += possible_total_score;
+            temp_score_keys["highestFieldScore"] = groupCriteria[i].criteria[0].fields[0].points;
+            temp_score_keys["possibleTotalScore"] = possible_total_score;            
+            group_score_keys[data_type_group] = temp_score_keys;            
            
             htmlTable += '</table><br />';
 
             templateHTML += htmlTable;
         }
 
+        assessment.scoreCriteria['groupCriteria'] = group_score_keys;
+        assessment.scoreCriteria['totalPossibleScore'] = totalPossibleScore;
         assessment.results['groupCriteria'] = group_keys;
 
-        $('.template-container').html(templateHTML);
+        $('.assessment-container').html(templateHTML);
 
         assessment.init();
         assessment.enableSaveButton(assessment.results, template.id);
+
+        createScoreCards();
     });
 
 }

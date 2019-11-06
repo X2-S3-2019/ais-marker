@@ -22,13 +22,15 @@ class Field:
 
 class Criterion:
 
-    def __init__(self, id, name, description, group=None):
+    def __init__(self, id, name, description, group=None, icon=None):
         self.id = id
         self.name = name
         self.description = description
         self.fields = []
         if group:
             self.group = group
+        if icon:
+            self.icon = icon
 
     def addField(self, field):
         self.fields.append(field)
@@ -42,10 +44,11 @@ class Criterion:
 
 class GroupCriterion:
 
-    def __init__(self, id, name):
+    def __init__(self, id, name, icon):
         self.id = id
         self.name = name
         self.criteria = []
+        self.icon = icon
 
     def addCriterion(self, criterion):
         self.criteria.append(criterion)

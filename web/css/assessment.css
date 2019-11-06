@@ -1,0 +1,147 @@
+/* These are styles for assessment.html ONLY */
+
+.template-container{
+    background: white;
+    margin: 5em 1em;
+    padding: 1em;
+    border: 1px solid #b7b7b7;
+}
+
+.header-container {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    position: fixed;
+    top: 0;
+    width: 100%;
+    padding: 0 .5em;
+    margin-bottom: 1em;
+    background: #f1ebeb;
+    box-shadow: 0px 3px 3px rgba(173, 169, 169, .5);
+}
+
+.header-icon {
+  display: inline-block;
+  text-align: center;
+  line-height: 10px;
+  padding: 5px;
+  cursor: pointer;
+}
+
+.header-icon i {
+  font-size: 2.5em;
+  color: rgb(52, 93, 154);
+}
+
+.header-icon span {
+  font-size: .8em;
+  color: grey;
+}
+
+.table {
+    border: 1px solid black;
+  }
+
+  .table td {
+    border: 1px solid black;
+    padding: .5em;
+    cursor: pointer;
+  }
+
+  .table th {
+    border: 1px solid black !important;
+    padding: .2em;
+    text-align: center;
+    vertical-align: middle !important;
+    cursor: default;
+  }
+
+  .table thead th {
+    background-color: rgb(247, 114, 114);
+  }
+
+  .table tbody th {
+    background-color: rgb(228, 228, 228);
+  }
+
+.hidden-fields-container {
+  margin-top: 1em;
+  display: none;
+}
+
+.table-dynamic-text {
+  padding: 1em;
+  font-weight: 500;
+}
+
+.header-icon-container {
+  float: right;
+}
+
+.header-score-container {
+  display: inline-block;
+  text-align: center;
+  padding-left: 2em;
+  font-size: 1.5em;
+}
+
+.small-score-card {
+  display: inline-block;
+  background:#b9b9b9;
+  padding: 5px;
+  margin: 5px;
+  color:#484848;
+  border-radius: 5px;
+  cursor: default;
+}
+
+.small-score-card i {
+  padding: 0 5px;
+}
+
+.score-text {
+  font-size: 18px;
+}
+
+.header-input {
+  font-weight: 500;
+}
+
+.modal-input {
+    display: block;
+    width: 100%;
+    margin-top: 12px;
+    padding-bottom: 7px;
+    font-size: 1rem;
+    font-weight: 400;
+    line-height: 1.5;
+    color: #495057;
+    background-color: #fff;
+    background-clip: padding-box;
+    border: none;
+    transition: border-color .15s ease-in-out,box-shadow .15s ease-in-out;
+    border-bottom: 1px solid grey;
+    outline: none;
+}
+
+.labeled-input-group {
+    position: relative;
+    margin: auto;
+    -webkit-backface-visibility: hidden;
+            backface-visibility: hidden;
+}
+
+.labeled-input-group label {
+    position: absolute;
+    top: 7px;
+    left: 5px;
+    color: #A9A9A9;
+    cursor: text;
+    transition: .2s;
+}
+
+.labeled-input-group input:focus ~ label {
+  top: -18px;
+  color: black;
+  font-size: 12px;
+}

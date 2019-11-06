@@ -1,0 +1,69 @@
+
+<div class="btn fab"></div>
+<div class="overlay"></div>
+<div class="fab" id="error"></div>
+<div class="fab" id="success"></div>
+<div class="flip-container">
+  <div class="flipper">
+    <div class="front">
+      <form class="contact">
+        <h1>Contact Us
+          <div class="close" id="close" title="Close"></div>
+        </h1>
+        <div class="group">
+          <input type="text" id="user" required="required"/>
+          <label for="user">Name</label>
+        </div>
+        <div class="group">
+          <input type="text" id="pass" required="required"/>
+          <label for="pass">Email</label>
+        </div>
+        <div class="group">
+          <textarea id="msg" required="required"></textarea>
+          <label for="msg">Your Message</label>
+        </div>
+        <button value="submit"></button>
+      </form>
+    </div>
+    <div class="back">
+      <div class="msg">
+        <button class="close">Close</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+
+
+
+
+
+
+
+
+
+
+<div class="md-form">
+    <input type="text" pattern="[0-9]{10}" required="'required'" class="form-control mdb-autocomplete"
+        id="txtStudentID" maxlength="10" /> <br />
+    <!-- For autocomplete close icon -->
+    <button class="mdb-autocomplete-clear">
+        <svg fill="#000000" height="24" viewBox="0 0 24 24" width="24"
+            xmlns="https://www.w3.org/2000/svg">
+            <path
+                d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z" />
+            <path d="M0 0h24v24H0z" fill="none" />
+        </svg>
+    </button>
+    <label for="txtStudentID" class="active">Student ID</label>
+    <!-- End of autocomplete close icon -->
+    <u id="linkShowAdditionalFields" class="black-link hidden">Show additional fields</u>
+    <div class="hidden-fields-container">
+        <input type="text" class="form-control" placeholder="Student Name" id="txtStudentName"
+            maxlength="60" /> <br />
+        <input type="text" class="form-control" placeholder="Course" id="txtCourse" /> <br />
+        <input type="text" class="form-control" placeholder="Topic of Presentation"
+            id="txtPresentation" />
+    </div>
+</div>

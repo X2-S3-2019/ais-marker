@@ -11,7 +11,7 @@
 
 
 from __future__ import print_function	# For Py2/3 compatibility
-import eel, json, os, sys               # External dependencies
+import eel, json, os, sys , time        # External dependencies
 # Program-related python files
 import datastore                        # Database-related functions
 # assessment contains template- and assessment-related classes
@@ -29,13 +29,13 @@ def createTemplate(template_id):
 
     # For each group, add criterion
     for group in group_criteria_db:
-        temp_group = GroupCriterion(group[0], group[1])
+        temp_group = GroupCriterion(group[0], group[1], group[2])
         template.addGroupCriterion(temp_group)
         group_id = group[0]
         criteria = databaseManager.getCriteriaOfGroup(group_id)
         # For each criterion, get information and fields
         for criterion in criteria:
-            temp_criterion = Criterion(criterion[0], criterion[1], criterion[2])
+            temp_criterion = Criterion(criterion[0], criterion[1], criterion[2], criterion[3])
             fields = databaseManager.getFieldsOf(criterion[0])
             for field in fields:
                 temp_field = Field(field[0], field[1], field[2], field[3], field[4])
@@ -53,9 +53,17 @@ def getTemplateJSON(template_id):
     return templateJSON
 
 @eel.expose
+def openDocument(document_name):
+    print('Open this document: ' + document_name)
+    os.startfile(document_name + '.docx')
+
+@eel.expose
 def createAssessmentResultDocument(header_info, results, template_id, openDocument):
     # data_of_presentation acts as a unique id for the document
-    document_name = header_info['studentName'] + ' - ' + header_info['studentId'] + ' (' + header_info['presentationDate'] + ')'
+    if "".__eq__(header_info['studentName']):
+        document_name = header_info['studentId'] + ' (' + header_info['presentationDate'] + ')'
+    else:
+        document_name = header_info['studentName'] + ' - ' + header_info['studentId'] + ' (' + header_info['presentationDate'] + ')'       
 
     template = createTemplate(template_id)
 
@@ -75,6 +83,8 @@ if __name__ == '__main__':
     # Create Default template
     #templateDocument = TemplateDocument('AIS_Default')
     #templateDocument.createTemplateDocument(createTemplate(1))
+
+    time.sleep(0.5) # Dianwen Wang have yet to explain what this is for
 
     eel.init('web')
     eel.start('index.html', size=(1000, 600), disable_cache=True)

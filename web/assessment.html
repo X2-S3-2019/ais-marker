@@ -4,35 +4,138 @@
     <title>Assessment</title>
     <!-- Include eel.js - note this file doesn't exist in the 'web' directory -->
     <script type="text/javascript" src="/eel.js"></script>
-    <link rel="stylesheet" href="/external_assets/css/bootstrap4_3_1.min.css">
+    <link rel="shortcut icon" href="ais.ico" type="image/x-icon">
+    <link rel="stylesheet" href="external_assets/css/bootstrap4_3_1.min.css">
+    <link rel="stylesheet" href="external_assets/css/fontawesome.min.css">
+    <link rel="stylesheet" href="external_assets/css/all.min.css">
+    <link rel="stylesheet" href="css/main.css">
+    <link rel="stylesheet" href="css/assessment.css">
     <script type="text/javascript" src="/external_assets/js/jquery-3.4.1.min.js"></script>
     <script type="text/javascript" src="/external_assets/js/bootstrap.min.js"></script>
-    <style>
-      .table {
-        border: 1px solid black;
-      }
-
-      .table td {
-        border: 1px solid black;
-        padding: .5em;
-        cursor: pointer;
-      }
-
-      .table th {
-        border: 1px solid black;
-        padding: .2em;
-        text-align: center;
-        vertical-align: middle !important;
-        background-color: rgb(209, 206, 206);
-        cursor: default;
-      }
-    </style>
   </head>
 
-  <body>
-    <div class="template-container">
+  <body style="background-color: rgb(209, 201, 201);">
+
+    <div class="header-container">
+        <div class="header-icon btnEditTemplate"><i title="Edit Template" class="fas fa-file-invoice"></i></div>
+        <!-- <div class="header-score-container">
+            <span class="spaced-span grey-bg">Presentation Time: <span id="presentation_timer_container" class="lblPresentationTime">00:00:00</span></span>
+            <br />
+            <span class="spaced-span">Content/Structure Idea: <span class="contentScore">0</span>/16</span> | 
+            <span class="spaced-span">Language and Delivery: <span class="languageScore">0</span>/12</span> | 
+            <span class="spaced-span">Technical: <span class="technicalScore">0</span>/20</span> |
+            <span class="spaced-span">Total: <span class="totalScore">0</span>/48 (<span class="scorePercentage">0</span>%)</span>
+        </div> -->
+        <div class="header-score-container">
+            <!-- Dynamically populated in the back-end -->
+        </div>
+        <div class="header-icon-container">
+            <div class="header-icon btnSaveDocument"><i title="Save" class="fas fa-save"></i></div>
+        </div>
+        
     </div>
-    <button id="btnSaveDocument" class="btn btn-success">Save Assessment</button>
+
+    <div class="template-container">
+        <div class="document-header">
+            <table class="full-width-table">
+                <tr>
+                    <td>Student Name:
+                        <input type="text" class="header-input border-bottom-only tableStudentName"></span>
+                    </td>
+                    <td>Student ID:
+                        <input type="text" class="header-input border-bottom-only tableStudentID"></span>
+                    </td>
+                </tr>
+            </table>
+            <table class="full-width-table">
+                <tr>
+                    <td>Topic of Presentation:
+                        <input type="text" class="header-input border-bottom-only tablePresentation"></span>
+                    </td>
+                </tr>
+            </table>
+        </div>
+        <br />
+        <div class="assessment-container">
+            <!-- Dynamically populated in the back-end -->
+        </div>
+        <button class="btnSaveDocument btn btn-primary">Finish Evaluation</button>
+    </div>
+
+    <!-- MODALS (POPUPS) -->
+
+    <!-- Evaluate Info Popup -->
+
+    <div class="modal fade" id="popupAddStudent" tabindex="-1" role="dialog" aria-labelledby="popupAddStudentTitle"
+        aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="modalTitle">Evaluation Information</h5>
+                    <button type="button" class="close" data-dismiss="modal" onclick="location.href='index.html'" aria-label="Close">x</button>
+                </div>
+                <div class="modal-body">
+                    <div class="labeled-input-group">
+                        <input type="text" pattern="[0-9]{10}" class="modal-input" id="txtStudentID" maxlength="10" />
+                        <label for="txtStudentID">Student ID</label>
+                    </div>
+                    <br />
+                    <u id="linkShowAdditionalFields" class="black-link hidden">Show additional fields</u>
+                    <br />
+                    
+                    <div class="hidden-fields-container">
+                        <div class="labeled-input-group">
+                            <input type="text" class="modal-input" id="txtStudentName" maxlength="50" />
+                            <label for="txtStudentName">Student Name</label>
+                        </div> <br />
+                        <div class="labeled-input-group">
+                            <input type="text" class="modal-input" id="txtCourse" maxlength="50" />
+                            <label for="txtCourse">Course</label>
+                        </div> <br />
+                        <div class="labeled-input-group">
+                            <input type="text" class="modal-input" id="txtPresentation" maxlength="50" />
+                            <label for="txtPresentation">Presentation</label>
+                        </div>
+                    </div>               
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-block btn-primary" id="btnEvaluate"><i class="fa fa-check"></i></button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- End of Evaluate Info Popup -->
+
+    <!-- Successful Save Popup -->
+
+    <div class="modal fade" id="popupSuccessfulSave" tabindex="-1" role="dialog" aria-labelledby="successfulSavePopup" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                <h5 class="modal-title" id="modalTitle">Successful Evaluation</h5>
+                </div>
+                <div class="modal-body">
+                    <div class="row">
+                        <div class="col-sm-4 text-center">
+                            <i style="font-size: 5em; color: green;" class="fas fa-clipboard-check"></i>
+                        </div>
+                        <div class="col-sm-8">
+                            <p class="successSavePopupBody">Your evaluation was successfully saved.</p>
+                            <u id="linkOpenDocument" class="black-link">Open document</u>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button id="btnShowSurvey" class="btn btn-danger" data-dismiss="modal">Exit</button>
+                    <a href="#" class="btn btn-secondary" onclick="window.location.reload();">Next Student</a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- End of Successful Save Popup -->
+
     <script type="text/javascript" src="js/assessment.js"></script>
   </body>
 </html>
