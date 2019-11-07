@@ -15,7 +15,8 @@ import eel, json, os, sys , time        # External dependencies
 # Program-related python files
 import datastore                        # Database-related functions
 # assessment contains template- and assessment-related classes
-from assessment import AssessmentDocument, TemplateDocument, Template, GroupCriterion, Criterion, Field            
+from assessment import AssessmentDocument, TemplateDocument, Template, GroupCriterion, Criterion, Field    
+from schoolrecords import Student, Presentation, Course        
 
 global databaseManager
 
@@ -45,8 +46,46 @@ def createTemplate(template_id):
 
     return template
 
+@eel.expose
+def getCourses():
+    return databaseManager.getAllCourses()
+
+@eel.expose
+def getStudents():
+    return databaseManager.getAllStudents()
+
+@eel.expose
+def getPresentations():
+    return databaseManager.getAllPresentations()
+
+@eel.expose
+def getAllPresentationsOfCourse(course_id):
+    return databaseManager.getAllPresentationsOfCourse(course_id)
+
+
+@eel.expose
+def addStudent(id, name):
+    student_id = databaseManager.addStudent(id, name)
+    print('Added student with id ' + str(student_id))
+
+    return student_id
+
+@eel.expose
+def addCourse(code, name):
+    course_id = databaseManager.addCourse(code, name)
+    print('Added course with id ' + str(course_id))
+
+    return course_id
+@eel.expose
+def addPresentation(course_id, name, date):
+    presentation_id = databaseManager.addPresentation(course_id, name, date)
+    print('Added presentation with id ' + str(presentation_id))
+
+    return presentation_id
+
 # Create the class version of the JSON template
 # For when the user doesn't want to save his/her template to the database
+# NOTE: This is is not used as of the moment.
 @eel.expose
 def deserializeJSONDummyTemplate(JSONTemplate):
 
@@ -88,8 +127,6 @@ def saveJSONTemplateToDatabase(JSONTemplate):
 
     return template_id
 
-
-
 # Create JSON object of template object
 @eel.expose
 def getTemplateJSON(template_id):
@@ -102,6 +139,7 @@ def getTemplateJSON(template_id):
 def openDocument(document_name):
     os.startfile(document_name + '.docx')   
 
+# Creates the document containing the results of the assessment
 @eel.expose
 def createAssessmentResultDocument(header_info, results, template_id, openDocument):
     # data_of_presentation acts as a unique id for the document
@@ -129,13 +167,13 @@ if __name__ == '__main__':
 
     # Initiliaze database
     databaseManager = datastore.DBManager()
-    databaseManager.initDB('ais_marker')
+    databaseManager.initDB('ais_marker_db')
+
+    # Add a default template to database
+    databaseManager.createDefaultTemplate()
+    databaseManager.createSaghirTemplate()
 
     web_app_options = {'mode': "chrome-app", 'host': '127.0.0.1'}
-
-    # Create Default template
-    #templateDocument = TemplateDocument('AIS_Default')
-    #templateDocument.createTemplateDocument(createTemplate(1))
 
     eel.init('web')
     eel.start('index.html', size=(1000, 600), options=web_app_options)

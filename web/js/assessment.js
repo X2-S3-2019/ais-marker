@@ -4,7 +4,7 @@
     File description: Contains functions related to assessment and navigation of assessment.html
 
     TODO:
-    In initiliazeSelect, values are hard-coded. Make this dynamic.
+    In initiliazeSelect, values are hard-coded (Excellent, Fair, Good, Poor). Make this dynamic.
     Create a way to store course, presentation and student information directly to database from the assessment page.
 */
 
@@ -18,6 +18,8 @@ var arrPresentations = [{'course': 'SOFT808', 'presentations': ['The Era of UX D
 {'course': 'SOFT703', 'presentations': ['Assignment 1 Presentations', 'Assignment 2 Presentations']}];
 
 $(document).ready(function(){    
+    let template_id = 1;
+
     // Get data from back-end and populate arrays for autocomplete
 
     initializeEvaluationPopup();
@@ -168,9 +170,6 @@ var assessment = {
             }
                         
              that.results['groupCriteria'][tmp[0]]['groupTotalScore'] = groupTotalScore;
-            // let currentAssessmentTotalScore = parseInt(that.results['assessmentTotalScore']);
-
-            // that.printAssessmentJSON();
 
             assessment.updateAssessmentScoresUI(tmp[0], groupTotalScore);
         });
@@ -197,7 +196,6 @@ var assessment = {
             $('.' + type).parent('.small-score-card').css({'background': '#88ff86', 'color': '#00a90d'});
         }
         
-
         // Update the total of score cards
         let totalScore = 0;
         let groupCriteria = assessment.results.groupCriteria;
@@ -223,8 +221,6 @@ var assessment = {
     },
     checkOptions: function() {
         var that = this;
-        
-        console.log('Checking if criteria are selected...');
 
 		for (category in assessment.results['groupCriteria'] ) {
 			for ( subcate in assessment.results['groupCriteria'][category]['criteria'] ) {
@@ -338,6 +334,8 @@ function createScoreCards(){
 
 function createTemplateTable(template_id){
 
+    // TODO: Add loader here
+
     eel.getTemplateJSON(template_id)().then(function(templateJSON){
         /* Organize the JSON object */
         let template = JSON.parse(templateJSON);
@@ -435,7 +433,6 @@ function createTemplateTable(template_id){
         assessment.init();
         assessment.template = template;
         assessment.enableSaveButton(assessment.results, template.id);
-
 
         createScoreCards();
     });

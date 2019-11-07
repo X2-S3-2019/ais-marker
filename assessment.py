@@ -21,7 +21,6 @@ class Field:
         self.points = points
 
 class Criterion:
-
     def __init__(self, id, name, description,  icon):
         self.id = id
         self.name = name
@@ -40,7 +39,6 @@ class Criterion:
             print(i.description)
 
 class GroupCriterion:
-
     def __init__(self, id, name, icon):
         self.id = id
         self.name = name
@@ -62,7 +60,6 @@ class GroupCriterion:
 
 
 class Template:
-
     def __init__(self, id, name, type):
         self.id = id
         self.name = name
@@ -98,7 +95,6 @@ class Template:
 
 
 class AssessmentDocument:
-
     def __init__(self, document_name):
         self.document_name = document_name
 
@@ -201,7 +197,6 @@ class AssessmentDocument:
         
 
 class TemplateDocument:
-
     def __init__(self, name):
         self.name = name
 

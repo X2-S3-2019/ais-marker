@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Managing Courses</title>
+    <!-- Include eel.js - note this file doesn't exist in the 'web' directory -->
+    <script type="text/javascript" src="/eel.js"></script>
+    <link rel="shortcut icon" href="../ais.ico" type="image/x-icon">
+    <link rel="stylesheet" href="../external_assets/css/bootstrap4_3_1.min.css">
+    <link rel="stylesheet" href="../external_assets/css/fontawesome.min.css">
+    <link rel="stylesheet" href="../external_assets/css/all.min.css">
+    <script type="text/javascript" src="../external_assets/js/jquery-3.4.1.min.js"></script>
+    <script type="text/javascript" src="../external_assets/js/bootstrap.min.js"></script>
+    <link rel="stylesheet" href="../css/global.css">
+    <link rel="stylesheet" href="../css/setup.css">
+  </head>
+
+  <body style="background-color: rgb(239, 237, 237);">
+    <div>
+        <nav class="breadcrumbs">
+            <a href="../index.html" class="fas fa-home"></a> 
+            <span class="fa fa-angle-right"></span>
+            <p class="current-item">Managing Courses</p>
+        </nav>        
+    </div>
+
+    <div class="form-group small-padded">
+        <div class="row">
+            <div class="col-4">
+                <label for="txtCourseCode">Course Code</label>
+                <input type="text" class="form-control" id="txtCourseCode"placeholder="Enter Course Code">
+            </div>
+            <div class="col-8">
+                <label for="txtCourseName">Course Name</label>
+                <input type="text" class="form-control" id="txtCourseName" placeholder="Course Name">
+            </div>
+        </div>
+        <br />
+        <button class="btn btn-primary" id="btnAddCourse">Add Course</button>
+        <h2 class="mt-5">Available courses</h2>
+        <div class="overflow-auto container-courses">
+            <table class="table table-hover" id="tblCourses">
+                <thead>
+                    <tr>
+                        <th scope="col">Course Code</th>
+                        <th scope="col">Course Name</th>
+                        <th scope="col"></th>
+                    </tr>
+                </thead>
+                <tbody>
+                
+                </tbody>
+            </table>
+        </div>
+    </div>
+  </body>
+  <script type="text/javascript" src="../js/global.js"></script>
+  <script type="text/javascript" src="../js/setup.js"></script>
+</html>

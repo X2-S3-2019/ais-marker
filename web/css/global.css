@@ -83,3 +83,11 @@ input {
         transform: scale(1.1);
         transition: 0.3s;
   }
+
+.small-padded {
+    padding: 1em;
+}
+
+.medium-padded {
+    padding: 3em;
+}

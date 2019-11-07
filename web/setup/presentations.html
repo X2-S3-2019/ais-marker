@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Managing Presentations</title>
+    <!-- Include eel.js - note this file doesn't exist in the 'web' directory -->
+    <script type="text/javascript" src="/eel.js"></script>
+    <link rel="shortcut icon" href="../ais.ico" type="image/x-icon">
+    <link rel="stylesheet" href="../external_assets/css/bootstrap4_3_1.min.css">
+    <link rel="stylesheet" href="../external_assets/css/fontawesome.min.css">
+    <link rel="stylesheet" href="../external_assets/css/all.min.css">
+    <script type="text/javascript" src="../external_assets/js/jquery-3.4.1.min.js"></script>
+    <script type="text/javascript" src="../external_assets/js/bootstrap.min.js"></script>
+    <link rel="stylesheet" href="../css/global.css">
+    <link rel="stylesheet" href="../css/setup.css">
+  </head>
+
+  <body style="background-color: rgb(239, 237, 237);">
+    <div>
+        <nav class="breadcrumbs">
+            <a href="../index.html" class="fas fa-home"></a> 
+            <span class="fa fa-angle-right"></span>
+            <p class="current-item">Managing Presentations</p>
+        </nav>        
+    </div>
+
+    <div class="form-group small-padded">
+        <div class="row">
+            <div class="col-12 small-padded">
+                <select id="ddlCourses" class="form-control"></select>
+            </div>
+            <div class="col-4">
+                <label for="txtStudentID">Presentation Date</label>
+                <input type="date" class="form-control" id="datePresentation">
+            </div>
+            <div class="col-8">
+                <label for="txtStudentName">Presentation Topic</label>
+                <input type="text" class="form-control" id="txtPresentationName" placeholder="Enter Presentation Topic">
+            </div>
+        </div>
+        <br />
+        <button class="btn btn-primary" id="btnAddPresentation">Add Presentation</button>
+        <h2 class="mt-5">Available Presentation Topic</h2>
+        <div class="overflow-auto">
+            <table class="table table-hover" id="tblPresentations">
+                <thead>
+                    <tr>
+                        <th scope="col" style="width: 22%">Date</th>
+                        <th scope="col">Presentation Topic</th>
+                        <th scope="col"></th>
+                    </tr>
+                </thead>
+                <tbody>
+                
+                </tbody>
+            </table>
+        </div>
+    </div>
+  </body>
+  <script type="text/javascript" src="../js/global.js"></script>
+  <script type="text/javascript" src="../js/setup.js"></script>
+</html>
