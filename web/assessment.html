@@ -73,8 +73,10 @@
                 </div>
                 <div class="modal-body">
                     <div class="labeled-input-group">
-                        <input type="text" pattern="[0-9]{10}" class="modal-input" id="txtStudentID" maxlength="10" />
-                        <label for="txtStudentID">Student ID</label>
+                        <div class="autocomplete">
+                            <input type="text" pattern="[0-9]+" class="modal-input" id="txtStudentID" maxlength="10" />
+                            <label for="txtStudentID">Student ID</label>
+                        </div>
                     </div>
                     <br />
                     <u id="linkShowAdditionalFields" class="black-link hidden">Show additional fields</u>
@@ -82,16 +84,22 @@
                     
                     <div class="hidden-fields-container">
                         <div class="labeled-input-group">
-                            <input type="text" class="modal-input" id="txtStudentName" maxlength="50" />
-                            <label for="txtStudentName">Student Name</label>
+                            <div class="autocomplete">
+                                <input type="text" class="modal-input" id="txtStudentName" maxlength="50" />
+                                <label for="txtStudentName">Student Name</label>
+                            </div>
                         </div> <br />
                         <div class="labeled-input-group">
-                            <input type="text" class="modal-input" id="txtCourse" maxlength="50" />
-                            <label for="txtCourse">Course</label>
+                            <div class="autocomplete">
+                                <input type="text" class="modal-input" id="txtCourse" maxlength="50" />
+                                <label for="txtCourse">Course</label>
+                            </div>
                         </div> <br />
                         <div class="labeled-input-group">
-                            <input type="text" class="modal-input" id="txtPresentation" maxlength="50" />
-                            <label for="txtPresentation">Presentation</label>
+                            <div class="autocomplete">
+                                <input type="text" class="modal-input" id="txtPresentation" maxlength="50" />
+                                <label for="txtPresentation">Presentation</label>
+                            </div>
                         </div>
                     </div>               
                 </div>
