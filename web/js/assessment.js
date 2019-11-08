@@ -727,17 +727,17 @@ function autocomplete(inp, arr) {
                 x[i].parentNode.removeChild(x[i]);
             }
         }
-      }
     }
     /*execute a function when someone clicks in the document:*/
     document.addEventListener("click", function (e) {
         closeAllLists(e.target);
     });
-  }
+}
+ 
 
 function initTableEdit() {
 
     $(document).on('click', '.edit-assesment', function () {
         tableEdit.init($('table.table'));
-    }) 
+    })
 }
