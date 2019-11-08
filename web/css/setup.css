@@ -1,0 +1,37 @@
+.breadcrumbs {
+    padding: 1em;
+}
+
+.breadcrumbs span {
+    color: black;
+    padding: 0 .5em;
+  }
+
+  .breadcrumbs .current-item {
+    display: inline;
+    color: #fc354c;
+    font-size: 1.5em;
+    cursor: pointer;
+    font-weight: bolder;
+  }
+
+  .breadcrumbs a {
+    color: black;
+    font-size: 2em;
+    text-decoration-color: none;
+  }
+
+  .breadcrumbs a:hover {
+    color: #fc354c;
+    text-decoration: none;
+    font-weight: 600;
+    -webkit-transform: scale(1.1);
+        -ms-transform: scale(1.1);
+        transform: scale(1.1);
+        transition: 0.3s;
+  }
+
+  .breadcrumbs .nav-link-text {
+      color: grey;
+      font-size: 1.5em;
+  }

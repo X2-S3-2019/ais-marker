@@ -4,14 +4,40 @@
     File description: Contains functions related to assessment and navigation of assessment.html
 
     TODO:
-    In initiliazeSelect, values are hard-coded. Make this dynamic.
+    In initiliazeSelect, values are hard-coded (Excellent, Fair, Good, Poor). Make this dynamic.
     Create a way to store course, presentation and student information directly to database from the assessment page.
 */
 
-$(document).ready(function(){
-    let template_id = 2;
+var arrStudentIDs = ['09185533', '123456', '0918765', '0938274'];
+var arrStudentNames = [{'student_id': '09185533', 'student_name' : 'Farrah Marie Chavez'},
+{'student_id': '0918765', 'student_name' : 'Al Cassey Chavez'},
+{'student_id': '0938274', 'student_name' : 'Paprika Meihart Chavez'}];
 
-    console.log('In Assessment');
+var arrCourses = ['SOFT808', 'SOFT703', 'SOFT650']
+var arrPresentations = [{'course': 'SOFT808', 'presentations': ['The Era of UX Designing', 'UX Research Methods', 'UX Design Methods']}, 
+{'course': 'SOFT703', 'presentations': ['Assignment 1 Presentations', 'Assignment 2 Presentations']}];
+
+$(document).ready(function(){    
+    let template_id = 1;
+
+    // Get data from back-end and populate arrays for autocomplete
+
+    initializeEvaluationPopup();
+
+    // When user wants to open recently created document
+    $('#linkOpenDocument').click(function(){
+        console.log('Link to open document is clicked');
+        eel.openDocument(assessment.documentName)(function(){
+            console.log('Document opened');
+        });
+    });
+
+    createTemplateTable(template_id);
+});
+
+function initializeEvaluationPopup(){
+    autocomplete(document.getElementById("txtStudentID"), arrStudentIDs);
+    autocomplete(document.getElementById("txtCourse"), arrCourses);
 
     // Show popup
     $('#popupAddStudent').modal('show');
@@ -25,8 +51,24 @@ $(document).ready(function(){
         }
     });
 
-    // When Evaluate button from popup is clicked
-    $('#btnEvaluate').click(function(){
+    $('.labeled-input-group input').blur(function(){
+        if($('.labeled-input-group input').val() != ''){
+            $(this).next().css({'top':'-10px', 'color':'black', 'font-size':'12px'});
+        }
+    });
+
+
+    // Student ID input event
+    $('#txtStudentID').on('change', function(){
+        if($('#txtStudentID').val() != ''){
+            $('#txtStudentID').css({'border-bottom': '1px solid grey'});
+            $(this).next.css('color', 'black');
+            $(this).next().text('Student ID');
+        }
+    });
+
+     // When checkmark button from popup is clicked
+     $('#btnEvaluate').click(function(){
         
         // Check if student ID was inputted
         // Only the student ID is required
@@ -48,37 +90,7 @@ $(document).ready(function(){
             $('#popupAddStudent').modal('toggle');
         }
     });
-
-    $('.labeled-input-group label').blur(function(){
-        if($('.labeled-input-group input').val() != ''){
-            console.log('Input blurred');
-            $('.labeled-input-group label')
-        }
-    });
-
-    // Student ID input event
-    $('#txtStudentID').on('change', function(){
-        console.log('Changed');
-        if($('#txtStudentID').val() === ''){
-            $('#txtStudentID').css({'border-bottom': '1px solid grey'});
-            $('.labeled-input-group label').css('color', 'black');
-            $('.labeled-input-group label').text('Student ID');
-        }
-    });
-
-    // When user wants to open recently created document
-    $('#linkOpenDocument').click(function(){
-        console.log('Link to open document is clicked');
-        eel.openDocument(assessment.documentName)(function(){
-            console.log('Document opened');
-        });
-    });
-
-        //TODO: Store values for adding to database
-
-
-    createTemplateTable(template_id).then(initTableEdit);
-});
+}
 
 
 function toggleAdditionalFields(status){
@@ -158,9 +170,6 @@ var assessment = {
             }
                         
              that.results['groupCriteria'][tmp[0]]['groupTotalScore'] = groupTotalScore;
-            // let currentAssessmentTotalScore = parseInt(that.results['assessmentTotalScore']);
-
-            // that.printAssessmentJSON();
 
             assessment.updateAssessmentScoresUI(tmp[0], groupTotalScore);
         });
@@ -187,7 +196,6 @@ var assessment = {
             $('.' + type).parent('.small-score-card').css({'background': '#88ff86', 'color': '#00a90d'});
         }
         
-
         // Update the total of score cards
         let totalScore = 0;
         let groupCriteria = assessment.results.groupCriteria;
@@ -213,8 +221,6 @@ var assessment = {
     },
     checkOptions: function() {
         var that = this;
-        
-        console.log('Checking if criteria are selected...');
 
 		for (category in assessment.results['groupCriteria'] ) {
 			for ( subcate in assessment.results['groupCriteria'][category]['criteria'] ) {
@@ -276,8 +282,6 @@ var assessment = {
 
                 console.log(results);
 
-                $('body').css('background', '#000');
-
                 eel.createAssessmentResultDocument(header_info, results, template, false)().then(function(){
                     // Show popup
                     $('#popupSuccessfulSave').modal('show');
@@ -291,7 +295,6 @@ var assessment = {
                     }
                 
                     console.log('Successfully created document.');
-                    $('body').css('background', 'red');
                 })
                 .catch(function(){
 
@@ -329,9 +332,11 @@ function createScoreCards(){
     headerScoreContainer.html(scoreCardsHTML);
 }
 
-async function createTemplateTable(template_id){
+function createTemplateTable(template_id){
 
-    let templateJSON = eel.getTemplateJSON(template_id)(function (templateJSON){
+    // TODO: Add loader here
+
+    eel.getTemplateJSON(template_id)().then(function(templateJSON){
         /* Organize the JSON object */
         let template = JSON.parse(templateJSON);
        console.log('Creating template...');
@@ -424,15 +429,112 @@ async function createTemplateTable(template_id){
         assessment.results['groupCriteria'] = group_keys;
 
         $('.assessment-container').html(templateHTML);
-        
+
         assessment.init();
+        assessment.template = template;
         assessment.enableSaveButton(assessment.results, template.id);
 
         createScoreCards();
     });
 
-    
 }
+
+function autocomplete(inp, arr) {
+    /*the autocomplete function takes two arguments,
+    the text field element and an array of possible autocompleted values:*/
+    var currentFocus;
+    /*execute a function when someone writes in the text field:*/
+    inp.addEventListener("input", function(e) {
+        var a, b, i, val = this.value;
+        /*close any already open lists of autocompleted values*/
+        closeAllLists();
+        if (!val) { return false;}
+        currentFocus = -1;
+        /*create a DIV element that will contain the items (values):*/
+        a = document.createElement("DIV");
+        a.setAttribute("id", this.id + "autocomplete-list");
+        a.setAttribute("class", "autocomplete-items");
+        /*append the DIV element as a child of the autocomplete container:*/
+        this.parentNode.appendChild(a);
+        /*for each item in the array...*/
+        for (i = 0; i < arr.length; i++) {
+          /*check if the item starts with the same letters as the text field value:*/
+          if (arr[i].substr(0, val.length).toUpperCase() == val.toUpperCase()) {
+            /*create a DIV element for each matching element:*/
+            b = document.createElement("DIV");
+            /*make the matching letters bold:*/
+            b.innerHTML = "<strong>" + arr[i].substr(0, val.length) + "</strong>";
+            b.innerHTML += arr[i].substr(val.length);
+            /*insert a input field that will hold the current array item's value:*/
+            b.innerHTML += "<input type='hidden' value='" + arr[i] + "'>";
+            /*execute a function when someone clicks on the item value (DIV element):*/
+            b.addEventListener("click", function(e) {
+                /*insert the value for the autocomplete text field:*/
+                inp.value = this.getElementsByTagName("input")[0].value;
+                /*close the list of autocompleted values,
+                (or any other open lists of autocompleted values:*/
+                closeAllLists();
+            });
+            a.appendChild(b);
+          }
+        }
+    });
+    /*execute a function presses a key on the keyboard:*/
+    inp.addEventListener("keydown", function(e) {
+        var x = document.getElementById(this.id + "autocomplete-list");
+        if (x) x = x.getElementsByTagName("div");
+        if (e.keyCode == 40) {
+          /*If the arrow DOWN key is pressed,
+          increase the currentFocus variable:*/
+          currentFocus++;
+          /*and and make the current item more visible:*/
+          addActive(x);
+        } else if (e.keyCode == 38) { //up
+          /*If the arrow UP key is pressed,
+          decrease the currentFocus variable:*/
+          currentFocus--;
+          /*and and make the current item more visible:*/
+          addActive(x);
+        } else if (e.keyCode == 13) {
+          /*If the ENTER key is pressed, prevent the form from being submitted,*/
+          e.preventDefault();
+          if (currentFocus > -1) {
+            /*and simulate a click on the "active" item:*/
+            if (x) x[currentFocus].click();
+          }
+        }
+    });
+    function addActive(x) {
+      /*a function to classify an item as "active":*/
+      if (!x) return false;
+      /*start by removing the "active" class on all items:*/
+      removeActive(x);
+      if (currentFocus >= x.length) currentFocus = 0;
+      if (currentFocus < 0) currentFocus = (x.length - 1);
+      /*add class "autocomplete-active":*/
+      x[currentFocus].classList.add("autocomplete-active");
+    }
+    function removeActive(x) {
+      /*a function to remove the "active" class from all autocomplete items:*/
+      for (var i = 0; i < x.length; i++) {
+        x[i].classList.remove("autocomplete-active");
+      }
+    }
+    function closeAllLists(elmnt) {
+      /*close all autocomplete lists in the document,
+      except the one passed as an argument:*/
+      var x = document.getElementsByClassName("autocomplete-items");
+      for (var i = 0; i < x.length; i++) {
+        if (elmnt != x[i] && elmnt != inp) {
+          x[i].parentNode.removeChild(x[i]);
+        }
+      }
+    }
+    /*execute a function when someone clicks in the document:*/
+    document.addEventListener("click", function (e) {
+        closeAllLists(e.target);
+    });
+  }
 
 function initTableEdit() {
     setTimeout(function () {

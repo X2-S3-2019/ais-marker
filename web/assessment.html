@@ -8,28 +8,25 @@
     <link rel="stylesheet" href="external_assets/css/bootstrap4_3_1.min.css">
     <link rel="stylesheet" href="external_assets/css/fontawesome.min.css">
     <link rel="stylesheet" href="external_assets/css/all.min.css">
-    <link rel="stylesheet" href="css/main.css">
-    <link rel="stylesheet" href="css/assessment.css">
     <script type="text/javascript" src="/external_assets/js/jquery-3.4.1.min.js"></script>
     <script type="text/javascript" src="/external_assets/js/bootstrap.min.js"></script>
+    <link rel="stylesheet" href="css/global.css">
+    <link rel="stylesheet" href="css/assessment.css">
     <script type="text/javascript" src="/external_assets/js/jquery.tabledit.js"></script>
   </head>
 
   <body style="background-color: rgb(209, 201, 201);">
 
     <div class="header-container">
-        <div class="header-icon btnEditTemplate"><i title="Edit Template" class="fas fa-file-invoice"></i></div>
-        <!-- <div class="header-score-container">
-            <span class="spaced-span grey-bg">Presentation Time: <span id="presentation_timer_container" class="lblPresentationTime">00:00:00</span></span>
-            <br />
-            <span class="spaced-span">Content/Structure Idea: <span class="contentScore">0</span>/16</span> | 
-            <span class="spaced-span">Language and Delivery: <span class="languageScore">0</span>/12</span> | 
-            <span class="spaced-span">Technical: <span class="technicalScore">0</span>/20</span> |
-            <span class="spaced-span">Total: <span class="totalScore">0</span>/48 (<span class="scorePercentage">0</span>%)</span>
-        </div> -->
+        <div>
+            <div class="header-icon btnNavigate"><i class="fas fa-bars"></i></div>
+            <div class="header-icon btnEditTemplate"><i title="Edit Template" class="fas fa-file-invoice"></i></div>
+        </div>
+        
         <div class="header-score-container">
             <!-- Dynamically populated in the back-end -->
         </div>
+        
         <div class="header-icon-container">
             <div class="header-icon btnSaveDocument"><i title="Save" class="fas fa-save"></i></div>
         </div>
@@ -77,8 +74,10 @@
                 </div>
                 <div class="modal-body">
                     <div class="labeled-input-group">
-                        <input type="text" pattern="[0-9]{10}" class="modal-input" id="txtStudentID" maxlength="10" />
-                        <label for="txtStudentID">Student ID</label>
+                        <div class="autocomplete">
+                            <input type="text" pattern="[0-9]+" class="modal-input" id="txtStudentID" maxlength="10" />
+                            <label for="txtStudentID">Student ID</label>
+                        </div>
                     </div>
                     <br />
                     <u id="linkShowAdditionalFields" class="black-link hidden">Show additional fields</u>
@@ -86,16 +85,22 @@
                     
                     <div class="hidden-fields-container">
                         <div class="labeled-input-group">
-                            <input type="text" class="modal-input" id="txtStudentName" maxlength="50" />
-                            <label for="txtStudentName">Student Name</label>
+                            <div class="autocomplete">
+                                <input type="text" class="modal-input" id="txtStudentName" maxlength="50" />
+                                <label for="txtStudentName">Student Name</label>
+                            </div>
                         </div> <br />
                         <div class="labeled-input-group">
-                            <input type="text" class="modal-input" id="txtCourse" maxlength="50" />
-                            <label for="txtCourse">Course</label>
+                            <div class="autocomplete">
+                                <input type="text" class="modal-input" id="txtCourse" maxlength="50" />
+                                <label for="txtCourse">Course</label>
+                            </div>
                         </div> <br />
                         <div class="labeled-input-group">
-                            <input type="text" class="modal-input" id="txtPresentation" maxlength="50" />
-                            <label for="txtPresentation">Presentation</label>
+                            <div class="autocomplete">
+                                <input type="text" class="modal-input" id="txtPresentation" maxlength="50" />
+                                <label for="txtPresentation">Presentation</label>
+                            </div>
                         </div>
                     </div>               
                 </div>
@@ -134,10 +139,10 @@
             </div>
         </div>
     </div>
-    <table class="tabledit"></table>
 
     <!-- End of Successful Save Popup -->
 
+    <script type="text/javascript" src="js/global.js"></script>
     <script type="text/javascript" src="js/assessment.js"></script>
     <script type="text/javascript" src="js/table-edit.js"></script>
   </body>

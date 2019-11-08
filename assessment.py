@@ -21,16 +21,12 @@ class Field:
         self.points = points
 
 class Criterion:
-
-    def __init__(self, id, name, description, group=None, icon=None):
+    def __init__(self, id, name, description,  icon):
         self.id = id
         self.name = name
         self.description = description
+        self.icon = icon
         self.fields = []
-        if group:
-            self.group = group
-        if icon:
-            self.icon = icon
 
     def addField(self, field):
         self.fields.append(field)
@@ -43,12 +39,11 @@ class Criterion:
             print(i.description)
 
 class GroupCriterion:
-
     def __init__(self, id, name, icon):
         self.id = id
         self.name = name
-        self.criteria = []
         self.icon = icon
+        self.criteria = []
 
     def addCriterion(self, criterion):
         self.criteria.append(criterion)
@@ -65,7 +60,6 @@ class GroupCriterion:
 
 
 class Template:
-
     def __init__(self, id, name, type):
         self.id = id
         self.name = name
@@ -101,7 +95,6 @@ class Template:
 
 
 class AssessmentDocument:
-
     def __init__(self, document_name):
         self.document_name = document_name
 
@@ -204,7 +197,6 @@ class AssessmentDocument:
         
 
 class TemplateDocument:
-
     def __init__(self, name):
         self.name = name
 
