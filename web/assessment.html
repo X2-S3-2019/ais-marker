@@ -19,7 +19,7 @@
 
     <div class="header-container">
         <div>
-            <div class="header-icon btnNavigate"><i class="fas fa-bars"></i></div>
+            <a href="index.html" class="header-icon btnNavigate"><i class="fas fa-home"></i></a>
             <div class="header-icon btnEditTemplate"><i title="Edit Template" class="fas fa-file-invoice"></i></div>
         </div>
         
@@ -35,13 +35,14 @@
 
     <div class="template-container">
         <div class="document-header">
+            <input type="hidden" class="tableCourseCode" />
             <table class="full-width-table">
                 <tr>
                     <td>Student Name:
-                        <input type="text" class="header-input border-bottom-only tableStudentName"></span>
+                        <input type="text" class="header-input border-bottom-only tableStudentName" />
                     </td>
                     <td>Student ID:
-                        <input type="text" class="header-input border-bottom-only tableStudentID"></span>
+                        <input type="text" class="header-input border-bottom-only tableStudentID" />
                     </td>
                 </tr>
             </table>
@@ -141,6 +142,27 @@
     </div>
 
     <!-- End of Successful Save Popup -->
+
+    <!-- Save New Information Popup -->
+
+    <div class="modal fade" id="popupSaveNewInfo" tabindex="-1" role="dialog" aria-labelledby="saveNewInfoPopup" aria-hidden="true">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                    <h5 class="modal-title" id="modalTitle">Save New Information?</h5>
+                    </div>
+                    <div id="modalSaveNewInfo" class="modal-body">
+                        
+                    </div>
+                    <div class="modal-footer">
+                        <button id="btnDiscard" class="btn btn-secondary">Discard</button>
+                        <button id="btnSaveNewInfo" class="btn btn-success">Save</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    <!-- End of Save New Information Popup -->
 
     <script type="text/javascript" src="js/global.js"></script>
     <script type="text/javascript" src="js/assessment.js"></script>
