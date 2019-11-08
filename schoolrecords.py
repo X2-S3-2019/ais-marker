@@ -7,11 +7,10 @@ class Student:
         self.name = name
 
 class Presentation:
-    def __init__(self, id, name, year, semester):
+    def __init__(self, id, date, name):
         self.id = id
         self.name = name
-        self.year = year
-        self.semester = semester    
+        self.date = date   
 
 class Course:
     def __init__(self, id, code, name):
