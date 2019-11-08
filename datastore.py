@@ -47,8 +47,6 @@ class DBManager:
 
         if not results:
             self.createDefaultTemplate()
-        
-        print(crs.fetchone())
 
         con.close()
 
@@ -99,6 +97,28 @@ class DBManager:
         con.close()
 
         return row
+
+    def getCourseIDOf(self, course_code):
+        try:
+            con = sqlite3.connect(db)
+            crs = con.cursor()
+        except Error:
+            print(Error)
+            con.close()
+
+        print(course_code)
+
+        test = crs.execute('SELECT id FROM courses WHERE code = ?', (course_code,))
+
+        row = crs.fetchone()
+        course_id = -1
+
+        if row is not None:
+            course_id = row[0]
+        else:
+            print('There was an error in getCourseIdOf() ' + str(row))
+
+        return course_id
 
     def removeCourse(self, course_id):
         try:
