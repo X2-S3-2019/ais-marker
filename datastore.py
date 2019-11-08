@@ -69,7 +69,7 @@ class DBManager:
 
         return course_id
 
-    def updateCourse(self, course_id, code, name):
+    def updateCourse(self, course_id, code, name, date):
         try:
             con = sqlite3.connect(db)
             crs = con.cursor()
@@ -77,10 +77,18 @@ class DBManager:
             print(Error)
             con.close()
         
-        crs.execute('UPDATE courses SET code = ?, name = ? WHERE id = ?', (code, name, course_id))
+        crs.execute('UPDATE courses SET code = ?, name = ?, date = ? WHERE id = ?', (code, name, date, course_id))
+
+        updated = crs.rowcount()
         
         con.commit()
         con.close()
+
+        if updated:
+            return True
+        else:
+            return False
+
 
     def getAllCourses(self):
         try:
@@ -132,8 +140,15 @@ class DBManager:
 
         crs.execute(sql, course_id)
 
+        deleted = crs.rowcount()
+        
         con.commit()
-        con.close()        
+        con.close()
+
+        if deleted:
+            return True
+        else:
+            return False       
 
     def addPresentation(self, course_id, name, date):
         try:
@@ -164,8 +179,15 @@ class DBManager:
 
         crs.execute(sql, presentation_id)
 
+        deleted = crs.rowcount()
+        
         con.commit()
         con.close()
+
+        if deleted:
+            return True
+        else:
+            return False
 
     def updatePresentation(self, presentation_id, name):
         try:
@@ -177,8 +199,15 @@ class DBManager:
         
         crs.execute('UPDATE presentations SET name = ? WHERE id = ?', (name, presentation_id))
         
+        updated = crs.rowcount()
+        
         con.commit()
         con.close()
+
+        if updated:
+            return True
+        else:
+            return False
 
     def getAllPresentations(self):
         try:
@@ -246,8 +275,15 @@ class DBManager:
 
         crs.execute('UPDATE courses SET name = ? WHERE id = ?', (name, student_id))
         
+        updated = crs.rowcount()
+        
         con.commit()
         con.close()
+
+        if updated:
+            return True
+        else:
+            return False
 
     def getAllStudents(self):
         try:
@@ -277,8 +313,15 @@ class DBManager:
 
         crs.execute(sql, student_id)
 
+        deleted = crs.rowcount()
+        
         con.commit()
         con.close()
+
+        if deleted:
+            return True
+        else:
+            return False
 
 # Database functions related to the template and settings
     def getTemplate(self, id):
