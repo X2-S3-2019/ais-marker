@@ -33,6 +33,7 @@ $(document).ready(function(){
     });
 
     createTemplateTable(template_id);
+    initTableEdit()
 });
 
 function initializeEvaluationPopup(){
@@ -62,7 +63,7 @@ function initializeEvaluationPopup(){
     $('#txtStudentID').on('change', function(){
         if($('#txtStudentID').val() != ''){
             $('#txtStudentID').css({'border-bottom': '1px solid grey'});
-            $(this).next.css('color', 'black');
+            $(this).next().css('color', 'black');
             $(this).next().text('Student ID');
         }
     });
@@ -341,7 +342,7 @@ function createTemplateTable(template_id){
         let template = JSON.parse(templateJSON);
        console.log('Creating template...');
 
-        let templateHTML = '';
+        let templateHTML = '<div class="text-right"><button class="btn btn-danger edit-assesment mb-3">Edit template</button></div>';
         let group_keys = {}; 
         let group_score_keys = {};
         
@@ -352,17 +353,20 @@ function createTemplateTable(template_id){
         for(var i = 0; i < template.groupCriteria.length; i++){
             let groupCriteria = template.groupCriteria;
 
+            $('.assessment-container').data('id', template.id);
+            $('.assessment-container').data('name', template.name);
+                
             let htmlTable = '<table class="table">';
             /* Table Headers containing group criterion's name */
             htmlTable += '<thead><tr>';
-            htmlTable += '<th scope="col" width="12%">' + groupCriteria[i].name + '</th>';
+            htmlTable += '<th scope="col" width="12%" data-name="' + groupCriteria[i].name.replace(/["]/g, '') + '" data-id="' + groupCriteria[i].id + '">' + groupCriteria[i].name + '</th>';
 
             let first_criterion_fields = groupCriteria[i].criteria[0].fields;
 
             /* Add value and points in header */
             for(var j = 0; j < first_criterion_fields.length; j++){
-                htmlTable += '<th scope="col" width="22%">' + first_criterion_fields[j].points 
-                + " - " + first_criterion_fields[j].value + '</th>';
+                htmlTable += '<th scope="col" width="22%" data-points="' + first_criterion_fields[j].points + '" data-point-name="' + first_criterion_fields[j].value + '">' +
+                     first_criterion_fields[j].points + " - " + first_criterion_fields[j].value + '</th>';
             }
 
             htmlTable += '</tr></thead>';
@@ -392,12 +396,14 @@ function createTemplateTable(template_id){
 
                 let data_type = data_type_group + '.' + data_type_criterion;
 
-                htmlTable += '<tr data-type="' + data_type + '"><th>' + criteria[k].name + '</th>';
+                htmlTable += '<tr data-type="' + data_type + '" data-id="' + criteria[k].id + '" data-name="' + criteria[k].name +'"><th>' + criteria[k].name + '</th>';
 
                 /* Add fields' descriptions */
                 for(var l = 0; l < criteria[i].fields.length; l++){
                     let fields = criteria[k].fields;
-                    htmlTable += '<td data-score="' + fields[l].points + '" data-type="' + data_type + '" data-value="' + fields[l].value + '">' 
+                    
+                    htmlTable += '<td data-score="' + fields[l].points + '" data-type="' + data_type + '" data-value="'
+                        + fields[l].value + '" data-id="' + fields[l].id + '" data-name="' + fields[l].name +'">' 
                     + fields[l].description + '</td>';
                 }
 
@@ -537,8 +543,8 @@ function autocomplete(inp, arr) {
   }
 
 function initTableEdit() {
-    setTimeout(function () {
+
+    $(document).on('click', '.edit-assesment', function () {
         tableEdit.init($('table.table'));
-    }, 600)
-    
+    }) 
 }

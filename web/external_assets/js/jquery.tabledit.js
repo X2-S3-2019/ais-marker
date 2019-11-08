@@ -93,6 +93,7 @@ if (typeof jQuery === 'undefined') {
                     }
 
                     var $td = $table.find('tbody td:nth-child(' + (parseInt(settings.columns.identifier[0]) + 1) + ')');
+                    var $th = $table.find('tbody th:nth-child(' + (parseInt(settings.columns.identifier[0]) + 1) + ')');
 
                     $td.each(function() {
                         // Create hidden input with row identifier.
@@ -108,7 +109,10 @@ if (typeof jQuery === 'undefined') {
                 },
                 editable: function() {
                     for (var i = 0; i < settings.columns.editable.length; i++) {
+
                         var $td = $table.find('tbody td:nth-child(' + (parseInt(settings.columns.editable[i][0]) + 1) + ')');
+                        var $thth = $table.find('thead th[data-points]:nth-child(' + (parseInt(settings.columns.editable[i][0]) + 1) + ')');
+                        var $th = $table.find('tbody th:nth-child(' + (parseInt(settings.columns.editable[i][0]) + 1) + ')');
 
                         $td.each(function() {
                             // Get text of this cell.
@@ -146,7 +150,43 @@ if (typeof jQuery === 'undefined') {
                             // Add elements and class "view" to table cell.
                             $(this).html(span + input);
                             $(this).addClass('tabledit-view-mode');
-                       });
+                        });
+
+                        $thth.each(function () {
+                            // Get text of this cell.
+                            var text = $(this).text();
+
+                            // Add pointer as cursor.
+                            if (!settings.editButton) {
+                                $(this).css('cursor', 'pointer');
+                            }
+
+                            // Create span element.
+                            var span = '<span class="tabledit-span">' + text + '</span>';
+                            
+                            var input = '<input class="tabledit-input ' + settings.inputClass + '" type="text" name="' + settings.columns.editable[i][1] + '" value="' + $(this).text() + '" style="display: none;" disabled>';
+                            
+                            // Add elements and class "view" to table cell.
+                            $(this).html(span + input);
+                            $(this).addClass('tabledit-view-mode');
+                        });
+                        $th.each(function () {
+                            $(this).css({ cssText: 'vertical-align:top !important' });
+                            $(this).addClass('tabledit-view-mode');
+                            var editButton = '<button type="button" class="btn-sm tabledit-header-edit" style="float: none;"><span class="fas fa-edit fa-1x" style="color:green;"></span></button>';
+                            var saveButton = '<button type="button" class="tabledit-header-save ' + settings.buttons.save.class + '" style="display: none; float: none;">' + settings.buttons.save.html + '</button>';
+                            
+                            // Create hidden input with row identifier.
+                            var span = '<span class="tabledit-span">' + $(this).text() + '</span>';
+                            var input = '<input class="tabledit-input ' + settings.inputClass + '" type="text" name="' + settings.columns.editable[i][1] + '" value="' + $(this).text() + '" style="display: none;" disabled>';
+                            //var input = '<input class="tabledit-input tabledit-identifier" type="hidden" name="' + settings.columns.identifier[1] + '" value="' + $(this).text() + '" disabled>';
+
+                            // Add elements to table cell.
+                            $(this).html('<div class="text-right">' + editButton + saveButton + '</div><div class="vertical-center py-2 my-4">' + span + input + '</div>');
+
+                            // Add attribute "id" to table row.
+                            $(this).parent('tr').attr(settings.rowIdentifier, $(this).text());
+                        });
                     }
                 },
                 toolbar: function() {
@@ -192,6 +232,16 @@ if (typeof jQuery === 'undefined') {
 
                         // Add toolbar column cells.
                         $table.find('tr:gt(0)').append('<td style="white-space: nowrap; width: 1%;">' + toolbar + '</td>');
+
+                        var pointsToolbar = '<div class="tabledit-toolbar header-toolbar text-center">\n\
+                                           <div class="" style="float: none;">' +
+                           
+                            editButton + '</div>\n' +
+                                           '<button type = "button" class="headeredit-save-button ' + settings.buttons.save.class + '" style = "display: none; float: none;" > ' + settings.buttons.save.html + '</button >';
+                                       '</div></div>';
+
+                        $table.find('thead th:last').append(pointsToolbar);
+
                     }
                 }
             }
@@ -217,7 +267,10 @@ if (typeof jQuery === 'undefined') {
                 // Update toolbar buttons.
                 if (settings.editButton) {
                     $tr.find('button.tabledit-save-button').hide();
+                    $tr.find('button.tabledit-header-save').hide();
+                    $tr.find('button.headeredit-header-save').hide();
                     $tr.find('button.tabledit-edit-button').removeClass('active').blur();
+                    $tr.find('button.tabledit-header-edit').removeClass('active').blur();
                 }
             },
             edit: function(td) {
@@ -236,12 +289,20 @@ if (typeof jQuery === 'undefined') {
                 if (settings.autoFocus) {
                     $input.focus();
                 }
+
                 // Add "edit" class and remove "view" class in td element.
                 $(td).addClass('tabledit-edit-mode').removeClass('tabledit-view-mode');
-                // Update toolbar buttons.
-                if (settings.editButton) {
-                    $tr.find('button.tabledit-edit-button').addClass('active');
-                    $tr.find('button.tabledit-save-button').show();
+                if ($(td).find('button.tabledit-header-save').length > 0) {
+                    $(td).find('button.tabledit-header-save').addClass('active').show();
+                } else if ($(td).parents('thead').length > 0) {
+                    $tr.find('button.headeredit-save-button').addClass('active').show();
+                }
+                else {
+                    // Update toolbar buttons.
+                    if (settings.editButton) {
+                        $tr.find('button.tabledit-edit-button').addClass('active');
+                        $tr.find('button.tabledit-save-button').show();
+                    }
                 }
             }
         };
@@ -488,7 +549,7 @@ if (typeof jQuery === 'undefined') {
              *
              * @param {object} event
              */
-            $table.on('click', 'button.tabledit-edit-button', function(event) {
+            $table.on('click', 'button.tabledit-edit-button', function (event) {
                 if (event.handled !== true) {
                     event.preventDefault();
 
@@ -505,12 +566,40 @@ if (typeof jQuery === 'undefined') {
                         $($button.parents('tr').find('td.tabledit-view-mode').get().reverse()).each(function() {
                             Mode.edit(this);
                         });
+
+                        if ($button.parents('.header-toolbar').length > 0) {
+                            $($button.parents('tr').find('th.tabledit-view-mode').get().reverse()).each(function () {
+                                $(this).find('.tabledit-input').attr('type', 'number').val($(this).data('points'));
+                                Mode.edit(this);
+                            });
+                        }
                     }
 
                     event.handled = true;
                 }
             });
+            $table.on('click', 'button.tabledit-header-edit', function (event) {
+                if (event.handled !== true) {
+                    event.preventDefault();
 
+                    var $button = $(this);
+
+                    // Get current state before reset to view mode.
+                    var activated = $button.hasClass('active');
+
+                    // Change to view mode columns that are in edit mode.
+                    Edit.reset($table.find('td.tabledit-edit-mode'));
+
+                    if (!activated) {
+                        // Change to edit mode for all columns in reverse way.
+                        $($button.parents('tr').find('th.tabledit-view-mode').get().reverse()).each(function () {
+                            Mode.edit(this);
+                        });
+                    }
+
+                    event.handled = true;
+                }
+            });
             /**
              * Save edited row.
              *
@@ -523,6 +612,50 @@ if (typeof jQuery === 'undefined') {
                     // Submit and update all columns.
                     Edit.submit($(this).parents('tr').find('td.tabledit-edit-mode'));
 
+                    event.handled = true;
+                }
+            });/**
+             * Save edited header.
+             *
+             * @param {object} event
+             */
+            $table.on('click', 'button.tabledit-header-save', function (event) {
+                if (event.handled !== true) {
+                    event.preventDefault();
+
+                    // Submit and update all columns.
+                    Edit.submit($(this).parents('tr').find('th.tabledit-edit-mode'));
+
+                    $(this).parents('tr').data('name', $(this).parents('th').find('.tabledit-input').val());
+                    event.handled = true;
+                }
+            });
+            $table.on('click', 'button.headeredit-save-button', function (event) {
+                if (event.handled !== true) {
+                    event.preventDefault();
+
+                    var thr = $(this).parents('tr');
+
+                    $(this).parents('tr').find('th.tabledit-edit-mode').each(function (index, item) {
+                        $(item).data('points', $(item).find('.tabledit-input').val())
+                    })
+
+                   
+                    $(this).parents('table').find('tbody tr').each(function (trindex, tr) {
+                        
+                        $(tr).find('td').each(function (tdindex, td) {
+
+                            var score = thr.find('th:nth-child(' + (tdindex + 2) + ') .tabledit-input').val() 
+                            if (score) {
+                                $(td).data('score', parseInt(score));
+                            }
+                                    
+                        })
+                    })  
+
+                    // Submit and update all columns.
+                    Edit.submit($(this).parents('tr').find('th.tabledit-edit-mode'));
+                    
                     event.handled = true;
                 }
             });
