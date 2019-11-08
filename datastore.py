@@ -611,9 +611,9 @@ class DBManager:
         crs.execute('INSERT INTO fields VALUES (?, ?, ?, ?, ?, ?)', (None, criterion_id, 'elocution_excellent',
                                                                      'Excellent', 'Student uses a clear voice so that all audience members can hear presentation', 4))
         crs.execute('INSERT INTO fields VALUES (?, ?, ?, ?, ?, ?)', (None, criterion_id, 'elocution_good',
-                                                                     'Good', 'Student’s voice is clear. Most audience members can hear presentation', 3))
+                                                                     'Good', 'Students voice is clear. Most audience members can hear presentation', 3))
         crs.execute('INSERT INTO fields VALUES (?, ?, ?, ?, ?, ?)', (None, criterion_id, 'elocution_fair',
-                                                                     'Fair', 'Student’s voice is low. Audience has difficulty hearing presentation', 2))
+                                                                     'Fair', 'Students voice is low. Audience has difficulty hearing presentation', 2))
         crs.execute('INSERT INTO fields VALUES (?, ?, ?, ?, ?, ?)', (None, criterion_id, 'elocution_poor',
                                                                      'Poor', 'Student mumbles, speaks too quietly for a majority of audience to hear', 1))
 
@@ -801,9 +801,9 @@ class DBManager:
         crs.execute('INSERT INTO fields VALUES (?, ?, ?, ?, ?, ?)', (None, criterion_id, 'elocution_excellent',
                                                                      'Excellent', 'Student uses a clear voice so that all audience members can hear presentation', 4))
         crs.execute('INSERT INTO fields VALUES (?, ?, ?, ?, ?, ?)', (None, criterion_id, 'elocution_good',
-                                                                     'Good', 'Student’s voice is clear. Most audience members can hear presentation', 3))
+                                                                     'Good', 'Students voice is clear. Most audience members can hear presentation', 3))
         crs.execute('INSERT INTO fields VALUES (?, ?, ?, ?, ?, ?)', (None, criterion_id, 'elocution_fair',
-                                                                     'Fair', 'Student’s voice is low. Audience has difficulty hearing presentation', 2))
+                                                                     'Fair', 'Students voice is low. Audience has difficulty hearing presentation', 2))
         crs.execute('INSERT INTO fields VALUES (?, ?, ?, ?, ?, ?)', (None, criterion_id, 'elocution_poor',
                                                                      'Poor', 'Student mumbles, speaks too quietly for a majority of audience to hear', 1))
 
