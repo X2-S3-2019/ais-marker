@@ -87,4 +87,4 @@ if __name__ == '__main__':
     time.sleep(0.5) # Dianwen Wang have yet to explain what this is for
 
     eel.init('web')
-    eel.start('index.html', size=(1000, 600), disable_cache=True)
+    eel.start('index.html',size=(1000, 600),disable_cache=True)

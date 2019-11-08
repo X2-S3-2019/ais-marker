@@ -77,7 +77,7 @@ $(document).ready(function(){
         //TODO: Store values for adding to database
 
 
-    createTemplateTable(template_id);
+    createTemplateTable(template_id).then(initTableEdit);
 });
 
 
@@ -329,7 +329,7 @@ function createScoreCards(){
     headerScoreContainer.html(scoreCardsHTML);
 }
 
-function createTemplateTable(template_id){
+async function createTemplateTable(template_id){
 
     let templateJSON = eel.getTemplateJSON(template_id)(function (templateJSON){
         /* Organize the JSON object */
@@ -424,11 +424,19 @@ function createTemplateTable(template_id){
         assessment.results['groupCriteria'] = group_keys;
 
         $('.assessment-container').html(templateHTML);
-
+        
         assessment.init();
         assessment.enableSaveButton(assessment.results, template.id);
 
         createScoreCards();
     });
 
+    
+}
+
+function initTableEdit() {
+    setTimeout(function () {
+        tableEdit.init($('table.table'));
+    }, 600)
+    
 }
