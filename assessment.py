@@ -60,11 +60,10 @@ class GroupCriterion:
 
 
 class Template:
-    def __init__(self, id, name, type):
+    def __init__(self, id, name, description):
         self.id = id
         self.name = name
-        self.type = type
-        self.criteria = []
+        self.description = description
         self.groupCriteria = [] # If groupCriteria is null or empty, then the template only contains criteria without grouping
 
     def addCriterion(self, criterion):
@@ -104,8 +103,9 @@ class AssessmentDocument:
 
     # Create document containing assessment results using a template
     # Add shading of selected marking
-    def createResultsDocument(self, template, results, otherInfo):
+    def createResultsDocument(self, template, results, otherInfo, path):
         document = Document()
+        print('Path: ' + path)
 
         # Add the total score with percentage
         score_header = document.add_paragraph()
@@ -192,7 +192,7 @@ class AssessmentDocument:
         font.size = Pt(8)
         font.italic = True
         
-        document.save(self.document_name + '.docx')
+        document.save(path + '/' + self.document_name + '.docx')
 
         
 
@@ -234,7 +234,7 @@ class TemplateDocument:
 
             # Add a new line for every group criterion
             document.add_paragraph()
-        
+
         document.save(self.name + '.docx')
         
     

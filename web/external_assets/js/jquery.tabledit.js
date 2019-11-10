@@ -144,7 +144,8 @@ if (typeof jQuery === 'undefined') {
                                 input += '</select>';
                             } else {
                                 // Create text input element.
-                                var input = '<input class="tabledit-input ' + settings.inputClass + '" type="text" name="' + settings.columns.editable[i][1] + '" value="' + $(this).text() + '" style="display: none;" disabled>';
+                                //var input = '<input class="tabledit-input ' + settings.inputClass + '" type="text" name="' + settings.columns.editable[i][1] + '" value="' + $(this).text() + '" style="display: none;" disabled>';
+                                var input = '<textarea rows="4" cols="20" class="tabledit-input ' + settings.inputClass + '" type="text" name="' + settings.columns.editable[i][1] + '" style="display: none;" disabled>' + $(this).text() + '</textarea>';
                             }
 
                             // Add elements and class "view" to table cell.
@@ -233,11 +234,14 @@ if (typeof jQuery === 'undefined') {
                         // Add toolbar column cells.
                         $table.find('tr:gt(0)').append('<td style="white-space: nowrap; width: 1%;">' + toolbar + '</td>');
 
-                        var pointsToolbar = '<div class="tabledit-toolbar header-toolbar text-center">\n\
+                        // This has been customized to override the editing of cells. Instead, a popup will show up.
+                        // var pointsToolbar = '<div class="tabledit-toolbar header-toolbar text-center">\n\
+                        //                    <div class="" style="float: none;">' +
+                        var pointsToolbar = '<div class="text-center">\n\
                                            <div class="" style="float: none;">' +
                            
                             editButton + '</div>\n' +
-                                           '<button type = "button" class="headeredit-save-button ' + settings.buttons.save.class + '" style = "display: none; float: none;" > ' + settings.buttons.save.html + '</button >';
+                                           '<button type="button" class="headeredit-save-button btnEditScores' + settings.buttons.save.class + '" style = "display: none; float: none;" > ' + settings.buttons.save.html + '</button >';
                                        '</div></div>';
 
                         $table.find('thead th:last').append(pointsToolbar);

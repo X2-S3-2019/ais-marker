@@ -94,8 +94,8 @@ function displayAllStudents() {
                 '<tr>' +
                 '<th scope="row">' + row[0] + '</th>' +
                 '<td>' + row[1] + '</td>' +
-                '<td style="text-align: center"> <button class="link btn btn-danger"> <i class="fa fa-trash"></i> </button>' +
-                ' <button class="link btn btn-primary"> <i class="fa fa-edit"></i> </button></td>' +
+                '<td style="text-align: center"> <button class="link btn btn-primary"> <i class="fa fa-edit"></i> </button>' +
+                ' <button class="link btn btn-danger"> <i class="fa fa-trash"></i> </button></td>' +
                 '</tr');
         });
     });

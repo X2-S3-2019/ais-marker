@@ -1,0 +1,261 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>Assessment</title>
+    <!-- Include eel.js - note this file doesn't exist in the 'web' directory -->
+    <script type="text/javascript" src="/eel.js"></script>
+    <link rel="shortcut icon" href="ais.ico" type="image/x-icon">
+    <link rel="stylesheet" href="external_assets/css/bootstrap4_3_1.min.css">
+    <link rel="stylesheet" href="external_assets/css/fontawesome.min.css">
+    <link rel="stylesheet" href="external_assets/css/all.min.css">
+    <script type="text/javascript" src="/external_assets/js/jquery-3.4.1.min.js"></script>
+    <script type="text/javascript" src="/external_assets/js/bootstrap.min.js"></script>
+    <link rel="stylesheet" href="css/global.css">
+    <link rel="stylesheet" href="css/assessment.css">
+    <script type="text/javascript" src="/external_assets/js/jquery.tabledit.js"></script>
+    <!-- This is a hack. This overrides the styling of input's label when on focus-->
+    <style>
+        .labeled-input-group input:focus~label {
+            top: -18px;
+        }
+
+        .preview-header-score {
+            width: 100%;
+            border: 1px solid black;
+        }
+
+        .preview-header-score td {
+            border: 1px solid black;
+            background: rgb(247, 114, 114);
+            text-align: center;
+            vertical-align: middle !important;
+        }
+
+        .score-error {
+            color: red;
+            padding-left: 1em;
+            display: none;
+        }
+    </style>
+</head>
+
+<body style="background-color:rgb(209, 201, 201);">
+
+    <div class="header-container" style="background: #bdbdff;">
+        <div>
+            <a href="assessment.html" class="header-icon btnNavigate"><i class="fas fa-arrow-alt-circle-left"></i></a>
+        </div>
+
+        <div>
+            <h2 class=".header-template-name">Editing Mode</h2>
+        </div>
+
+        <div class="header-icon-container">
+            <div class="header-icon btnInitializeSave"><i title="Save" class="fas fa-save"></i></div>
+        </div>
+
+    </div>
+
+    <div class="template-container">
+        <div class="assessment-container">
+            <!-- Dynamically populated in the back-end -->
+        </div>
+        <div>
+            <button class="btn btn-primary btnInitializeSave">Save Template</button>
+        </div>
+    </div>
+
+    <!-- Edit Score System Popup -->
+
+    <div class="modal fade" id="popupEditScoreSystem" tabindex="-1" role="dialog">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="modalTitle">Edit Score System</h5>
+                    <a href="#" class="close" data-dismiss="modal">x</a>
+                </div>
+                <div class="modal-body">
+                    <input type="hidden" id="txtGroupCriterionID" />
+                    <div><input type="radio" class="radio-dropdown" id="rdoCalculated" name="rdoGroupScoreSystem" />
+                        <label for="rdoCalculated">Calculated</label></div>
+                    <div id="divCalculated" class="div-dropdown">
+                        <table>
+                            <tr>
+                                <td>Lowest Score:</td> <!-- Score of Poor -->
+                                <td><input id="txtLowestScore" type="number" min="0" max="100" value="0"
+                                        style="width: 50px" /></td>
+                            </tr>
+                            <tr>
+                                <td>Multiplier:</td>
+                                <td><input id="txtMultiplier" type="number" min="1" max="50" value="1"
+                                        style="width: 50px" /></td>
+                            </tr>
+                        </table>
+                    </div>
+                    <div><input type="radio" class="radio-dropdown" id="rdoCustom" name="rdoGroupScoreSystem" /><label
+                            for="rdoCustom">Custom</label></div>
+                    <div id="divCustom" class="div-dropdown">
+                        <p><em>Note: Your points should follow correct order (highest to lowest)</em></p>
+                        <table>
+                            <tr>
+                                <td>Excellent: </td>
+                                <td><input id="txtExcellentScore" type="number" min="1" max="100" value="4"
+                                        style="width: 50px" /></td>
+                                <td><span class="score-error excellentScore">Should be higher than Good</span></td>
+                            </tr>
+                            <tr>
+                                <td>Good:</td>
+                                <td><input id="txtGoodScore" type="number" min="1" max="100" value="3"
+                                        style="width: 50px" /></td>
+                                <td><span class="score-error goodScore">Should be higher than Fair</span></td>
+                            </tr>
+                            <tr>
+                                <td>Fair:</td>
+                                <td><input id="txtFairScore" type="number" min="1" max="100" value="2"
+                                        style="width: 50px" /></td>
+                                <td><span class="score-error fairScore">Should be higher than Poor</span></td>
+                            </tr>
+                            <tr>
+                                <td>Poor:</td>
+                                <td><input id="txtPoorScore" type="number" min="0" max="100" value="1"
+                                        style="width: 50px" /></td>
+                                <td><span class="score-error poorScore"></span></td>
+                            </tr>
+                        </table>
+                    </div>
+                    <div>
+                        <em>Preview</em>
+                        <div>
+                            <!-- Create preview of score here -->
+                            <table class="preview-header-score">
+                                <tr>
+                                    <td><span class="preview-text excellentScore"></span> - Excellent</td>
+                                    <td><span class="preview-text goodScore"></span> - Good</td>
+                                    <td><span class="preview-text fairScore"></span> - Fair</td>
+                                    <td><span class="preview-text poorScore"></span> - Poor</td>
+                                </tr>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button id="btnCancelEdit" class="btn btn-secondary">Cancel</button>
+                    <button id="btnApply" class="btn btn-success">Apply</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- End of Edit Score System Popup -->
+
+    <!-- Choose Save Popup -->
+
+    <div class="modal fade" id="popupSaveTemplate" tabindex="-1" role="dialog">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="modalTitle">Save Template</h5>
+                    <a href="#" class="close" data-dismiss="modal">x</a>
+                </div>
+                <div class="modal-body">
+                    <div class="labeled-input-group">
+                        <input type="text" class="modal-input" required id="txtTemplateName" maxlength="30" />
+                        <label for="txtStudentID">Name</label>
+                    </div>
+                    <br />
+                    <label class="small" for="txtTemplateDescription" style="margin-bottom: 0;">Description (Optional): </label>
+                    <textarea rows="4" class="modal-input" id="txtTemplateDescription" style="margin-top: initial"></textarea>
+
+                </div>
+                <div class="modal-footer" style="justify-content: space-between;">
+                    <!-- <div class="checkbox">
+                        <label class="checkbox-inline"><input type="checkbox" value="">Make this default
+                            template</label>
+                    </div> -->
+                    <button id="btnSaveTemplate" class="btn btn-success">Save</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- End of Save Template Popup -->
+
+    <!-- Leaving without Saving Popup -->
+
+    <div class="modal fade" id="popupLeaveWithoutSaving" tabindex="-1" role="dialog">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title text-danger" id="modalTitle">Leave without Saving</h5>
+                </div>
+                <div class="modal-body">
+                    <p>Your template has not been saved. You will lose your changes. Proceed?</p>
+                </div>
+                <div class="modal-footer">
+                    <button id="btnCancel" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
+                    <button id="btnExit" class="btn btn-danger">Exit</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- End of Leaving without Saving Popup -->
+
+    <!-- Update or Create Copy Popup -->
+
+    <div class="modal fade" id="popupUpdateOrCopy" tabindex="-1" role="dialog">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="modalTitle">Update or Create a Copy</h5>
+                </div>
+                <div class="modal-body">
+                    <p>You edited an existing template.</p>
+                    <p>Do you want to update this template or make a new copy?</p>
+                </div>
+                <div class="modal-footer">
+                    <button id="btnUpdateTemplate" class="btn btn-primary">Update</button>
+                    <button id="btnNewCopy" class="btn btn-success">New Copy</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- End of Update or Create a Copy Popup -->
+
+    <!-- Successful Save Popup -->
+
+    <div class="modal fade" id="popupSuccessfulSave" tabindex="-1" role="dialog" aria-labelledby="successfulSavePopup"
+        aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="modalTitle">New Template Saved</h5>
+                </div>
+                <div class="modal-body">
+                    <div class="row">
+                        <div class="col-sm-4 text-center">
+                            <i style="font-size: 5em; color: green;" class="fas fa-clipboard-list"></i>
+                        </div>
+                        <div class="col-sm-8">
+                            <p>You successfully created a new template!</p>
+                            <p>Do you want to use this now?</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button class="btn btn-secondary" data-dismiss="modal">Later</button>
+                    <button id="btnUseTemplate" class="btn btn-primary">Use</a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- End of Successful Save Popup -->
+
+    <script type="text/javascript" src="js/global.js"></script>
+    <script type="text/javascript" src="js/table-edit.js"></script>
+</body>
+
+</html>

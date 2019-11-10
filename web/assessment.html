@@ -1,6 +1,7 @@
 <!DOCTYPE html>
 <html>
-  <head>
+
+<head>
     <title>Assessment</title>
     <!-- Include eel.js - note this file doesn't exist in the 'web' directory -->
     <script type="text/javascript" src="/eel.js"></script>
@@ -8,29 +9,30 @@
     <link rel="stylesheet" href="external_assets/css/bootstrap4_3_1.min.css">
     <link rel="stylesheet" href="external_assets/css/fontawesome.min.css">
     <link rel="stylesheet" href="external_assets/css/all.min.css">
-    <script type="text/javascript" src="/external_assets/js/jquery-3.4.1.min.js"></script>
-    <script type="text/javascript" src="/external_assets/js/bootstrap.min.js"></script>
+    <script type="text/javascript" src="external_assets/js/popper.min.js"></script>
+    <script type="text/javascript" src="external_assets/js/jquery-3.4.1.min.js"></script>
+    <script type="text/javascript" src="external_assets/js/bootstrap.min.js"></script>
     <link rel="stylesheet" href="css/global.css">
     <link rel="stylesheet" href="css/assessment.css">
-    <script type="text/javascript" src="/external_assets/js/jquery.tabledit.js"></script>
-  </head>
+    <script type="text/javascript" src="external_assets/js/jquery.tabledit.js"></script>
+</head>
 
-  <body style="background-color: rgb(209, 201, 201);">
+<body style="background-color: rgb(209, 201, 201);">
 
     <div class="header-container">
         <div>
             <a href="index.html" class="header-icon btnNavigate"><i class="fas fa-home"></i></a>
             <div class="header-icon btnEditTemplate"><i title="Edit Template" class="fas fa-file-invoice"></i></div>
         </div>
-        
+
         <div class="header-score-container">
             <!-- Dynamically populated in the back-end -->
         </div>
-        
+
         <div class="header-icon-container">
             <div class="header-icon btnSaveDocument"><i title="Save" class="fas fa-save"></i></div>
         </div>
-        
+
     </div>
 
     <div class="template-container">
@@ -63,6 +65,34 @@
 
     <!-- MODALS (POPUPS) -->
 
+    <!-- Choose Template Popup -->
+
+    <div class="modal fade" id="popupChooseTemplate" tabindex="-1" role="dialog">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="modalTitle">Template for Evaluation</h5>
+                </div>
+                <div class="modal-body">
+                    <div class="row">
+                        <div class="col-12 small-padded">
+                            <select id="ddlTemplates" class="form-control"></select>
+                        </div>
+                        <div class="col-sm-12">
+                            <p><span class="small">Description:</span><br />
+                                <span class="small text-secondary" id="lblTemplateDescription">This is the description.</span></p>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button id="btnApplyTemplate" class="btn btn-primary" data-dismiss="modal">Apply</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- End of Successful Save Popup -->
+
     <!-- Evaluate Info Popup -->
 
     <div class="modal fade" id="popupAddStudent" tabindex="-1" role="dialog" aria-labelledby="popupAddStudentTitle"
@@ -71,7 +101,7 @@
             <div class="modal-content">
                 <div class="modal-header">
                     <h5 class="modal-title" id="modalTitle">Evaluation Information</h5>
-                    <button type="button" class="close" data-dismiss="modal" onclick="location.href='index.html'" aria-label="Close">x</button>
+                    <a href="index.html" class="close btn" data-dismiss="modal">x</a>
                 </div>
                 <div class="modal-body">
                     <div class="labeled-input-group">
@@ -83,7 +113,7 @@
                     <br />
                     <u id="linkShowAdditionalFields" class="black-link hidden">Show additional fields</u>
                     <br />
-                    
+
                     <div class="hidden-fields-container">
                         <div class="labeled-input-group">
                             <div class="autocomplete">
@@ -103,10 +133,11 @@
                                 <label for="txtPresentation">Presentation</label>
                             </div>
                         </div>
-                    </div>               
+                    </div>
                 </div>
                 <div class="modal-footer">
-                    <button type="button" class="btn btn-block btn-primary" id="btnEvaluate"><i class="fa fa-check"></i></button>
+                    <button type="button" class="btn btn-block btn-primary" id="btnEvaluate"><i
+                            class="fa fa-check"></i></button>
                 </div>
             </div>
         </div>
@@ -116,11 +147,12 @@
 
     <!-- Successful Save Popup -->
 
-    <div class="modal fade" id="popupSuccessfulSave" tabindex="-1" role="dialog" aria-labelledby="successfulSavePopup" aria-hidden="true">
+    <div class="modal fade" id="popupSuccessfulSave" tabindex="-1" role="dialog" aria-labelledby="successfulSavePopup"
+        aria-hidden="true">
         <div class="modal-dialog">
             <div class="modal-content">
                 <div class="modal-header">
-                <h5 class="modal-title" id="modalTitle">Successful Evaluation</h5>
+                    <h5 class="modal-title" id="modalTitle">Successful Evaluation</h5>
                 </div>
                 <div class="modal-body">
                     <div class="row">
@@ -129,7 +161,7 @@
                         </div>
                         <div class="col-sm-8">
                             <p class="successSavePopupBody">Your evaluation was successfully saved.</p>
-                            <u id="linkOpenDocument" class="black-link">Open document</u>
+                            <i id="linkOpenDocument" class="black-link">Open document</i>
                         </div>
                     </div>
                 </div>
@@ -145,27 +177,28 @@
 
     <!-- Save New Information Popup -->
 
-    <div class="modal fade" id="popupSaveNewInfo" tabindex="-1" role="dialog" aria-labelledby="saveNewInfoPopup" aria-hidden="true">
-            <div class="modal-dialog">
-                <div class="modal-content">
-                    <div class="modal-header">
+    <div class="modal fade" id="popupSaveNewInfo" tabindex="-1" role="dialog" aria-labelledby="saveNewInfoPopup"
+        aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
                     <h5 class="modal-title" id="modalTitle">Save New Information?</h5>
-                    </div>
-                    <div id="modalSaveNewInfo" class="modal-body">
-                        
-                    </div>
-                    <div class="modal-footer">
-                        <button id="btnDiscard" class="btn btn-secondary">Discard</button>
-                        <button id="btnSaveNewInfo" class="btn btn-success">Save</button>
-                    </div>
+                </div>
+                <div id="modalSaveNewInfo" class="modal-body">
+
+                </div>
+                <div class="modal-footer">
+                    <button id="btnDiscard" class="btn btn-secondary">Discard</button>
+                    <button id="btnSaveNewInfo" class="btn btn-success">Save</button>
                 </div>
             </div>
         </div>
+    </div>
 
     <!-- End of Save New Information Popup -->
 
     <script type="text/javascript" src="js/global.js"></script>
     <script type="text/javascript" src="js/assessment.js"></script>
-    <script type="text/javascript" src="js/table-edit.js"></script>
-  </body>
+</body>
+
 </html>

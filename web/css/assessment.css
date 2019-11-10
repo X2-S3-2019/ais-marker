@@ -12,6 +12,7 @@
     align-items: center;
     justify-content: space-between;
     position: fixed;
+    z-index: 1;
     top: 0;
     width: 100%;
     padding: 0 .5em;
@@ -180,4 +181,13 @@
 .autocomplete-active {
   background-color: DodgerBlue !important; 
   color: #ffffff; 
+}
+
+/* Overried styles from tabledit library */
+.tabledit-save-button, .tabledit-confirm-button {
+  margin: auto;
+}
+
+.div-dropdown {
+  display: none;
 }

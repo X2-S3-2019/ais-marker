@@ -5,16 +5,108 @@
 
     TODO:
     In initiliazeSelect, values are hard-coded (Excellent, Fair, Good, Poor). Make this dynamic.
-    Create a way to store course, presentation and student information directly to database from the assessment page.
 */
 
 var arrStudentIDs = [];
 var arrStudentNames = [];
 var arrCourses = [];
 var arrPresentations = [];
-var template_id = 1;    // Default template (Change)
+var arrTemplates = [];
+var template_id;
+var isDragging = false;
 
 $(document).ready(function () {
+
+    let template_info = getTemplateInfo();
+    console.log(template_info);
+    template_id = template_info['template_id'];
+
+    getDataFromDatabase();
+
+    // If there's only one template (the Default AIS template), don't show the template popup
+    // Check if user doesn't want to see the popup for choosing templates
+    if(arrTemplates.length > 1){
+        initializeChooseTemplatePopup();
+    } else {
+        initializeEvaluationPopup();
+        createTemplateTable(1); // Use the default template
+        initTableEdit();
+    }    
+
+    // When user wants to open recently created document
+    $('#linkOpenDocument').click(function () {
+        console.log('Link to open document is clicked');
+        eel.openDocument(assessment.documentName)(function () {
+            console.log('Document opened');
+        });
+    });
+
+    $('.btnEditTemplate').click(function(){
+        initializeChooseTemplatePopup();
+    });
+
+});
+
+function initializeChooseTemplatePopup() {
+    $('#popupChooseTemplate').modal('show');
+
+    $('#btnApplyTemplate').click(function () {
+        createTemplateTable(template_id);
+        initializeEvaluationPopup();
+        initTableEdit();
+    })
+}
+
+function popuplateChooseTemplateDropdown() {
+    let dropdownHTML = '';
+    console.log('Populating template dropdown..');
+    $('#ddlTemplates').append('<option value="None">Choose a template..</option>');
+    arrTemplates.forEach(function (template) {
+        console.log('Adding ' + template.name + ' to dropdown');
+        $('#ddlTemplates').append('<option value="' + template['id'] + '">' + template['name'] + '</option>');
+    });
+
+    $('#ddlTemplates').change(function () {
+        let selectedValue = $('#ddlTemplates').find(':selected').val();
+        console.log('Dropdown changed..');
+        console.log('Selected value: ' + selectedValue);
+
+        if (selectedValue != "None") {
+            template_id = selectedValue;
+
+            // Look for the corresponding description through the array of templates
+            arrTemplates.forEach(function (template) {
+                if (template.id == selectedValue) {
+                    if (template.description != '') {
+                        $('#lblTemplateDescription').html(template.description);
+                    } else {
+                        $('#lblTemplateDescription').html('No description available.');
+                    }
+
+                    return;
+                }
+            });
+        } else {
+            $('#ddlTemplates').addClass('is-invalid');
+        }
+
+
+    });
+}
+
+
+function getDataFromDatabase() {
+    eel.getTemplates()(function (templates) {
+        templates.forEach(function (row) {
+            let temp_template = {};
+            temp_template['id'] = row[0];
+            temp_template['name'] = row[1];
+            temp_template['description'] = row[2];
+            arrTemplates.push(temp_template);
+        });
+        console.log(arrTemplates);
+        popuplateChooseTemplateDropdown();
+    });
 
     // Get data from back-end and populate arrays for autocomplete
     eel.getStudents()(function (students) {
@@ -37,7 +129,7 @@ $(document).ready(function () {
                 temp['presentations'] = [];
                 console.log(row[1] + ' has the id ' + course_id);
                 eel.getAllPresentationsOfCourse(course_id.toString())(function (presentations) {
-                    console.log('Accessed' + presentations.length + ' right?');
+                    console.log('Number of Presentations: ' + presentations.length);
                     presentations.forEach(function (row) {
                         console.log(row[3]);
                         temp['presentations'].push(row[3]);
@@ -48,20 +140,16 @@ $(document).ready(function () {
             });
         });
     });
+}
 
-    initializeEvaluationPopup();
-
-    // When user wants to open recently created document
-    $('#linkOpenDocument').click(function () {
-        console.log('Link to open document is clicked');
-        eel.openDocument(assessment.documentName)(function () {
-            console.log('Document opened');
-        });
+function getTemplateInfo() {
+    var params = {};
+    var parts = window.location.href.replace(/[?&]+([^=&]+)=([^&]*)/gi, function (m, key, value) {
+        params[key] = value;
     });
 
-    createTemplateTable(template_id);
-    initTableEdit()
-});
+    return params;
+}
 
 function initializeEvaluationPopup() {
     autocomplete(document.getElementById("txtStudentID"), arrStudentIDs);
@@ -193,45 +281,62 @@ var assessment = {
     initializeSelect: function () {
         let that = this;
 
-        $('td').click(function (e) {
-
-            $(e.target).parent().removeClass("table-danger");
-            let score = $(e.target).attr('data-score');
-            let type = $(e.target).attr('data-type');
-            let value = $(e.target).attr('data-value');
-            let classname = "";
-            let tmp = type.split('.')
-
-            if (value == 'Excellent') {
-                classname = "table-success";
-            } else if (value == 'Good') {
-                classname = "table-primary";
-            } else if (value == 'Fair') {
-                classname = "table-warning";
-            } else if (value == 'Poor') {
-                classname = "table-danger";
-            }
-
-            $('td[data-type="' + type + '"]').removeClass();
-            $(e.target).addClass(classname);
-
-            assessment.results['groupCriteria'][tmp[0]]["criteria"][tmp[1]] = score;
-
-            // Update assessment scores
-            let groupTotalScore = 0;
-            let criteria = assessment.results['groupCriteria'][tmp[0]]["criteria"];
-
-            for (var key in criteria) {
-                /* Checks if the field has been selected. Else, ignore. */
-                if (criteria[key] >= 0) {
-                    groupTotalScore += parseInt(criteria[key]);
-                }
-            }
-
-            that.results['groupCriteria'][tmp[0]]['groupTotalScore'] = groupTotalScore;
-
-            assessment.updateAssessmentScoresUI(tmp[0], groupTotalScore);
+        $("td").mousedown(function (e) {
+            console.log()
+            isDragging = true;
+            assessment.updateAssessmentScoreObject(e);
         });
+
+        $("body").mouseup(function (e) {
+            isDragging = false;
+        });
+
+        $('td').mouseover(function (e) {
+            //     $(this).parent()
+            //   .children(".selected")
+            //   .removeClass("selected");
+            if (isDragging) {
+                assessment.updateAssessmentScoreObject(e);
+            }
+        });
+    },
+    updateAssessmentScoreObject: function (e) {
+        $(e.target).parent().removeClass("table-danger");
+        let score = $(e.target).attr('data-score');
+        let type = $(e.target).attr('data-type');
+        let value = $(e.target).attr('data-value');
+        let classname = "";
+        let tmp = type.split('.')
+
+        if (value == 'Excellent') {
+            classname = "table-success";
+        } else if (value == 'Good') {
+            classname = "table-primary";
+        } else if (value == 'Fair') {
+            classname = "table-warning";
+        } else if (value == 'Poor') {
+            classname = "table-danger";
+        }
+
+        $('td[data-type="' + type + '"]').removeClass();
+        $(e.target).addClass(classname);
+
+        assessment.results['groupCriteria'][tmp[0]]["criteria"][tmp[1]] = score;
+
+        // Update assessment scores
+        let groupTotalScore = 0;
+        let criteria = assessment.results['groupCriteria'][tmp[0]]["criteria"];
+
+        for (var key in criteria) {
+            /* Checks if the field has been selected. Else, ignore. */
+            if (criteria[key] >= 0) {
+                groupTotalScore += parseInt(criteria[key]);
+            }
+        }
+
+        assessment.results['groupCriteria'][tmp[0]]['groupTotalScore'] = groupTotalScore;
+
+        assessment.updateAssessmentScoresUI(tmp[0], groupTotalScore);
     },
     updateAssessmentScoresUI: function (type, score) {
         /* This is only to update the scores in the user interface */
@@ -308,6 +413,8 @@ var assessment = {
             if (allAssessmentChecked) {
 
                 let newInfo = assessment.checkForNewInformation();
+                assessment.addHeaderInfo();
+                assessment.calculateScores();
 
                 if (jQuery.isEmptyObject(newInfo)) {
                     // Proceed to creating document
@@ -315,7 +422,7 @@ var assessment = {
                     assessment.createAssessmentDocument();
                 } else {
 
-                    if(newInfo.hasOwnProperty('error')){
+                    if (newInfo.hasOwnProperty('error')) {
                         console.log(newInfo['error']);
                         return;
                     }
@@ -391,12 +498,10 @@ var assessment = {
 
                     // If user decides not to save the new information, proceed to making the document.
                     $('#btnDiscard').click(function () {
-                        assessment.createAssessmentResultDocument();
+                        $('#popupSaveNewInfo').modal('toggle');
+                        assessment.createAssessmentDocument();
                     });
                 }
-
-                assessment.addHeaderInfo();
-                assessment.calculateScores();
 
             }
         });
@@ -433,7 +538,9 @@ var assessment = {
     },
     createAssessmentDocument: function () {
         console.log('Creating document..');
-        eel.createAssessmentResultDocument(assessment.header_info, assessment.results, template_id, false)().then(function () {
+        let header_info = assessment.header_info;
+        console.log(header_info);
+        eel.createAssessmentResultDocument(header_info, assessment.results, template_id, false)().then(function () {
             // Show popup
             $('#popupSuccessfulSave').modal('show');
 
@@ -447,8 +554,8 @@ var assessment = {
 
             console.log('Successfully created document.');
         })
-            .catch(function () {
-
+            .catch(function (error) {
+                console.log(error)
             });
     },
     printAssessmentJSON: function () {
@@ -476,7 +583,7 @@ var assessment = {
             // Show error popup
             // 'Student ID should not be empty or focus() on tableStudentID
             $('.tableStudentID').focus();
-            return {'error': 'Student ID is missing'};
+            return { 'error': 'Student ID is missing' };
         }
         // New student name? Update student in database
         // New course? Add course to database
@@ -533,22 +640,23 @@ function createTemplateTable(template_id) {
         /* Organize the JSON object */
         let template = JSON.parse(templateJSON);
         console.log('Creating template...');
+        console.log(template);
 
         let templateHTML = '<div class="text-right"><button class="btn btn-danger edit-assesment mb-3">Edit template</button></div>';
-        let group_keys = {}; 
+        let group_keys = {};
         let group_score_keys = {};
 
         let totalPossibleScore = 0;
 
         /* For each group criterion, create a table */
-        /* Developer's Notes: i is for groupCriteria, j is for first criterion fields, k is for criteria */
+        /* Developer's Notes: i is for groupCriteria, j is for first criterion fields, k is for criteria, l is for fields */
         for (var i = 0; i < template.groupCriteria.length; i++) {
             let groupCriteria = template.groupCriteria;
 
             $('.assessment-container').data('id', template.id);
             $('.assessment-container').data('name', template.name);
-                
-            let htmlTable = '<table class="table">';
+
+            let htmlTable = '<table class="table disabled-highlight-table">';
             /* Table Headers containing group criterion's name */
             htmlTable += '<thead><tr>';
             htmlTable += '<th scope="col" width="12%" data-name="' + groupCriteria[i].name.replace(/["]/g, '') + '" data-id="' + groupCriteria[i].id + '">' + groupCriteria[i].name + '</th>';
@@ -556,9 +664,9 @@ function createTemplateTable(template_id) {
             let first_criterion_fields = groupCriteria[i].criteria[0].fields;
 
             /* Add value and points in header */
-            for(var j = 0; j < first_criterion_fields.length; j++){
+            for (var j = 0; j < first_criterion_fields.length; j++) {
                 htmlTable += '<th scope="col" width="22%" data-points="' + first_criterion_fields[j].points + '" data-point-name="' + first_criterion_fields[j].value + '">' +
-                     first_criterion_fields[j].points + " - " + first_criterion_fields[j].value + '</th>';
+                    first_criterion_fields[j].points + " - " + first_criterion_fields[j].value + '</th>';
             }
 
             htmlTable += '</tr></thead>';
@@ -590,13 +698,15 @@ function createTemplateTable(template_id) {
 
                 htmlTable += '<tr data-type="' + data_type + '"><th>' + criteria[k].name + '</th>';
 
+                // console.log('Index: ' + k + ' - ' + criteria[k].fields.length);
                 /* Add fields' descriptions */
-                for (var l = 0; l < criteria[i].fields.length; l++) {
+                for (var l = 0; l < criteria[k].fields.length; l++) {
                     let fields = criteria[k].fields;
-                    
+
+
                     htmlTable += '<td data-score="' + fields[l].points + '" data-type="' + data_type + '" data-value="'
-                        + fields[l].value + '" data-id="' + fields[l].id + '" data-name="' + fields[l].name +'">' 
-                    + fields[l].description + '</td>';
+                        + fields[l].value + '" data-id="' + fields[l].id + '" data-name="' + fields[l].name + '">'
+                        + fields[l].description + '</td>';
                 }
 
                 possible_total_score += criteria[k].fields[0].points; // Get highest possible points
@@ -733,11 +843,10 @@ function autocomplete(inp, arr) {
         closeAllLists(e.target);
     });
 }
- 
 
 function initTableEdit() {
 
     $(document).on('click', '.edit-assesment', function () {
-        tableEdit.init($('table.table'));
+        window.location.replace('edit-assessment.html?template_id=' + assessment.template.id + '&template_name=' + assessment.template.name);
     })
 }

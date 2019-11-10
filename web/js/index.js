@@ -23,6 +23,9 @@ $(document).ready(function(){
     });
     
     $('#btnQuickStart').click(function(){
-        window.location.replace('assessment.html');
+        eel.getDefaultTemplateID()().then(function(default_template_id){
+            console.log('Template ID: ' + default_template_id);
+            window.location.replace('assessment.html?template_id=' + default_template_id);
+        });
     });
 });

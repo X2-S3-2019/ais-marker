@@ -3,6 +3,7 @@
 import json
 import sqlite3
 from sqlite3 import Error
+import os
 
 
 class DBManager:
@@ -21,15 +22,16 @@ class DBManager:
 
         # Create tables related to templates
         crs.execute(
-            'CREATE TABLE IF NOT EXISTS templates (id INTEGER PRIMARY KEY AUTOINCREMENT, name, type)')
+            'CREATE TABLE IF NOT EXISTS templates (id INTEGER PRIMARY KEY AUTOINCREMENT, name, description)')
         crs.execute(
             'CREATE TABLE IF NOT EXISTS groupCriteria (id INTEGER PRIMARY KEY AUTOINCREMENT, fk_template_id, name, icon, FOREIGN KEY (fk_template_id) REFERENCES templates(id) ON UPDATE CASCADE ON DELETE CASCADE)')
         crs.execute(
             'CREATE TABLE IF NOT EXISTS criteria (id INTEGER PRIMARY KEY AUTOINCREMENT, fk_groupCriterion_id, name, description, icon, FOREIGN KEY (fk_groupCriterion_id) REFERENCES groupCriteria(id) ON UPDATE CASCADE ON DELETE CASCADE)')
         crs.execute(
             'CREATE TABLE IF NOT EXISTS fields (id INTEGER PRIMARY KEY AUTOINCREMENT, fk_criterion_id, name, value, description, points, FOREIGN KEY (fk_criterion_id) REFERENCES criteria(id) ON UPDATE CASCADE ON DELETE CASCADE)')
+        # The settings table will only have one row
         crs.execute(
-            'CREATE TABLE IF NOT EXISTS settings (defaultDirectory, enabledNightMode, setPathEveryPresentation, openDocumentAfterAssess)')
+            'CREATE TABLE IF NOT EXISTS settings (id INTEGER PRIMARY KEY AUTOINCREMENT, defaultTemplateID, defaultDirectory, enabledNightMode, setPathEveryPresentation, openDocumentAfterAssess)')
 
         # Create tables related to AIS
         crs.execute(
@@ -43,10 +45,17 @@ class DBManager:
 
         # If there is no template in templates table, add AIS default
 
-        results = crs.execute('SELECT * FROM templates LIMIT 1')
+        crs.execute('SELECT * FROM templates')
+        results = crs.fetchone()
 
-        if not results:
+        print('Templates ' + str(crs.rowcount))
+
+        if results == None:
+            print('Creating default template')
             self.createDefaultTemplate()
+            print('Setting default settings')
+            self.setDefaultSettings()
+
 
         con.close()
 
@@ -332,7 +341,7 @@ class DBManager:
             print(Error)
             con.close()
 
-        crs.execute('SELECT id, name, type FROM templates WHERE id=?', (id,))
+        crs.execute('SELECT id, name, description FROM templates WHERE id=?', (id,))
 
         template = []
 
@@ -347,7 +356,23 @@ class DBManager:
 
         return template
 
-    def addTemplate(self, name, template_type):
+    def getAllTemplates(self):
+        try:
+            con = sqlite3.connect(db)
+            crs = con.cursor()
+        except Error:
+            print(Error)
+            con.close()
+
+        crs.execute('SELECT id, name, description FROM templates')
+
+        results = crs.fetchall()
+
+        con.close()
+
+        return results
+
+    def addTemplate(self, name, template_description):
         try:
             con = sqlite3.connect(db)
         except Error:
@@ -357,7 +382,7 @@ class DBManager:
         crs = con.cursor()
 
         crs.execute('INSERT INTO templates VALUES (?, ?, ?)',
-                    (None, name, template_type))
+                    (None, name, template_description))
         template_id = crs.lastrowid
 
         con.commit()
@@ -428,7 +453,7 @@ class DBManager:
 
         crs = con.cursor()
 
-        crs.execute('SELECT id, name, type FROM templates')
+        crs.execute('SELECT id, name, description FROM templates')
 
         row = crs.fetchall()
 
@@ -505,9 +530,68 @@ class DBManager:
         crs = con.cursor()
 
         # Get user's Desktop path as default path, use light mode, always set path every presentation and always open document
-        default_path = os.path.expanduser("~/Desktop")
-        crs.execute('INSERT INTO settings VALUES (?, ?, ?, ?)',
-                    (default_path, False, True, True))
+        default_path = os.path.expanduser("~\Desktop")
+        crs.execute('INSERT INTO settings VALUES (?, ?, ?, ?, ?, ?)',
+                    (None, 1, default_path, False, False, False))
+
+        con.commit()
+        con.close()
+
+    def getDefaultTemplateID(self):
+        try:
+            con = sqlite3.connect(db)
+        except Error:
+            print(Error)
+            con.close()
+
+        crs = con.cursor()
+
+        crs.execute('SELECT defaultTemplateID FROM settings WHERE id = 1')
+
+        templateID = crs.fetchone()
+
+        con.close()
+
+        print(str(templateID[0]))
+
+        return templateID[0]
+
+    def getDefaultDirectory(self):
+        try:
+            con = sqlite3.connect(db)
+        except Error:
+            print(Error)
+            con.close()
+
+        crs = con.cursor()
+
+        crs.execute('SELECT defaultDirectory FROM settings WHERE id = 1')
+
+        directory = crs.fetchone()
+
+        con.close()
+
+        print(directory[0])
+
+        return directory[0]
+
+    def setDefaultDirectory(self, newDirectory):
+        try:
+            con = sqlite3.connect(db)
+        except Error:
+            print(Error)
+            con.close()
+
+        crs = con.cursor()
+
+        crs.execute('UPDATE settings SET defaultDirectory = ? WHERE id = 1', (newDirectory,))
+
+        updated = crs.rowcount()
+
+        con.commit()
+        con.close()
+
+    # def setDefaultTemplate(self):
 
     # Generates the values of AIS default assessment document
     def createDefaultTemplate(self):
@@ -520,7 +604,7 @@ class DBManager:
         crs = con.cursor()
 
         crs.execute('INSERT INTO templates VALUES (?, ?, ?)',
-                    (None, 'Default', 'table'))
+                    (None, 'Default', 'This is the default template for evaluating students in Auckland Institue of Studies (AIS)'))
         template_id = crs.lastrowid
 
         # Content Structure / Ideas

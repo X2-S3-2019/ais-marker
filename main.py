@@ -16,7 +16,7 @@ import eel
 import json
 import os
 import sys
-import time        
+import time
 # Program-related python files
 import datastore                        # Database-related functions
 # assessment contains template- and assessment-related classes
@@ -26,6 +26,8 @@ from schoolrecords import Student, Presentation, Course
 global databaseManager
 
 # Create template document from database values
+
+
 def createTemplate(template_id):
     template_db = databaseManager.getTemplate(
         template_id)  # Get Default template
@@ -56,6 +58,12 @@ def createTemplate(template_id):
 
 
 @eel.expose
+def getDefaultTemplateID():
+    print('Default template: ' + str(databaseManager.getDefaultTemplateID()))
+    return databaseManager.getDefaultTemplateID()
+
+
+@eel.expose
 def getCourses():
     return databaseManager.getAllCourses()
 
@@ -68,6 +76,7 @@ def getStudents():
 @eel.expose
 def getPresentations():
     return databaseManager.getAllPresentations()
+
 
 @eel.expose
 def getAllPresentationsOfCourse(course_id):
@@ -135,12 +144,22 @@ def deserializeJSONDummyTemplate(JSONTemplate):
 @eel.expose
 def saveJSONTemplateToDatabase(JSONTemplate):
 
+    # This is a hack to retain the icons for the group criteria
+    groupIcon = {
+        "Content Structure / Ideas" : "fas fa-sitemap",
+        "Language and Delivery" : "fas fa-comment-dots",
+        "Technical" : "fas fa-cogs"
+    }
+
     template_id = databaseManager.addTemplate(
-        JSONTemplate['name'], JSONTemplate['type'])
+        JSONTemplate['name'], JSONTemplate['description'])
 
     for group in JSONTemplate['groupCriteria']:
+        group_name = group['name']
+        print(group_name)
+        print(groupIcon[group_name])
         group_criterion_id = databaseManager.addGroupCriterion(
-            template_id, group['name'], group['icon'])
+            template_id, group['name'], groupIcon[group_name])
 
         for criterion in group['criteria']:
             criterion_id = databaseManager.addCriterionToGroup(
@@ -151,6 +170,10 @@ def saveJSONTemplateToDatabase(JSONTemplate):
                     criterion_id, field['name'], field['value'], field['description'], field['points'])
 
     return template_id
+
+@eel.expose
+def getTemplates():
+    return databaseManager.getAllTemplates()
 
 # Create JSON object of template object
 @eel.expose
@@ -163,12 +186,18 @@ def getTemplateJSON(template_id):
 
 @eel.expose
 def openDocument(document_name):
-    os.startfile(document_name + '.docx')
+    try:
+        path = databaseManager.getDefaultDirectory()
+        print('Path: ' + path)
+        os.system(f'start {os.path.realpath(path)}')
+    except:
+        print('There was an error.')
+    # os.startfile(document_name + '.docx')
 
 # Creates the document containing the results of the assessment
 @eel.expose
 def createAssessmentResultDocument(header_info, results, template_id, openDocument):
-    # data_of_presentation acts as a unique id for the document
+
     if "".__eq__(header_info['studentName']):
         document_name = header_info['studentId'] + \
             ' (' + header_info['presentationDate'] + ')'
@@ -179,8 +208,13 @@ def createAssessmentResultDocument(header_info, results, template_id, openDocume
 
     template = createTemplate(template_id)
 
-    assessmentDocument = AssessmentDocument(document_name)
-    assessmentDocument.createResultsDocument(template, results, header_info)
+    path = ''
+    if path == '':
+        # Get default directory from database
+        path = databaseManager.getDefaultDirectory()
+
+        assessmentDocument = AssessmentDocument(document_name)
+        assessmentDocument.createResultsDocument(template, results, header_info, path)
 
     if openDocument:
         assessmentDocument.openResultsDocument()
@@ -198,10 +232,6 @@ if __name__ == '__main__':
     # Initiliaze database
     databaseManager = datastore.DBManager()
     databaseManager.initDB('ais_marker_db')
-
-    # Add a default template to database
-    databaseManager.createDefaultTemplate()
-    databaseManager.createSaghirTemplate()
 
     web_app_options = {'mode': "chrome-app", 'host': '127.0.0.1'}
 
