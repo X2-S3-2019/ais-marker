@@ -1,12 +1,10 @@
 var template_info;
+var template_id;
 
 $(document).ready(function () {
     template_info = getTemplateInfo();
 
-    $('body').on('bind', function(){
-        // Change the name of header
-    $('.header-template-name').html('Editing: ' + template_info['template_name']);
-    });
+    $('.header-template-name').html(decodeURI(template_info['template_name']));
 
     createTemplateTable(template_info['template_id']);
 
@@ -92,6 +90,10 @@ $(document).ready(function () {
             calculated = true;
         }
         calculateNewScores(calculated);
+    });
+
+    $('#btnUseTemplate').click(function(){
+        window.location.replace('assessment.html?template_id=' + template_id);
     });
 
 });
@@ -319,8 +321,9 @@ var tableEdit = {
             if ($('#txtTemplateName').val() != '' && $('#txtTemplateName').val() != template['name']) {
                 template.name = $('#txtTemplateName').val();
                 console.log('Saving template to database...');
-                eel.saveJSONTemplateToDatabase(template)(function (template_id) {
-                    console.log('Created new template with ID: ' + template_id);
+                eel.saveJSONTemplateToDatabase(template)(function (new_template_id) {
+                    console.log('Created new template with ID: ' + new_template_id);
+                    template_id = new_template_id;
                     $('#popupSaveTemplate').modal('toggle');
                     $('#popupSuccessfulSave').modal('show');
                 });
