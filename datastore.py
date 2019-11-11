@@ -56,7 +56,6 @@ class DBManager:
             print('Setting default settings')
             self.setDefaultSettings()
 
-
         con.close()
 
         return True
@@ -78,18 +77,19 @@ class DBManager:
 
         return course_id
 
-    def updateCourse(self, course_id, code, name, date):
+    def updateCourse(self, course_id, code, name):
         try:
             con = sqlite3.connect(db)
             crs = con.cursor()
         except Error:
             print(Error)
             con.close()
-        
-        crs.execute('UPDATE courses SET code = ?, name = ?, date = ? WHERE id = ?', (code, name, date, course_id))
 
-        updated = crs.rowcount()
-        
+        crs.execute(
+            'UPDATE courses SET code = ?, name = ? WHERE id = ?', (code, name, course_id))
+
+        updated = crs.rowcount
+
         con.commit()
         con.close()
 
@@ -97,7 +97,6 @@ class DBManager:
             return True
         else:
             return False
-
 
     def getAllCourses(self):
         try:
@@ -125,7 +124,8 @@ class DBManager:
 
         print(course_code)
 
-        test = crs.execute('SELECT id FROM courses WHERE code = ?', (course_code,))
+        test = crs.execute(
+            'SELECT id FROM courses WHERE code = ?', (course_code,))
 
         row = crs.fetchone()
         course_id = -1
@@ -137,7 +137,7 @@ class DBManager:
 
         return course_id
 
-    def removeCourse(self, course_id):
+    def deleteCourse(self, course_id):
         try:
             con = sqlite3.connect(db)
             crs = con.cursor()
@@ -145,19 +145,17 @@ class DBManager:
             print(Error)
             con.close()
 
-        sql = 'DELETE FROM courses WHERE id = ?'
+        crs.execute('DELETE FROM courses WHERE id = ?', (course_id,))
 
-        crs.execute(sql, course_id)
+        deleted = crs.rowcount
 
-        deleted = crs.rowcount()
-        
         con.commit()
         con.close()
 
         if deleted:
             return True
         else:
-            return False       
+            return False
 
     def addPresentation(self, course_id, name, date):
         try:
@@ -176,7 +174,7 @@ class DBManager:
 
         return presentation_id
 
-    def removePresentation(self, presentation_id):
+    def deletePresentation(self, presentation_id):
         try:
             con = sqlite3.connect(db)
             crs = con.cursor()
@@ -184,12 +182,11 @@ class DBManager:
             print(Error)
             con.close()
 
-        sql = 'DELETE FROM presentations WHERE id = ?'
+        crs.execute('DELETE FROM presentations WHERE id = ?',
+                    (presentation_id,))
 
-        crs.execute(sql, presentation_id)
+        deleted = crs.rowcount
 
-        deleted = crs.rowcount()
-        
         con.commit()
         con.close()
 
@@ -198,18 +195,19 @@ class DBManager:
         else:
             return False
 
-    def updatePresentation(self, presentation_id, name):
+    def updatePresentation(self, presentation_id, name, date):
         try:
             con = sqlite3.connect(db)
             crs = con.cursor()
         except Error:
             print(Error)
             con.close()
-        
-        crs.execute('UPDATE presentations SET name = ? WHERE id = ?', (name, presentation_id))
-        
-        updated = crs.rowcount()
-        
+
+        crs.execute('UPDATE presentations SET name = ?, date = ? WHERE id = ?',
+                    (name, date, presentation_id))
+
+        updated = crs.rowcount
+
         con.commit()
         con.close()
 
@@ -242,7 +240,8 @@ class DBManager:
             print(Error)
             con.close()
 
-        crs.execute('SELECT id, fk_course_id, date, name FROM presentations WHERE fk_course_id = ?', (course_id,))
+        crs.execute(
+            'SELECT id, fk_course_id, date, name FROM presentations WHERE fk_course_id = ?', (course_id,))
 
         row = crs.fetchall()
 
@@ -282,10 +281,11 @@ class DBManager:
             print(Error)
             con.close()
 
-        crs.execute('UPDATE courses SET name = ? WHERE id = ?', (name, student_id))
-        
-        updated = crs.rowcount()
-        
+        crs.execute('UPDATE courses SET name = ? WHERE id = ?',
+                    (student_name, student_id))
+
+        updated = crs.rowcount
+
         con.commit()
         con.close()
 
@@ -310,7 +310,7 @@ class DBManager:
 
         return row
 
-    def removeStudent(self, student_id):
+    def deleteStudent(self, student_id):
         try:
             con = sqlite3.connect(db)
             crs = con.cursor()
@@ -318,12 +318,10 @@ class DBManager:
             print(Error)
             con.close()
 
-        sql = 'DELETE FROM students WHERE id = %s'
+        crs.execute('DELETE FROM students WHERE id = ?', (student_id,))
 
-        crs.execute(sql, student_id)
+        deleted = crs.rowcount
 
-        deleted = crs.rowcount()
-        
         con.commit()
         con.close()
 
@@ -341,7 +339,8 @@ class DBManager:
             print(Error)
             con.close()
 
-        crs.execute('SELECT id, name, description FROM templates WHERE id=?', (id,))
+        crs.execute(
+            'SELECT id, name, description FROM templates WHERE id=?', (id,))
 
         template = []
 
@@ -584,9 +583,10 @@ class DBManager:
 
         crs = con.cursor()
 
-        crs.execute('UPDATE settings SET defaultDirectory = ? WHERE id = 1', (newDirectory,))
+        crs.execute(
+            'UPDATE settings SET defaultDirectory = ? WHERE id = 1', (newDirectory,))
 
-        updated = crs.rowcount()
+        updated = crs.rowcount
 
         con.commit()
         con.close()

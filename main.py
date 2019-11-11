@@ -64,13 +64,11 @@ def getDefaultTemplateID():
 
 
 @eel.expose
-def getCourses():
-    return databaseManager.getAllCourses()
+def addPresentation(course_id, name, date):
+    presentation_id = databaseManager.addPresentation(course_id, name, date)
+    print('Added presentation with id ' + str(presentation_id))
 
-
-@eel.expose
-def getStudents():
-    return databaseManager.getAllStudents()
+    return presentation_id
 
 
 @eel.expose
@@ -79,13 +77,19 @@ def getPresentations():
 
 
 @eel.expose
-def getAllPresentationsOfCourse(course_id):
-    return databaseManager.getAllPresentationsOfCourse(course_id)
+def updatePresentation(id, name, date):
+    updated = databaseManager.updatePresentation(id, name, date)
+    print(updated)
 
 
 @eel.expose
-def getCourseID(course_code):
-    return databaseManager.getCourseIDOf(course_code)
+def deletePresentation(id):
+    deleted = databaseManager.deletePresentation(id)
+
+
+@eel.expose
+def getAllPresentationsOfCourse(course_id):
+    return databaseManager.getAllPresentationsOfCourse(course_id)
 
 
 @eel.expose
@@ -97,6 +101,21 @@ def addStudent(id, name):
 
 
 @eel.expose
+def getStudents():
+    return databaseManager.getAllStudents()
+
+
+@eel.expose
+def updateStudent(student_id, student_name):
+    updated = databaseManager.updateStudentInfo(student_id, student_name)
+
+
+@eel.expose
+def deleteStudent(id):
+    deleted = databaseManager.deleteStudent(id)
+
+
+@eel.expose
 def addCourse(code, name):
     course_id = databaseManager.addCourse(code, name)
     print('Added course with id ' + str(course_id))
@@ -105,11 +124,24 @@ def addCourse(code, name):
 
 
 @eel.expose
-def addPresentation(course_id, name, date):
-    presentation_id = databaseManager.addPresentation(course_id, name, date)
-    print('Added presentation with id ' + str(presentation_id))
+def getCourseID(course_code):
+    return databaseManager.getCourseIDOf(course_code)
 
-    return presentation_id
+
+@eel.expose
+def getCourses():
+    return databaseManager.getAllCourses()
+
+
+@eel.expose
+def updateCourse(id, code, name):
+    updated = databaseManager.updateCourse(id, code, name)
+
+
+@eel.expose
+def deleteCourse(id):
+    deleted = databaseManager.deleteCourse(id)
+
 
 # Create the class version of the JSON template
 # For when the user doesn't want to save his/her template to the database
@@ -146,9 +178,9 @@ def saveJSONTemplateToDatabase(JSONTemplate):
 
     # This is a hack to retain the icons for the group criteria
     groupIcon = {
-        "Content Structure / Ideas" : "fas fa-sitemap",
-        "Language and Delivery" : "fas fa-comment-dots",
-        "Technical" : "fas fa-cogs"
+        "Content Structure / Ideas": "fas fa-sitemap",
+        "Language and Delivery": "fas fa-comment-dots",
+        "Technical": "fas fa-cogs"
     }
 
     template_id = databaseManager.addTemplate(
@@ -170,6 +202,7 @@ def saveJSONTemplateToDatabase(JSONTemplate):
                     criterion_id, field['name'], field['value'], field['description'], field['points'])
 
     return template_id
+
 
 @eel.expose
 def getTemplates():
@@ -214,7 +247,8 @@ def createAssessmentResultDocument(header_info, results, template_id, openDocume
         path = databaseManager.getDefaultDirectory()
 
         assessmentDocument = AssessmentDocument(document_name)
-        assessmentDocument.createResultsDocument(template, results, header_info, path)
+        assessmentDocument.createResultsDocument(
+            template, results, header_info, path)
 
     if openDocument:
         assessmentDocument.openResultsDocument()
