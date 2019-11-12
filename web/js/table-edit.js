@@ -93,7 +93,7 @@ $(document).ready(function () {
         calculateNewScores(calculated);
     });
 
-    $('#btnUseTemplate').click(function(){
+    $('#btnUseTemplate').click(function () {
         window.location.replace('assessment.html?template_id=' + template_id);
     });
 
@@ -257,7 +257,9 @@ var tableEdit = {
             // As of the moment, users can't create their own template so this popup will always show up.
             // TODO: Change accordingly when users can create templates
 
-            initializeEditOrCopyPopup();
+            //initializeEditOrCopyPopup();
+            $('#popupSaveTemplate').modal('show');
+            tableEdit.initializeSaveTemplatePopup();
         })
 
     },
@@ -373,7 +375,7 @@ function createTemplateTable(template_id) {
             htmlTable += '</tr></thead>';
             htmlTable += '<tbody>';
 
-            
+
 
             for (var k = 0; k < groupCriteria[i].criteria.length; k++) {
 
