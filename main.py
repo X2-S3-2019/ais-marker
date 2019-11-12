@@ -32,6 +32,8 @@ def createTemplate(template_id):
     template_db = databaseManager.getTemplate(
         template_id)  # Get Default template
 
+    print(template_db)
+
     template = Template(template_db[0], template_db[1], template_db[2])
 
     group_criteria_db = databaseManager.getGroupCriteriaOf(template_db[0])
@@ -222,7 +224,7 @@ def openDocument(document_name):
     try:
         path = databaseManager.getDefaultDirectory()
         print('Path: ' + path)
-        os.system('start {os.path.realpath(path)}')
+        os.system(f'start {os.path.realpath(path)}')
     except:
         print('There was an error.')
     # os.startfile(document_name + '.docx')

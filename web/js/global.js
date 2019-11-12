@@ -9,4 +9,12 @@ $(document).ready(function(){
         eel.say_hello_py(lastPathSegment);
     });
 
+    /* If this is user's first time, load onboarding.html, else stay in index.html */
+    /* This is determined whether the user finished the onboarding or clicked Skip */
+    if(localStorage.getItem('finishedOnboarding') === null){
+        console.log('First time');
+        // Display onboarding section which is hidden by default
+        $('.onboarding-wrapper').show();
+    }
+
 });
