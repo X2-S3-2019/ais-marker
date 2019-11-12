@@ -53,13 +53,14 @@ $(document).ready(function () {
             applyScoresToTable();
         } else {
             // Check validity of custom scores
-            let excellentScore = $('.preview-text.excellentScore').html();
-            let goodScore = $('.preview-text.goodScore').html();
-            let fairScore = $('.preview-text.fairScore').html();
-            let poorScore = $('.preview-text.poorScore').html();
+            let excellentScore = parseInt($('.preview-text.excellentScore').html());
+            let goodScore = parseInt($('.preview-text.goodScore').html());
+            let fairScore = parseInt($('.preview-text.fairScore').html());
+            let poorScore = parseInt($('.preview-text.poorScore').html());
             let valid = true;
 
             $('.score-error').hide();
+            console.log(excellentScore + ' < ' + goodScore + ' < ' + fairScore + ' < ' + poorScore);
 
             if (excellentScore <= goodScore) {
                 $('.score-error.excellentScore').show();
@@ -120,22 +121,18 @@ function applyScoresToTable() {
 
     // Update Excellent score
     $('#' + groupCriterion + ' tbody tr td[data-value="Excellent"]').each(function (index) {
-        console.log('Getting Excellent fields ' + $(this).attr('data-name'));
         $(this).attr('data-score', excellentScore);
     });
     // Update Good score
     $('#' + groupCriterion + ' tbody tr td[data-value="Good"]').each(function (index) {
-        console.log('Getting Good fields ' + $(this).attr('data-name'));
         $(this).attr('data-score', goodScore);
     });
     // Update Fair score
     $('#' + groupCriterion + ' tbody tr td[data-value="Fair"]').each(function (index) {
-        console.log('Getting Fair fields ' + $(this).attr('data-name'));
         $(this).attr('data-score', fairScore);
     });
     // Update Poor score
     $('#' + groupCriterion + ' tbody tr td[data-value="Poor"]').each(function (index) {
-        console.log('Getting Poor fields ' + $(this).attr('data-name'));
         $(this).attr('data-score', poorScore);
     });
 
@@ -292,8 +289,8 @@ var tableEdit = {
         table.find('tbody tr').each(function (index, element) {
             var criteria = {}
 
-            criteria.id = $(element).attr('data-id');
-            criteria.name = $(element).attr('data-name');
+            criteria.id = $(element).data('id');
+            criteria.name = $(element).data('name');
             criteria.description = '';
             criteria.icon = 'fas fa-books';
             console.log('From generateCriteriaGroup: ' + criteria.id + ' with name ' + criteria.name);
@@ -320,6 +317,7 @@ var tableEdit = {
             // Check if name is valid
             if ($('#txtTemplateName').val() != '' && $('#txtTemplateName').val() != template['name']) {
                 template.name = $('#txtTemplateName').val();
+                template.description = $('#txtTemplateDescription').val();
                 console.log('Saving template to database...');
                 eel.saveJSONTemplateToDatabase(template)(function (new_template_id) {
                     console.log('Created new template with ID: ' + new_template_id);
