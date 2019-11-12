@@ -23,9 +23,13 @@ $(document).ready(function(){
     });
     
     $('#btnQuickStart').click(function(){
-        eel.getDefaultTemplateID()().then(function(default_template_id){
-            console.log('Template ID: ' + default_template_id);
-            window.location.replace('assessment.html?template_id=' + default_template_id);
-        });
+        // Check if user wants the default template to be used
+        // if(localStorange.getItem('loadDefaultItem'))
+        // eel.getDefaultTemplateID()().then(function(default_template_id){
+        //     console.log('Template ID: ' + default_template_id);
+        //     window.location.replace('assessment.html?template_id=' + default_template_id);
+        // });
+
+        window.location.replace('assessment.html');
     });
 });

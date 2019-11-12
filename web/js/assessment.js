@@ -12,26 +12,21 @@ var arrStudentNames = [];
 var arrCourses = [];
 var arrPresentations = [];
 var arrTemplates = [];
-var template_id;
+var template_id = -1;   // Initialize id; If no default is given, make user choose.
 var isDragging = false;
 
 $(document).ready(function () {
 
     let template_info = getTemplateInfo();
     console.log(template_info);
-    template_id = template_info['template_id'];
+    
+    if(template_info.hasOwnProperty('template_id')){
+        template_id = template_info['template_id'];
+    } else {
+        template_id = -1;
+    }
 
     getDataFromDatabase();
-
-    // If there's only one template (the Default AIS template), don't show the template popup
-    // Check if user doesn't want to see the popup for choosing templates
-    if(arrTemplates.length > 1){
-        initializeChooseTemplatePopup();
-    } else {
-        initializeEvaluationPopup();
-        createTemplateTable(1); // Use the default template
-        initTableEdit();
-    }    
 
     // When user wants to open recently created document
     $('#linkOpenDocument').click(function () {
@@ -41,11 +36,31 @@ $(document).ready(function () {
         });
     });
 
-    $('.btnEditTemplate').click(function(){
+    $('.btnEditTemplate').click(function () {
         initializeChooseTemplatePopup();
     });
 
 });
+
+function initializeAssessment() {
+    // If there's only one template (the Default AIS template), don't show the template popup
+    // Check if user doesn't want to see the popup for choosing templates
+    
+    if (arrTemplates.length > 1) {
+        if(template_id == -1){    // Using default value is disabled
+            initializeChooseTemplatePopup();
+        } else {
+            initializeEvaluationPopup();
+            console.log('Creating table with id: ' + template_id);
+            createTemplateTable(template_id); // Use the given template
+        }
+    } else {
+        initializeEvaluationPopup();
+        createTemplateTable(1); // Use the default template
+    }
+
+    initTableEdit();    // Initialize editing of template
+}
 
 function initializeChooseTemplatePopup() {
     $('#popupChooseTemplate').modal('show');
@@ -104,8 +119,10 @@ function getDataFromDatabase() {
             temp_template['description'] = row[2];
             arrTemplates.push(temp_template);
         });
-        console.log(arrTemplates);
+        console.log('There are ' + arrTemplates.length + ' available');
+        
         popuplateChooseTemplateDropdown();
+        initializeAssessment();
     });
 
     // Get data from back-end and populate arrays for autocomplete
@@ -185,17 +202,7 @@ function initializeEvaluationPopup() {
 
     // If student ID exists in the database, add the student name automatically
     $('#txtStudentID').blur(function () {
-        if ($('#txtStudentID').val() != '') {
-            let studentID = $('#txtStudentID').val();
-            for (i = 0; i < arrStudentNames.length; i++) {
-                if (studentID == arrStudentNames[i]['id']) {
-                    console.log('Found ' + arrStudentNames[i]['name']);
-                    $('#txtStudentName').val(arrStudentNames[i]['name']);
-                    // Override style and place label to top
-                    $('#txtStudentName').next().css({ 'top': '-10px', 'color': 'black', 'font-size': '12px' });
-                }
-            }
-        }
+        getStudentName();
     });
 
     // If course exists in the database, trigger autocomplete in Presentation field
@@ -224,6 +231,8 @@ function initializeEvaluationPopup() {
         } else {
             $('#txtStudentID').removeClass('is-invalid');
 
+            getStudentName();
+
             let student_id = $('#txtStudentID').val();
             let student_name = $('#txtStudentName').val();
             let course = $('#txtCourse').val();
@@ -234,6 +243,20 @@ function initializeEvaluationPopup() {
             $('#popupAddStudent').modal('toggle');
         }
     });
+}
+
+function getStudentName(){
+    if ($('#txtStudentID').val() != '') {
+        let studentID = $('#txtStudentID').val();
+        for (i = 0; i < arrStudentNames.length; i++) {
+            if (studentID == arrStudentNames[i]['id']) {
+                console.log('Found ' + arrStudentNames[i]['name']);
+                $('#txtStudentName').val(arrStudentNames[i]['name']);
+                // Override style and place label to top
+                $('#txtStudentName').next().css({ 'top': '-10px', 'color': 'black', 'font-size': '12px' });
+            }
+        }
+    }
 }
 
 

@@ -191,3 +191,11 @@
 .div-dropdown {
   display: none;
 }
+
+.header-edit-mode {
+  font-size: 1.3em;
+}
+
+.header-template-name {
+  font-weight: 900;
+}
