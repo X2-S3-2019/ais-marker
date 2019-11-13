@@ -281,7 +281,7 @@ class DBManager:
             print(Error)
             con.close()
 
-        crs.execute('UPDATE courses SET name = ? WHERE id = ?',
+        crs.execute('UPDATE students SET name = ? WHERE id = ?',
                     (student_name, student_id))
 
         updated = crs.rowcount
