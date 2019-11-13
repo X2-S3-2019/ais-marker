@@ -454,7 +454,7 @@ var assessment = {
                         return;
                     }
 
-                    let newInfoHTML = '';
+                    let newInfoHTML = '<p>You have inputted new information. Would you like to save these info to the database?</p>';
                     // Show Save New Info popup
                     if (newInfo.hasOwnProperty('student_id')) {
                         newInfoHTML += '<h3>New Student</h3>';
