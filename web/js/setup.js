@@ -5,6 +5,8 @@
     courses.html, presentations.html and students.html
 */
 
+var hasListeners = false;
+
 $(document).ready(function () {
 
     let sPath = window.location.pathname;
@@ -79,7 +81,10 @@ function displayAllCourses() {
         });
     });
 
-    addClickListeners('Course');
+    if(!hasListeners){
+        addClickListeners('Course');
+    }
+    
 }
 
 function displayAllStudents() {
@@ -92,7 +97,10 @@ function displayAllStudents() {
         });
     });
 
-    addClickListeners('Student');
+    if(!hasListeners){
+        addClickListeners('Student');
+    }
+    
 }
 
 function displayAllPresentations(filter = 'None') {
@@ -117,7 +125,9 @@ function displayAllPresentations(filter = 'None') {
         });
     }
 
-    addClickListeners('Presentation');
+    if(!hasListeners){
+        addClickListeners('Presentation');
+    }
 }
 
 function addActionButtons(table_id, row_id, row_head, row_name) {
@@ -145,6 +155,8 @@ function addActionButtons(table_id, row_id, row_head, row_name) {
 
 function addClickListeners(type) {
     let current_head, current_name; // Used to revert to old values when user clicks cancel
+    hasListeners = true;
+    console.log('Listeners attached: ' + hasListeners);
 
     $('body').on('click', '.btnEdit' + type, function (e) {
         let btn = $(this);
