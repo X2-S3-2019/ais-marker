@@ -81,15 +81,15 @@ function displayAllCourses() {
         });
     });
 
-    if(!hasListeners){
+    if (!hasListeners) {
         addClickListeners('Course');
     }
-    
+
 }
 
 function displayAllStudents() {
     $('#tblStudents tbody').empty()
-    
+
     students = eel.getStudents()(function (students) {
         students.forEach(function (row) {
             // row -> [0] = student_id, [1] = student_name
@@ -97,10 +97,10 @@ function displayAllStudents() {
         });
     });
 
-    if(!hasListeners){
+    if (!hasListeners) {
         addClickListeners('Student');
     }
-    
+
 }
 
 function displayAllPresentations(filter = 'None') {
@@ -125,7 +125,7 @@ function displayAllPresentations(filter = 'None') {
         });
     }
 
-    if(!hasListeners){
+    if (!hasListeners) {
         addClickListeners('Presentation');
     }
 }
@@ -200,19 +200,57 @@ function addClickListeners(type) {
         let row = btn.parents('tr');
         let id = row.attr('data-id');
         let new_name = row.find('td.name input').val();
-        let new_date = row.find('th input').val();
+        let new_head = row.find('th input').val();
 
-        // Save to database
-        eel.updatePresentation(id, new_name, new_date)(function () {
-            // Upon successful save, change input to text
-            row.children('th').html(new_date);
-            row.children('td.name').html(new_name);
-            // Enable delete button
-            row.find('.btnDelete' + type).attr('disabled', false);
+        console.log('Saving ' + new_name)
 
-            row.find('.btnSave').addClass('d-none');
-            row.find('.btnEdit' + type).html('<i class="fa fa-edit"></i>');
-        });
+        switch (type) {
+            case 'Presentation':
+                // Save presentation to database
+                console.log('Saving presentation to database...');
+                eel.updatePresentation(id, new_name, new_head)(function () {
+                    // Upon successful save, change input to text
+                    row.children('th').html(new_head);
+                    row.children('td.name').html(new_name);
+                    // Enable delete button
+                    row.find('.btnDelete' + type).attr('disabled', false);
+
+                    row.find('.btnSave').addClass('d-none');
+                    row.find('.btnEdit' + type).html('<i class="fa fa-edit"></i>');
+                });
+                break;
+            case 'Student':
+                // Save student to database
+                console.log('Saving student to database...');
+                eel.updateStudent(id, new_name)(function () {
+                    console.log('Student saved to database...');
+                    // Upon successful save, change input to text
+                    row.children('th').html(new_head);
+                    row.children('td.name').html(new_name);
+                    // Enable delete button
+                    row.find('.btnDelete' + type).attr('disabled', false);
+
+                    row.find('.btnSave').addClass('d-none');
+                    row.find('.btnEdit' + type).html('<i class="fa fa-edit"></i>');
+                });
+                break;
+            case 'Course':
+                // Save presentation to database
+                console.log('Saving course to database...');
+                eel.updateCourse(id, new_head, new_name)(function () {
+                    // Upon successful save, change input to text
+                    console.log('Saving course to database...');
+                    row.children('th').html(new_head);
+                    row.children('td.name').html(new_name);
+                    // Enable delete button
+                    row.find('.btnDelete' + type).attr('disabled', false);
+
+                    row.find('.btnSave').addClass('d-none');
+                    row.find('.btnEdit' + type).html('<i class="fa fa-edit"></i>');
+                });
+                break;
+        }
+
     });
 
     // Add listener to delete
@@ -256,7 +294,7 @@ function addClickListeners(type) {
 
                     row.find('.btnConfirm').addClass('d-none');
                     row.find('.btnDelete' + type).html('<i class="fa fa-trash"></i>');
-                    
+
                     location.reload();
                 })
                 break;
@@ -322,11 +360,11 @@ function addCourse() {
         return false;
     } else {
         console.log('Adding ' + course_code + 'with name ' + course_name);
-        eel.addCourse(course_code, course_name)(function(){
+        eel.addCourse(course_code, course_name)(function () {
             console.log('Course added');
             displayAllCourses();
         });
-        
+
         // Clear input fields
         $('#txtCourseCode').val('');
         $('#txtCourseName').val('');
@@ -335,7 +373,7 @@ function addCourse() {
 
 function addStudent() {
     let student_id, student_name;
-    
+
     $('input').removeClass('is-invalid');
     student_id = $('#txtStudentID').val();
     student_name = $('#txtStudentName').val();
@@ -355,10 +393,10 @@ function addStudent() {
         return false;
     } else {
         console.log('Adding ' + student_id + ' with name ' + student_name);
-        eel.addStudent(student_id, student_name)(function(){
+        eel.addStudent(student_id, student_name)(function () {
             displayAllStudents();
         });
-        
+
         // Clear input fields
         $('#txtStudentID').val('');
         $('#txtStudentName').val('');
@@ -393,10 +431,10 @@ function addPresentation() {
         return false;
     } else {
         console.log('Adding ' + presentation_name);
-        eel.addPresentation(course_id, presentation_name, presentation_date)(function(){
+        eel.addPresentation(course_id, presentation_name, presentation_date)(function () {
             displayAllPresentations(course_id);
         });
-        
+
         // Clear input fields
         $('#datePresentation').val('');
         $('#txtPresentationName').val('');
