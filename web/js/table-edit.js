@@ -26,8 +26,7 @@ $(document).ready(function () {
         let selectedScoreSystem = JSON.parse(localStorage.getItem('selectedScoreSystem'));
         console.log(selectedScoreSystem);
         if (selectedScoreSystem['radioID'] === 'rdoCalculated') {
-            $('#txtMultiplier').val(selectedScoreSystem['multiplier']);
-            $('#txtLowestScore').val(selectedScoreSystem['lowestScore']);
+            
         }
         // Set preview scores to match current
 
@@ -47,8 +46,7 @@ $(document).ready(function () {
         selectedSystem['radioID'] = $('input[name=rdoGroupScoreSystem]:checked').attr('id');
         if (selectedSystem['radioID'] === "rdoCalculated") {
             console.log('Calculated score');
-            selectedSystem['multiplier'] = $('#txtMultiplier').val();
-            selectedSystem['lowestScore'] = $('#txtLowestScore').val();
+            
 
             applyScoresToTable();
         } else {
