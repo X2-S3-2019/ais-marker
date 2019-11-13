@@ -248,6 +248,11 @@ def createAssessmentResultDocument(header_info, results, template_id, openDocume
         # Get default directory from database
         path = databaseManager.getDefaultDirectory()
 
+        if not os.path.exists(path):
+            os.makedirs(path)
+
+        print(path)
+        
         assessmentDocument = AssessmentDocument(document_name)
         assessmentDocument.createResultsDocument(
             template, results, header_info, path)
