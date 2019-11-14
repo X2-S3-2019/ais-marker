@@ -1,5 +1,17 @@
 /* Contains scripts used all over the application */
 
+
+var CutString = function(string, maxlength) {
+    if ( typeof string != "string" ) {
+        return string;
+    }
+    maxlength = maxlength || 40;
+    if ( string.length <= maxlength ) {
+        return $('<div/>').text(string).html();;
+    }
+    return $('<div/>').text(string.substr(0, maxlength) + "...").html();;
+}
+
 $(document).ready(function(){
 
     $(window).bind('beforeunload', function(){
@@ -16,5 +28,4 @@ $(document).ready(function(){
         // Display onboarding section which is hidden by default
         $('.onboarding-wrapper').show();
     }
-
 });

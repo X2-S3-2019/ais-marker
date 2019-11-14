@@ -141,8 +141,8 @@ function addActionButtons(table_id, row_id, row_head, row_name) {
 
     $('#' + table_id + ' tbody').append(
         '<tr data-id="' + row_id + '">' +
-        '<th scope="row">' + row_head + '</th>' +
-        '<td class="name">' + row_name + '</td>' +
+        '<th scope="row" title="' + row_head + '">' + CutString(row_head, 10) + '</th>' +
+        '<td class="name" title="' + row_name + '">' + CutString(row_name, 40) + '</td>' +
         '<td style="text-align: center"><div class="btn-group" style="padding-bottom: 10px">' +
         '<button class="link btn btn-primary ' + editBtnClass + ' edit-default"> <i class="fa fa-edit"></i> </button>' +
         '<button class="link btn btn-danger ' + deleteBtnClass + ' delete-default"><i class="fa fa-trash"></i></button></div>' +
@@ -161,22 +161,19 @@ function addClickListeners(type) {
     $('body').on('click', '.btnEdit' + type, function (e) {
         let btn = $(this);
         let row = btn.parents('tr');
-        let name = row.children('td.name').html();
-        let head = row.children('th').html();
+        let name = row.children('td.name').attr("title");
+        let head = row.children('th').attr("title");
 
         if (btn.hasClass('edit-default')) {
             current_head = head;
             current_name = name;
-
             // Change text to input
             if (type == 'Presentation') {
-                row.children('th').html('<input type="date" class="form-control" value="' + head + '" />');
+                row.children('th').html('<input maxlength=10 type="date" class="form-control" value="' + head + '" />');
             } else if (type == 'Course') {
-                row.children('th').html('<input type="text" class="form-control" value="' + head + '" />');
+                row.children('th').html('<input maxlength=10 type="text" class="form-control" value="' + head + '" />');
             }
-
-            row.children('td.name').html('<input type="text" class="form-control" value="' + name + '" />');
-
+            row.children('td.name').html('<input maxlength=40 type="text" class="form-control" value="' + name + '"/>');
             btn.html('<i class="fa fa-times"></i>');
             btn.removeClass('edit-default');
             btn.addClass('edit-cancel');
@@ -202,7 +199,11 @@ function addClickListeners(type) {
         let new_name = row.find('td.name input').val();
         let new_head = row.find('th input').val();
 
-        console.log('Saving ' + new_name)
+        console.log('Saving ' + new_name);
+        if ( new_name.length === 0 || new_head.length === 0 ) {
+            alert('invalid field, please check carefully!');
+            return;
+        }
 
         switch (type) {
             case 'Presentation':
@@ -211,12 +212,15 @@ function addClickListeners(type) {
                 eel.updatePresentation(id, new_name, new_head)(function () {
                     // Upon successful save, change input to text
                     row.children('th').html(new_head);
+                    row.children('th').attr("title", new_head);
                     row.children('td.name').html(new_name);
+                    row.children('td.name').attr("title", new_name);
                     // Enable delete button
                     row.find('.btnDelete' + type).attr('disabled', false);
-
                     row.find('.btnSave').addClass('d-none');
                     row.find('.btnEdit' + type).html('<i class="fa fa-edit"></i>');
+                    row.find('.btnEdit' + type).addClass('edit-default');
+
                 });
                 break;
             case 'Student':
@@ -226,12 +230,15 @@ function addClickListeners(type) {
                     console.log('Student saved to database...');
                     // Upon successful save, change input to text
                     row.children('th').html(new_head);
+                    row.children('th').attr("title", new_head);
                     row.children('td.name').html(new_name);
+                    row.children('td.name').attr("title", new_name);
                     // Enable delete button
                     row.find('.btnDelete' + type).attr('disabled', false);
 
                     row.find('.btnSave').addClass('d-none');
                     row.find('.btnEdit' + type).html('<i class="fa fa-edit"></i>');
+                    row.find('.btnEdit' + type).addClass('edit-default');
                 });
                 break;
             case 'Course':
@@ -241,12 +248,15 @@ function addClickListeners(type) {
                     // Upon successful save, change input to text
                     console.log('Saving course to database...');
                     row.children('th').html(new_head);
+                    row.children('th').attr("title", new_head);
                     row.children('td.name').html(new_name);
+                    row.children('td.name').attr("title", new_name);
                     // Enable delete button
                     row.find('.btnDelete' + type).attr('disabled', false);
 
                     row.find('.btnSave').addClass('d-none');
                     row.find('.btnEdit' + type).html('<i class="fa fa-edit"></i>');
+                    row.find('.btnEdit' + type).addClass('edit-default');
                 });
                 break;
         }
@@ -332,7 +342,7 @@ function populateCoursesDropdown() {
     eel.getCourses()(function (courses) {
         $('#ddlCourses').append('<option value="None">Select a course..</option>');
         courses.forEach(function (row) {
-            $('#ddlCourses').append('<option value="' + row[0] + '">' + row[1] + '(' + row[2] + ')</option>');
+            $('#ddlCourses').append('<option value="' + CutString(row[0], 100) + '">' + CutString(row[1], 100) + '(' + CutString(row[2], 100) + ')</option>');
         });
     });
 }

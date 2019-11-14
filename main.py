@@ -224,7 +224,7 @@ def openDocument(document_name):
     try:
         path = databaseManager.getDefaultDirectory()
         print('Path: ' + path)
-        os.system(f'start {os.path.realpath(path)}')
+        os.system('start {os.path.realpath(path)}')
     except:
         print('There was an error.')
     # os.startfile(document_name + '.docx')
