@@ -4,3 +4,4 @@ __pycache__/schoolrecords.cpython-36.pyc
 __pycache__/datastore.cpython-36.pyc
 __pycache__/assessment.cpython-36.pyc
 ais_marker_db
+*.pyc
