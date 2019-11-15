@@ -369,7 +369,7 @@ var walkthrough = {
         intro.setOptions({
             steps: [
                 {
-                    intro: "Before you evaluate, get to know the menu buttons first."
+                    intro: "Before you evaluate, let's get to know the menu buttons first."
                 },
                 {
                     element: document.querySelector('.secondGuide.stepOne'),
@@ -400,7 +400,7 @@ var walkthrough = {
                 },
                 {
                     element: document.querySelectorAll('.secondGuide.stepFour')[0],
-                    intro: "<em>Hint:</em> You can change the values if you need to.",
+                    intro: "<em>Hint: You can change the values if you need to.</em>",
                     position: 'right'
                 },
                 {

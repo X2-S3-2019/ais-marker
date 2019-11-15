@@ -92,10 +92,11 @@
     <div></div>
     <div>
       <span class="small-circle-bg menu-item small-icon">
-        <a class='fa fa-question-circle firstGuide stepThree' href='quick-guide.html' title="How to Use"></a>
+        <a id="btnEnableWalkthrough" class='fa fa-question-circle firstGuide stepThree' title="Enable Walkthrough"></a>
       </span>
       <span class="small-circle-bg menu-item small-icon">
-        <a class='fa fa-info firstGuide stepTwo' href='https://sites.google.com/view/evaluate-app' title="About" target='_blank'>
+        <a class='fa fa-info firstGuide stepTwo' href='https://sites.google.com/view/evaluate-app' title="About"
+          target='_blank'>
         </a>
       </span>
     </div>
@@ -127,10 +128,10 @@
           <li>
             <a href="setup/students.html">STUDENTS</a>
           </li>
-          <span class="line"></span>
+          <!-- <span class="line"></span>
           <li>
             <a href="setup/config.html">CONFIGURATIONS</a>
-          </li>
+          </li> -->
         </ul>
       </nav>
     </div>
@@ -199,7 +200,9 @@
   });
 
   $(document).ready(function () {
-    startIntro();
+    if (localStorage.getItem('finishedMainPageWalkthrough') == null) {
+      startIntro();
+    }
   });
 
   function startIntro() {
@@ -222,11 +225,11 @@
         },
         {
           element: document.querySelectorAll('.firstGuide.stepThree')[0],
-          intro: "Clicking this will enable the tutorial again." 
+          intro: "Clicking this will enable the tutorial again."
         },
         {
           element: document.querySelectorAll('.firstGuide.stepTwo')[0],
-          intro: "Visit our official website for more information about this application." 
+          intro: "Visit our official website for more information about this application."
         },
         {
           element: document.querySelectorAll('.firstGuide.stepFour')[0],
@@ -243,6 +246,11 @@
     });
 
     intro.start();
+    introJs.fn.oncomplete(function () {
+      console.log('Completed');
+      // Set localStorage so that walkthrough only appears once
+      localStorage.setItem('finishedMainPageWalkthrough', true);
+    });
   }
   // for index page
   // const isShowedIntroIndex = Cookies.get("isShowedIntroIndex");

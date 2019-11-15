@@ -37,7 +37,7 @@ $(document).ready(function () {
         
         if(showSecondWalkthrough){
             showSecondWalkthrough = false;
-            setTimeout(editWalkthrough.secondWalkthrough, 1000);
+            setTimeout(editWalkthrough.secondWalkthrough, 500);
         }
 
         
@@ -196,7 +196,6 @@ var editWalkthrough = {
                     intro: "Once you've finished editing the template, click this."
                 },
                 {
-                    element: document.querySelectorAll('.fourthGuide.stepOne')[0],
                     intro: "<div class='text-center'><h5>Congratulations!</h5>You've reached the end of the tutorial.<br /><b>Happy evaluating!</b></div>"
                 }
             ],
