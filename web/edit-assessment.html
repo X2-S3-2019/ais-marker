@@ -9,11 +9,16 @@
     <link rel="stylesheet" href="external_assets/css/bootstrap4_3_1.min.css">
     <link rel="stylesheet" href="external_assets/css/fontawesome.min.css">
     <link rel="stylesheet" href="external_assets/css/all.min.css">
-    <script type="text/javascript" src="/external_assets/js/jquery-3.4.1.min.js"></script>
-    <script type="text/javascript" src="/external_assets/js/bootstrap.min.js"></script>
+    <link rel="stylesheet" type="text/css" href="external_assets/css/introjs-rtl.min.css">
+    <link rel="stylesheet" type="text/css" href="external_assets/css/introjs.min.css">
     <link rel="stylesheet" href="css/global.css">
     <link rel="stylesheet" href="css/assessment.css">
-    <script type="text/javascript" src="/external_assets/js/jquery.tabledit.js"></script>
+    <script type="text/javascript" src="external_assets/js/popper.min.js"></script>
+    <script type="text/javascript" src="external_assets/js/jquery-3.4.1.min.js"></script>
+    <script type="text/javascript" src="external_assets/js/bootstrap.min.js"></script>
+    <script type="text/javascript" src="/external_assets/js/js.cookie.min.js"></script>
+    <script type="text/javascript" src="/external_assets/js/intro.min.js"></script>
+    <script type="text/javascript" src="external_assets/js/jquery.tabledit.js"></script>
     <!-- This is a hack. This overrides the styling of input's label when on focus-->
     <style>
         .labeled-input-group input:focus~label {
@@ -52,7 +57,7 @@
         </div>
 
         <div class="header-icon-container">
-            <div class="header-icon btnInitializeSave"><i title="Save" class="fas fa-save"></i></div>
+            <div class="header-icon btnInitializeSave thirdGuide stepSix"><i title="Save" class="fas fa-save"></i></div>
         </div>
 
     </div>
@@ -62,7 +67,7 @@
             <!-- Dynamically populated in the back-end -->
         </div>
         <div>
-            <button class="btn btn-primary btnInitializeSave">Save Template</button>
+            <button class="btn btn-primary btnInitializeSave thirdGuide stepFive">Save Template</button>
         </div>
     </div>
 
@@ -77,27 +82,29 @@
                 </div>
                 <div class="modal-body">
                     <input type="hidden" id="txtGroupCriterionID" />
-                    <div><input type="radio" class="radio-dropdown" id="rdoCalculated" name="rdoGroupScoreSystem" />
+                    <div class="secondGuide stepOne"><input type="radio" class="radio-dropdown"
+                            id="rdoCalculated" name="rdoGroupScoreSystem" />
                         <label for="rdoCalculated">Calculated</label></div>
                     <div id="divCalculated" class="div-dropdown">
                         <table>
-                            <tr>
+                            <tr class="thirdGuide stepOne">
                                 <td><strong>Lowest Score</strong>:</td> <!-- Score of Poor -->
                                 <td><input id="txtLowestScore" type="number" min="0" max="100" value="1"
                                         style="width: 50px" /></td>
                             </tr>
-                            <tr>
+                            <tr class="thirdGuide stepTwo">
                                 <td><strong>Multiplier</strong>:</td>
                                 <td><input id="txtMultiplier" type="number" min="1" max="50" value="1"
                                         style="width: 50px" /></td>
                             </tr>
                         </table>
                     </div>
-                    <div><input type="radio" class="radio-dropdown" id="rdoCustom" name="rdoGroupScoreSystem" />
+                    <div class="secondGuide stepTwo"><input type="radio" class="radio-dropdown" id="rdoCustom"
+                            name="rdoGroupScoreSystem" />
                         <label for="rdoCustom">Custom</label></div>
                     <div id="divCustom" class="div-dropdown">
                         <p><em>Note: Your points should follow correct order (highest to lowest)</em></p>
-                        <table>
+                        <table class="fourthGuide stepOne">
                             <tr>
                                 <td><strong>Excellent:</strong></td>
                                 <td><input id="txtExcellentScore" type="number" min="1" max="100" value="4"
@@ -124,24 +131,30 @@
                             </tr>
                         </table>
                     </div>
-                    <div>
+                    <div class="secondGuide stepThree">
                         <em>Preview</em>
                         <div>
                             <!-- Create preview of score here -->
                             <table class="preview-header-score">
                                 <tr>
-                                    <td><span class="preview-text excellentScore"></span> - Excellent</td>
-                                    <td><span class="preview-text goodScore"></span> - Good</td>
-                                    <td><span class="preview-text fairScore"></span> - Fair</td>
-                                    <td><span class="preview-text poorScore"></span> - Poor</td>
+                                    <td><span class="preview-text excellentScore">4</span> - Excellent</td>
+                                    <td><span class="preview-text goodScore">3</span> - Good</td>
+                                    <td><span class="preview-text fairScore">2</span> - Fair</td>
+                                    <td><span class="preview-text poorScore">1</span> - Poor</td>
                                 </tr>
                             </table>
                         </div>
                     </div>
+                    <br />
+                    <div class="secondGuide stepFour">
+                        <input type="checkbox" id="checkApplyAllScores" />
+                        <label for="checkApplyAllScores" style="margin-left: .3rem">Apply scoring
+                            system to all criteria</label>
+                    </div>
                 </div>
                 <div class="modal-footer">
                     <button id="btnCancelEdit" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
-                    <button id="btnApply" class="btn btn-success">Apply</button>
+                    <button id="btnApply" class="btn btn-success secondGuide stepFive">Apply</button>
                 </div>
             </div>
         </div>
@@ -164,8 +177,10 @@
                         <label for="txtStudentID">Name</label>
                     </div>
                     <br />
-                    <label class="small" for="txtTemplateDescription" style="margin-bottom: 0;">Description (Optional): </label>
-                    <textarea rows="4" class="modal-input" id="txtTemplateDescription" style="margin-top: initial"></textarea>
+                    <label class="small" for="txtTemplateDescription" style="margin-bottom: 0;">Description (Optional):
+                    </label>
+                    <textarea rows="4" class="modal-input" id="txtTemplateDescription"
+                        style="margin-top: initial"></textarea>
 
                 </div>
                 <div class="modal-footer" style="justify-content: space-between;">
@@ -255,19 +270,19 @@
     <!-- End of Successful Save Popup -->
 
     <div class="modal fade" id="popupMessage" tabindex="-1" role="dialog">
-    <div class="modal-dialog">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title" id="modalTitle">Message</h5>
-            </div>
-            <div class="modal-body">
-                <p>Delete the last criteria in a table is not allowed</p>
-            </div>
-            <div class="modal-footer">
-                <button id="btnClose" class="btn btn-success" data-dismiss="modal">Close</button>
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="modalTitle">Message</h5>
+                </div>
+                <div class="modal-body">
+                    <p>Delete the last criteria in a table is not allowed</p>
+                </div>
+                <div class="modal-footer">
+                    <button id="btnClose" class="btn btn-success" data-dismiss="modal">Close</button>
+                </div>
             </div>
         </div>
-    </div>
     </div>
 
     <script type="text/javascript" src="js/global.js"></script>

@@ -92,23 +92,10 @@
     <div></div>
     <div>
       <span class="small-circle-bg menu-item small-icon">
-        <a 
-        data-step=4
-        data-intro="Check the quick guidence"
-        data-position='left' 
-        class='fa fa-question-circle' 
-        href='quick-guide.html' 
-        title="How to Use"></a>
+        <a class='fa fa-question-circle firstGuide stepThree' href='quick-guide.html' title="How to Use"></a>
       </span>
       <span class="small-circle-bg menu-item small-icon">
-        <a 
-        data-step=3
-        data-intro="Visit our official website for more information"
-        data-position='right' 
-        class='fa fa-info' 
-        href='https://sites.google.com/view/evaluate-app' 
-        title="About" 
-        target='_blank'>
+        <a class='fa fa-info firstGuide stepTwo' href='https://sites.google.com/view/evaluate-app' title="About" target='_blank'>
         </a>
       </span>
     </div>
@@ -120,23 +107,14 @@
   <!-- Main Menu buttons -->
 
   <div class="container text-center">
-    <div >
-      <button 
-      data-step=1 
-      data-intro="start evaluation here" 
-      data-position='right' 
-      id="btnQuickStart" 
-      class="btn">
-      <img src='imgs/quick start.png' />
+    <div>
+      <button id="btnQuickStart" class="btn firstGuide stepFour">
+        <img src='imgs/quick start.png' />
       </button>
     </div>
-    <div class="footer">
+    <div class="footer firstGuide stepOne">
       <hr>
-      <nav 
-      data-step=2
-      data-intro="Manage all extral informations here. You can generate all the information in the 'quick start' page automaticallly, but you can only edit/delete the information in those pages" 
-      data-position='left' 
-      >
+      <nav>
         <ul>
           <li>
             <a href="setup/courses.html">COURSES</a>
@@ -147,7 +125,7 @@
           </li>
           <span class="line"></span>
           <li>
-            <a  href="setup/students.html">STUDENTS</a>
+            <a href="setup/students.html">STUDENTS</a>
           </li>
           <span class="line"></span>
           <li>
@@ -167,17 +145,17 @@
         <div id="intro-carousel" class="carousel" data-wrap="false" data-interval="false">
           <div class="carousel-inner">
             <div class="carousel-item active text-center">
-              
+
               <h1 class="text-danger">AIS Marker</h1>
               <h4 class="text-danger">A Presentation Marking Tool</h4>
             </div>
             <div class="carousel-item text-center">
-                <div class="d-block">
-                  <img src="imgs/teacher-in-red.png" />
-                </div>
-                <h3 class="text-danger">Easy Evaluation</h3>
-                <p>Focus on students' presentations and give them valuable feedback</p>
+              <div class="d-block">
+                <img src="imgs/teacher-in-red.png" />
               </div>
+              <h3 class="text-danger">Easy Evaluation</h3>
+              <p>Focus on students' presentations and give them valuable feedback</p>
+            </div>
             <div class="carousel-item text-center">
               <div class="d-block">
                 <img src="imgs/teacher-folder.png" />
@@ -219,13 +197,61 @@
       $('.carousel-control-next').hide(); return;
     }
   });
-  // for index page   
-  const isShowedIntroIndex = Cookies.get("isShowedIntroIndex");
-  if ( !isShowedIntroIndex ) {
-    introJs().setOption('showProgress', true).start().onskip(function() {
-        Cookies.set('isShowedIntroIndex', 1, { expires: 100, path: '' })
+
+  $(document).ready(function () {
+    startIntro();
+  });
+
+  function startIntro() {
+    var intro = introJs();
+    intro.setOptions({
+      steps: [
+        {
+          intro: "Welcome to AIS Marker!"
+        },
+        {
+          intro: "Please spend a few minutes to learn how to navigate around the application."
+        },
+        {
+          element: document.querySelectorAll('.firstGuide.stepOne')[0],
+          intro: "First, the management pages."
+        },
+        {
+          element: document.querySelectorAll('.firstGuide.stepOne')[0],
+          intro: "You manage school records here. You can automatically add new information in the assessment page, but you can only edit/delete them in these pages."
+        },
+        {
+          element: document.querySelectorAll('.firstGuide.stepThree')[0],
+          intro: "Clicking this will enable the tutorial again." 
+        },
+        {
+          element: document.querySelectorAll('.firstGuide.stepTwo')[0],
+          intro: "Visit our official website for more information about this application." 
+        },
+        {
+          element: document.querySelectorAll('.firstGuide.stepFour')[0],
+          intro: "Let's get started with evaluating!<br />Click Quick Start.",
+          position: 'right'
+        },
+      ],
+      showStepNumbers: false,
+      hidePrev: true,
+      hideNext: true,
+      skipLabel: 'Skip',
+      disableInteraction: false,
+      exitOnOverlayClick: false
     });
+
+    intro.start();
   }
+  // for index page
+  // const isShowedIntroIndex = Cookies.get("isShowedIntroIndex");
+  // if ( !isShowedIntroIndex ) {
+  //   introJs().setOption('showProgress', true).start().onskip(function() {
+  //       Cookies.set('isShowedIntroIndex', 1, { expires: 100, path: '' })
+  //   });
+  // }
+
 </script>
 
 </html>

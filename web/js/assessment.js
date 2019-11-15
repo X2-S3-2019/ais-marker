@@ -3,6 +3,9 @@
 
     File description: Contains functions related to assessment and navigation of assessment.html
 
+    Developer's notes:
+    Walkthrough is only shown once. It is initialized after the table has been created.
+
     TODO:
     In initiliazeSelect, values are hard-coded (Excellent, Fair, Good, Poor). Make this dynamic.
 */
@@ -15,6 +18,9 @@ var arrTemplates = [];
 var template_id = 1;   // Initialize id; If no default is given, make user choose.
 var isDragging = false;
 var linkAdditionalFieldsHasListener = false;
+var showSecondWalkthrough = false;
+var showThirdWalkthrough = false;
+var showFourthWalkthrough =false;
 
 $(document).ready(function () {
 
@@ -40,18 +46,28 @@ $(document).ready(function () {
     });
 
     // Only number input for student ID input
-    $("#txtStudentID, .tableStudentID").keypress(function(e){
+    $("#txtStudentID, .tableStudentID").keypress(function (e) {
         var keyCode = e.which;
-       /*
-         8 - (backspace)
-         32 - (space)
-         48-57 - (0-9)Numbers
-       */
-    
-       if ( (keyCode != 8 || keyCode ==32 ) && (keyCode < 48 || keyCode > 57)) { 
-         return false;
-       }
-     });
+        /*
+          8 - (backspace)
+          32 - (space)
+          48-57 - (0-9)Numbers
+        */
+
+        if ((keyCode != 8 || keyCode == 32) && (keyCode < 48 || keyCode > 57)) {
+            return false;
+        }
+    });
+
+    $('#btnNextStudent').click(function(){
+        console.log('Next Student');
+        if(showFourthWalkthrough){
+            showFourthWalkthrough = false;
+            setTimeout(walkthrough.fourthWalkthrough, 1000);
+        }
+       
+        $('#popupSuccessfulSave').modal('toggle');
+    });
 });
 
 function initializeAssessment() {
@@ -131,8 +147,6 @@ function getDataFromDatabase() {
             temp_template['description'] = row[2];
             arrTemplates.push(temp_template);
         });
-        console.log('There are ' + arrTemplates.length + ' available');
-
         popuplateChooseTemplateDropdown();
         initializeAssessment();
     });
@@ -261,6 +275,12 @@ function initializeEvaluationPopup() {
             addHeaderDocument(student_id, student_name, course, presentation);
 
             $('#popupAddStudent').modal('toggle');
+            if(showSecondWalkthrough){
+                showSecondWalkthrough = false;
+                setTimeout(walkthrough.secondWalkthrough, 1000);
+                showThirdWalkthrough = true;
+            }
+            
         }
     });
 }
@@ -306,6 +326,154 @@ function addHeaderDocument(student_id, student_name, course, presentation) {
     $('.tablePresentation').val(presentation);
     // Add the course code which is hidden
     $('.document-header .tableCourseCode').val(course);
+}
+
+var walkthrough = {
+    firstWalkthrough: function () {
+        var intro = introJs();
+        intro.setOptions({
+            steps: [
+                {
+                    intro: "Welcome to the assessment page!"
+                },
+                {
+                    intro: "This is where you'll make your evaluations."
+                },
+                {
+                    element: document.querySelector('.firstGuide.stepOne'),
+                    intro: "You only need the student ID to start."
+                },
+                {
+                    element: document.querySelectorAll('.firstGuide.stepTwo')[0],
+                    intro: "If you want to add more fields, click here.",
+                    position: 'right'
+                },
+                {
+                    element: document.querySelectorAll('.firstGuide.stepThree')[0],
+                    intro: "When you're ready to evaluate, click this button." +
+                        "<br /><span class='small text-info text-center'>Note: This will start the timer.</span>",
+                    position: 'right'
+                },
+            ],
+            showStepNumbers: false,
+            hidePrev: true,
+            hideNext: true,
+            skipLabel: 'Skip',
+            exitOnOverlayClick: false,
+            doneLabel: 'Got it'
+        });
+        intro.start();
+    },
+    secondWalkthrough: function () {
+        var intro = introJs();
+        intro.setOptions({
+            steps: [
+                {
+                    intro: "Before you evaluate, get to know the menu buttons first."
+                },
+                {
+                    element: document.querySelector('.secondGuide.stepOne'),
+                    intro: "This brings you back to the main page."
+                },
+                {
+                    element: document.querySelectorAll('.secondGuide.stepTwo')[0],
+                    intro: "If you want to change the template, click this.",
+                    position: 'right'
+                },
+                {
+                    intro: "We'll get to templates later."
+                },
+                {
+                    element: document.querySelectorAll('.secondGuide.stepThree')[0],
+                    intro: "This is the score board.",
+                    position: 'bottom-middle-aligned'
+                },
+                {
+                    element: document.querySelectorAll('.secondGuide.stepThree')[0],
+                    intro: "This is an on-the-go calculation of your evaluation scores.",
+                    position: 'bottom-middle-aligned'
+                },
+                {
+                    element: document.querySelectorAll('.secondGuide.stepFour')[0],
+                    intro: "This is your document header. This will appear at the top-most of your Word document",
+                    position: 'right'
+                },
+                {
+                    element: document.querySelectorAll('.secondGuide.stepFour')[0],
+                    intro: "<em>Hint:</em> You can change the values if you need to.",
+                    position: 'right'
+                },
+                {
+                    intro: "Click on a description cell to give a score for a criterion."
+                }
+            ],
+            showStepNumbers: false,
+            hidePrev: true,
+            hideNext: true,
+            skipLabel: 'Skip',
+            exitOnOverlayClick: false,
+            doneLabel: 'Got it'
+        });
+        intro.start();
+    },
+    thirdWalkthrough : function(){
+        var intro = introJs();
+        intro.setOptions({
+            steps: [
+                {
+                    intro: "You've added new school records!"
+                },
+                {
+                    element: document.querySelectorAll('.thirdGuide.stepOne')[0],
+                    intro: "These will be saved in the database and can be accessed in the future.",
+                    position: 'right'
+                },
+                {
+                    element: document.querySelectorAll('.thirdGuide.stepTwo')[0],
+                    intro: "To save the new information, click this."
+                },
+                {
+                    element: document.querySelectorAll('.thirdGuide.stepThree')[0],
+                    intro: "If you're sure you won't need this information, click this."
+                },
+            ],
+            showStepNumbers: false,
+            hidePrev: true,
+            hideNext: true,
+            skipLabel: 'Skip',
+            exitOnOverlayClick: false,
+            doneLabel: 'Got it'
+        });
+        intro.start();
+        introJs.fn.oncomplete(function() {
+            // Set localStorage so that walkthrough only appears once
+            localStorage.setItem('finishedWalkthrough', true);
+        });
+    }, 
+    fourthWalkthrough : function(){
+        var intro = introJs();
+        intro.setOptions({
+            steps: [
+                {
+                    intro: "Congratulations on finishing your first evaluation!"
+                },
+                {
+                    intro: "It's time to learn about Templates!"
+                },
+                {
+                    element: document.querySelectorAll('.fourthGuide.stepOne')[0],
+                    intro: "Click this button to get started.",
+                    position: 'left'
+                }
+            ],
+            showStepNumbers: false,
+            hidePrev: true,
+            hideNext: true,
+            skipLabel: 'Skip',
+            exitOnOverlayClick: false
+        });
+        intro.start();   
+    }
 }
 
 var assessment = {
@@ -493,6 +661,12 @@ var assessment = {
                     $('#modalSaveNewInfo').html(newInfoHTML);
 
                     $('#popupSaveNewInfo').modal('show');
+
+                    if(showThirdWalkthrough){
+                        showThirdWalkthrough = false;
+                        walkthrough.thirdWalkthrough();
+                        showFourthWalkthrough = true;
+                    }                    
 
                     $('#popupSaveNewInfo #btnSaveNewInfo').click(function () {
                         // Add new student
@@ -688,7 +862,7 @@ function createTemplateTable(template_id) {
         console.log('Creating template...');
         console.log(template);
 
-        let templateHTML = '<div class="text-right"><button class="btn btn-danger edit-assesment mb-3">Edit template</button></div>';
+        let templateHTML = '<div class="text-right"><button class="btn btn-danger edit-assesment mb-3 fourthGuide stepOne">Edit template</button></div>';
         let group_keys = {};
         let group_score_keys = {};
 
@@ -789,6 +963,11 @@ function createTemplateTable(template_id) {
         assessment.enableSaveButton(assessment.results, template.id);
 
         createScoreCards();
+        console.log('Value of walkthrough ' + localStorage.getItem('finishedWalkthrough'));
+        if(localStorage.getItem('finishedWalkthrough') == null){
+            walkthrough.firstWalkthrough();
+            showSecondWalkthrough = true;
+        }        
     });
 
 }

@@ -1,12 +1,15 @@
 var template_info;
 var template_id;
+var btnEditScoreBtnHack = false;
+var showSecondWalkthrough = false;
+var showThirdWalkthrough = false;
 
 $(document).ready(function () {
     template_info = getTemplateInfo();
 
     $('.header-template-name').html(decodeURI(template_info['template_name']));
 
-    createTemplateTable(template_info['template_id']);
+    createTemplateTable(template_info['template_id'])
 
     // Bring label from placeholder position to top when there's value
     $('.labeled-input-group input').blur(function () {
@@ -17,6 +20,12 @@ $(document).ready(function () {
 
     // Edit button for editing score system is clicked
     $('body').on('click', 'thead .tabledit-toolbar-column button', function () {
+        // Hack to force introJS to exit when button is clicked
+        if(btnEditScoreBtnHack){
+            introJs().exit();
+            btnEditScoreBtnHack = false;
+            showSecondWalkthrough = true;
+        }
         console.log('Edit header clicked');
         let name = $(this).parents('table').attr('id');
         $('#popupEditScoreSystem').modal('show');
@@ -25,11 +34,13 @@ $(document).ready(function () {
         // Set values of popupEditScoreSystem
         let selectedScoreSystem = JSON.parse(localStorage.getItem('selectedScoreSystem'));
         console.log(selectedScoreSystem);
-        if (selectedScoreSystem['radioID'] === 'rdoCalculated') {
-            
+        
+        if(showSecondWalkthrough){
+            showSecondWalkthrough = false;
+            setTimeout(editWalkthrough.secondWalkthrough, 1000);
         }
-        // Set preview scores to match current
 
+        
     });
 
     $('.radio-dropdown').change(function () {
@@ -46,7 +57,6 @@ $(document).ready(function () {
         selectedSystem['radioID'] = $('input[name=rdoGroupScoreSystem]:checked').attr('id');
         if (selectedSystem['radioID'] === "rdoCalculated") {
             console.log('Calculated score');
-            
 
             applyScoresToTable();
         } else {
@@ -76,6 +86,11 @@ $(document).ready(function () {
 
             if (valid) {
                 applyScoresToTable();
+                // Summon the third and final walkthrough
+                if(showThirdWalkthrough){
+                    showThirdWalkthrough = false;
+                    setTimeout(editWalkthrough.thirdWalkthrough, 500);
+                }
             }
         }
 
@@ -94,8 +109,111 @@ $(document).ready(function () {
     $('#btnUseTemplate').click(function () {
         window.location.replace('assessment.html?template_id=' + template_id);
     });
-
 });
+
+var editWalkthrough = {
+    firstWalkthrough: function () {
+        btnEditScoreBtnHack = true;
+        var intro = introJs();
+        intro.setOptions({
+            steps: [
+                {
+                    intro: "Welcome to Editing Mode!"
+                },
+                {
+                    intro: "You can edit templates to modify scoring system or change the criteria."
+                },
+                {
+                    element: document.querySelectorAll('.firstGuide.stepOne')[0],
+                    intro: "To change the scoring system, click this button.",
+                }
+            ],
+            showStepNumbers: false,
+            hidePrev: true,
+            hideNext: true,
+            skipLabel: 'Skip',
+            exitOnOverlayClick: true,
+            doneLabel: 'Got it'
+        });
+        intro.start();
+    },
+    secondWalkthrough: function () {
+        var intro = introJs();
+        intro.setOptions({
+            steps: [
+                {
+                    element: document.querySelectorAll('.secondGuide.stepOne')[0],
+                    intro: "You can choose to use calculated scores."
+                },
+                {
+                    element: document.querySelectorAll('.secondGuide.stepTwo')[0],
+                    intro: "Or customize your own scores."
+                },
+                {
+                    element: document.querySelectorAll('.secondGuide.stepThree')[0],
+                    intro: "The preview allows you to check your scores.",
+                },
+                {
+                    element: document.querySelectorAll('.secondGuide.stepFour')[0],
+                    intro: "If you want this scoring system to be applied to all criteria, tick the checkbox.",
+                },
+                {
+                    element: document.querySelectorAll('.secondGuide.stepFive')[0],
+                    intro: "When you're happy with the new scoring system, click Apply.",
+                }
+            ],
+            showStepNumbers: false,
+            hidePrev: true,
+            hideNext: true,
+            skipLabel: 'Skip',
+            doneLabel: 'Got it'
+        });
+        intro.start();
+        showThirdWalkthrough = true;
+    },
+    thirdWalkthrough: function () {
+        var intro = introJs();
+        intro.setOptions({
+            steps: [
+                {
+                    element: document.querySelectorAll('.thirdGuide.stepOne')[0],
+                    intro: "Click this button to edit the criterion's name."
+                },
+                {
+                    element: document.querySelectorAll('.thirdGuide.stepTwo')[0],
+                    intro: "Click this to edit the fields."
+                },
+                {
+                    element: document.querySelectorAll('.thirdGuide.stepThree')[0],
+                    intro: "Click this to delete the criterion."
+                },
+                {
+                    element: document.querySelectorAll('.thirdGuide.stepFour')[0],
+                    intro: "Click this to add a new criterion."
+                },
+                {
+                    element: document.querySelectorAll('.thirdGuide.stepFive')[0],
+                    intro: "Once you've finished editing the template, click this."
+                },
+                {
+                    element: document.querySelectorAll('.fourthGuide.stepOne')[0],
+                    intro: "<div class='text-center'><h5>Congratulations!</h5>You've reached the end of the tutorial.<br /><b>Happy evaluating!</b></div>"
+                }
+            ],
+            showStepNumbers: false,
+            hidePrev: true,
+            hideNext: true,
+            skipLabel: 'Skip',
+            scrollToElement: true,
+            doneLabel: 'Yay!'
+        });
+        intro.start();
+        introJs.fn.oncomplete(function() {
+            // Set localStorage so that walkthrough only appears once
+            localStorage.setItem('finishedTemplateWalkthrough', true);
+        });
+    }
+};
 
 function applyScoresToTable() {
     let groupCriterion = $('#txtGroupCriterionID').val();
@@ -270,8 +388,8 @@ var tableEdit = {
         let validationResult = true;
         tables.each(function (index, table) {
 
-            var result = tableEdit.validateTemplateTable($(table)); 
-            
+            var result = tableEdit.validateTemplateTable($(table));
+
             if (result !== true) {
                 tableEdit.markInvalidRow($(table), result.rowIndex, result.cellIndex);
                 tableEdit.showValidationError(result.message);
@@ -284,7 +402,7 @@ var tableEdit = {
         rowNames = [];
         var invalidItem = {}
         table.find('tbody tr').each(function (rowIndex, element) {
- 
+
             var tr = $(element);
             if (tr.find('th .tabledit-span').text().trim().length == 0) {
                 invalidItem.rowIndex = rowIndex;
@@ -323,16 +441,16 @@ var tableEdit = {
     },
     markInvalidRow: function (table, rowIndex, columnIndex) {
         if (columnIndex == 0) {
-            table.find('tr').eq(rowIndex+1).find('th').eq(columnIndex).addClass('danger');
+            table.find('tr').eq(rowIndex + 1).find('th').eq(columnIndex).addClass('danger');
         } else {
-            table.find('tr').eq(rowIndex+1).find('td').eq(columnIndex-1).addClass('table-danger');
+            table.find('tr').eq(rowIndex + 1).find('td').eq(columnIndex - 1).addClass('table-danger');
         }
 
         $('body, html').animate({
             scrollTop: table.find('.table-danger, .danger').offset().top - 100
-        }, {easing: "swing", duration: 500});
+        }, { easing: "swing", duration: 500 });
         return false;
-        
+
     },
     showValidationError: function (message) {
         $('#popupMessage .modal-body').html('<p>' + message + '</p>');
@@ -409,7 +527,6 @@ var tableEdit = {
 
 }
 
-
 function createTemplateTable(template_id) {
 
     // TODO: Add loader here
@@ -484,5 +601,22 @@ function createTemplateTable(template_id) {
 
         $('.assessment-container').html(templateHTML);
         tableEdit.init($('table.table'));
+        // This is to add the class for walkthrough in the edit score button
+        $('table:first-of-type .tabledit-toolbar-column .tabledit-edit-button').addClass('firstGuide');
+        $('table:first-of-type .tabledit-toolbar-column .tabledit-edit-button').addClass('stepOne');
+
+        // This is to add the class for walkthrough in edit and delete buttons for criteria
+        $('table:first-of-type tbody tr:first-child .tabledit-header-edit').addClass('thirdGuide');
+        $('table:first-of-type tbody tr:first-child .tabledit-header-edit').addClass('stepOne');
+        $('table:first-of-type tbody tr:first-child .tabledit-toolbar .tabledit-edit-button').addClass('thirdGuide');
+        $('table:first-of-type tbody tr:first-child .tabledit-toolbar .tabledit-edit-button').addClass('stepTwo');
+        $('table:first-of-type tbody tr:first-child .tabledit-toolbar .tabledit-delete-button').addClass('thirdGuide');
+        $('table:first-of-type tbody tr:first-child .tabledit-toolbar .tabledit-delete-button').addClass('stepThree');
+        $('table:first-of-type').next().find('.table-add-row').addClass('thirdGuide');
+        $('table:first-of-type').next().find('.table-add-row').addClass('stepFour');
+
+        if(localStorage.getItem('finishedTemplateWalkthrough') == null){
+            editWalkthrough.firstWalkthrough();
+        }
     });
 }

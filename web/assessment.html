@@ -25,52 +25,28 @@
 
     <div class="header-container">
         <div>
-            <a 
-            data-step=1
-            data-intro="Click to go back index page"
-            data-position="right"
-            href="index.html" 
-            class="header-icon btnNavigate">
-            <i class="fas fa-home"></i>
+            <a href="index.html" class="header-icon btnNavigate secondGuide stepOne">
+                <i class="fas fa-home"></i>
             </a>
-            <a 
-            data-step=2
-            data-intro="Click to change the evaluation template"
-            data-position="right"
-            href="index.html" 
-            class="header-icon btnEditTemplate" href="javascript:;">
-            <i title="Edit Template" class="fas fa-file-invoice"></i>
+            <a href="index.html" class="header-icon btnEditTemplate secondGuide stepTwo">
+                <i title="Edit Template" class="fas fa-file-invoice"></i>
             </a>
         </div>
 
-        <div 
-        data-step=3
-        data-intro="Realtime score shows here"
-        data-position="bottom"
-        class="header-score-container">
+        <div class="header-score-container secondGuide stepThree">
             <!-- Dynamically populated in the back-end -->
         </div>
 
         <div class="header-icon-container">
-            <a 
-            data-step=4
-            data-intro="Finish all the evaluation and save the scores to Word file."
-            data-position="left"
-            href="javascript:;" 
-            class="header-icon btnSaveDocument">
-            <i title="Save" class="fas fa-save"></i>
+            <a class="header-icon btnSaveDocument">
+                <i title="Save" class="fas fa-save"></i>
             </a>
         </div>
 
     </div>
 
-    <div 
-    class="template-container">
-        <div 
-        data-step=5
-        data-intro="Basic information, only student id is required. Your new information will be store in the database as well. You can go to management page to manage them."
-        data-position="left"
-        class="document-header">
+    <div class="template-container">
+        <div class="document-header secondGuide stepFour">
             <input type="hidden" class="tableCourseCode" />
             <table class="full-width-table">
                 <tr>
@@ -89,7 +65,8 @@
                 <tr>
                     <td>
                         Topic of Presentation:
-                        <input type="text" class="header-input border-bottom-only tablePresentation" maxlength=40></span>
+                        <input type="text" class="header-input border-bottom-only tablePresentation"
+                            maxlength=40></span>
                     </td>
                 </tr>
             </table>
@@ -99,20 +76,8 @@
             <!-- Dynamically populated in the back-end -->
         </div>
         <div style="text-align: right; width: 100%;">
-            <a 
-            data-step=6
-            data-intro="Abandon all current marking result"
-            data-position="left"
-            href="javascript:;" class="btn btn-secondary" onclick="window.location.reload();">
-            Reset
-            </a>
-            <button 
-            data-step=7
-            data-intro="Save current result into Word file"
-            data-position="left"
-            class="btnSaveDocument btn btn-primary">
-            Finish Evaluation
-            </button>
+            <a class="btn btn-secondary" onclick="window.location.reload();">Reset</a>
+            <button class="btnSaveDocument btn btn-primary">Finish Evaluation</button>
         </div>
 
     </div>
@@ -134,7 +99,8 @@
                         <div class="col-sm-12">
                             <p>
                                 <span class="small">Description:</span><br />
-                                <span class="small text-secondary" id="lblTemplateDescription">This is the description.</span>
+                                <span class="small text-secondary" id="lblTemplateDescription">This is the
+                                    description.</span>
                             </p>
                         </div>
                     </div>
@@ -150,7 +116,7 @@
     <!-- Evaluate Info Popup -->
 
     <div class="modal fade" id="popupAddStudent" tabindex="-1" role="dialog" aria-labelledby="popupAddStudentTitle"
-         aria-hidden="true">
+        aria-hidden="true">
         <div class="modal-dialog modal-dialog-centered" role="document">
             <div class="modal-content">
                 <div class="modal-header">
@@ -158,14 +124,14 @@
                     <a href="index.html" class="close btn" data-dismiss="modal">x</a>
                 </div>
                 <div class="modal-body">
-                    <div class="labeled-input-group">
+                    <div class="labeled-input-group firstGuide stepOne">
                         <div class="autocomplete">
                             <input type="text" pattern="[0-9]+" class="modal-input" id="txtStudentID" maxlength="10" />
                             <label for="txtStudentID">Student ID</label>
                         </div>
                     </div>
                     <br />
-                    <u id="linkShowAdditionalFields" class="black-link hidden">Show additional fields</u>
+                    <u id="linkShowAdditionalFields" class="black-link hidden firstGuide stepTwo">Show additional fields</u>
                     <br />
 
                     <div class="hidden-fields-container">
@@ -190,7 +156,7 @@
                     </div>
                 </div>
                 <div class="modal-footer">
-                    <button type="button" class="btn btn-block btn-primary" id="btnEvaluate">
+                    <button type="button" class="btn btn-block btn-primary firstGuide stepThree" id="btnEvaluate">
                         <i class="fa fa-check"></i>
                     </button>
                 </div>
@@ -202,7 +168,7 @@
     <!-- Successful Save Popup -->
 
     <div class="modal fade" id="popupSuccessfulSave" tabindex="-1" role="dialog" aria-labelledby="successfulSavePopup"
-         aria-hidden="true">
+        aria-hidden="true">
         <div class="modal-dialog">
             <div class="modal-content">
                 <div class="modal-header">
@@ -220,8 +186,8 @@
                     </div>
                 </div>
                 <div class="modal-footer">
-                    <button id="btnShowSurvey" class="btn btn-danger" data-dismiss="modal">Exit</button>
-                    <a href="#" class="btn btn-secondary" onclick="window.location.reload();">Next Student</a>
+                    <a href="index.html" class="btn btn-danger">Exit</a>
+                    <button id="btnNextStudent" class="btn btn-secondary">Next Student</button>
                 </div>
             </div>
         </div>
@@ -251,18 +217,18 @@
     <!-- Save New Information Popup -->
 
     <div class="modal fade" id="popupSaveNewInfo" tabindex="-1" role="dialog" aria-labelledby="saveNewInfoPopup"
-         aria-hidden="true">
+        aria-hidden="true">
         <div class="modal-dialog">
             <div class="modal-content">
                 <div class="modal-header">
                     <h5 class="modal-title" id="modalTitle">Save New Information?</h5>
                 </div>
-                <div id="modalSaveNewInfo" class="modal-body">
+                <div id="modalSaveNewInfo" class="modal-body thirdGuide stepOne">
 
                 </div>
                 <div class="modal-footer">
-                    <button id="btnDiscard" class="btn btn-secondary">Discard</button>
-                    <button id="btnSaveNewInfo" class="btn btn-success">Save</button>
+                    <button id="btnDiscard" class="btn btn-secondary thirdGuide stepThree">Discard</button>
+                    <button id="btnSaveNewInfo" class="btn btn-success thirdGuide stepTwo">Save</button>
                 </div>
             </div>
         </div>
@@ -273,14 +239,14 @@
     <script type="text/javascript" src="js/global.js"></script>
     <script type="text/javascript" src="js/assessment.js?v=0.12"></script>
 </body>
-    <script type="text/javascript">
+<script type="text/javascript">
     // for index page   
-    const isShowedIntroEvaluation = Cookies.get("isShowedIntroEvaluation");
-    if ( !isShowedIntroEvaluation ) {
-        introJs().setOption('showProgress', true).start().onskip(function() {
-            Cookies.set('isShowedIntroEvaluation', 1, { expires: 100, path: '' })
-        });
-    }
-    </script>
+    // const isShowedIntroEvaluation = Cookies.get("isShowedIntroEvaluation");
+    // if (!isShowedIntroEvaluation) {
+    //     introJs().setOption('showProgress', true).start().onskip(function () {
+    //         Cookies.set('isShowedIntroEvaluation', 1, { expires: 100, path: '' })
+    //     });
+    // }
+</script>
 
 </html>
