@@ -527,6 +527,7 @@ if (typeof jQuery === 'undefined') {
                     if ($td.parents('table').find('tbody tr').length != 1) {
                         Delete.submit($td);
                     } else {
+                        $('#popupMessage .modal-body').html('<p> Delete the last criteria in a table is not allowed </p>');
                         $('#popupMessage').modal('show');
                     }
 

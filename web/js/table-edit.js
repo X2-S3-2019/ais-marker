@@ -176,11 +176,6 @@ function getTemplateInfo() {
 
 function initializeEditOrCopyPopup() {
 
-    if (!tableEdit.validateTemplateTables(tableEdit.tables)) {
-
-        return false;
-    }
-
     $('#popupUpdateOrCopy').modal('show');
     console.log('Template name: ' + template_info['template_name']);
     $('#btnNewCopy').on('click', function () {
@@ -262,23 +257,28 @@ var tableEdit = {
             // TODO: Change accordingly when users can create templates
 
             //initializeEditOrCopyPopup();
+            if (!tableEdit.validateTemplateTables(tableEdit.tables)) {
+
+                return false;
+            }
             $('#popupSaveTemplate').modal('show');
             tableEdit.initializeSaveTemplatePopup();
         })
 
     },
     validateTemplateTables: function (tables) {
-        let result = true;
+        let validationResult = true;
         tables.each(function (index, table) {
 
             var result = tableEdit.validateTemplateTable($(table)); 
-            console.log(result);
+            
             if (result !== true) {
                 tableEdit.markInvalidRow($(table), result.rowIndex, result.cellIndex);
-                result = false;
+                tableEdit.showValidationError(result.message);
+                validationResult = false;
             };
         })
-        return false;
+        return validationResult;
     },
     validateTemplateTable: function (table) {
         rowNames = [];
@@ -289,11 +289,13 @@ var tableEdit = {
             if (tr.find('th .tabledit-span').text().trim().length == 0) {
                 invalidItem.rowIndex = rowIndex;
                 invalidItem.cellIndex = 0;
+                invalidItem.message = "Template has an empty criteria name";
             }
 
             if (rowNames.find(function (arrayItem) { return arrayItem == tr.data('name') })) {
                 invalidItem.rowIndex = rowIndex;
                 invalidItem.cellIndex = 0;
+                invalidItem.message = "Template has duplicated criteria names";
             }
 
             if (invalidItem.hasOwnProperty('rowIndex')) {
@@ -304,7 +306,8 @@ var tableEdit = {
 
                 if ($(cell).text().trim().length == 0) {
                     invalidItem.rowIndex = rowIndex;
-                    invalidItem.cellIndex = cellIndex+1;
+                    invalidItem.cellIndex = cellIndex + 1;
+                    invalidItem.message = "Template has an empty criteria mark";
                 }
             });
 
@@ -330,6 +333,10 @@ var tableEdit = {
         }, {easing: "swing", duration: 500});
         return false;
         
+    },
+    showValidationError: function (message) {
+        $('#popupMessage .modal-body').html('<p>' + message + '</p>');
+        $('#popupMessage').modal('show');
     },
     generateJSON: function (tables) {
         let template = {};
