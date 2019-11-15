@@ -175,6 +175,12 @@ function getTemplateInfo() {
 }
 
 function initializeEditOrCopyPopup() {
+
+    if (!tableEdit.validateTemplateTables(tableEdit.tables)) {
+
+        return false;
+    }
+
     $('#popupUpdateOrCopy').modal('show');
     console.log('Template name: ' + template_info['template_name']);
     $('#btnNewCopy').on('click', function () {
@@ -261,6 +267,70 @@ var tableEdit = {
         })
 
     },
+    validateTemplateTables: function (tables) {
+        let result = true;
+        tables.each(function (index, table) {
+
+            var result = tableEdit.validateTemplateTable($(table)); 
+            console.log(result);
+            if (result !== true) {
+                tableEdit.markInvalidRow($(table), result.rowIndex, result.cellIndex);
+                result = false;
+            };
+        })
+        return false;
+    },
+    validateTemplateTable: function (table) {
+        rowNames = [];
+        var invalidItem = {}
+        table.find('tbody tr').each(function (rowIndex, element) {
+ 
+            var tr = $(element);
+            if (tr.find('th .tabledit-span').text().trim().length == 0) {
+                invalidItem.rowIndex = rowIndex;
+                invalidItem.cellIndex = 0;
+            }
+
+            if (rowNames.find(function (arrayItem) { return arrayItem == tr.data('name') })) {
+                invalidItem.rowIndex = rowIndex;
+                invalidItem.cellIndex = 0;
+            }
+
+            if (invalidItem.hasOwnProperty('rowIndex')) {
+                return false;
+            }
+
+            tr.find('td .tabledit-span').each(function (cellIndex, cell) {
+
+                if ($(cell).text().trim().length == 0) {
+                    invalidItem.rowIndex = rowIndex;
+                    invalidItem.cellIndex = cellIndex+1;
+                }
+            });
+
+            rowNames.push($(element).data('name'));
+        });
+
+        if (invalidItem.hasOwnProperty('rowIndex')) {
+            return invalidItem;
+        } else {
+            return true;
+        }
+
+    },
+    markInvalidRow: function (table, rowIndex, columnIndex) {
+        if (columnIndex == 0) {
+            table.find('tr').eq(rowIndex+1).find('th').eq(columnIndex).addClass('danger');
+        } else {
+            table.find('tr').eq(rowIndex+1).find('td').eq(columnIndex-1).addClass('table-danger');
+        }
+
+        $('body, html').animate({
+            scrollTop: table.find('.table-danger, .danger').offset().top - 100
+        }, {easing: "swing", duration: 500});
+        return false;
+        
+    },
     generateJSON: function (tables) {
         let template = {};
         template.id = $('.assessment-container').data('id');
@@ -311,6 +381,7 @@ var tableEdit = {
         return groupCriteria;
     },
     initializeSaveTemplatePopup: function () {
+
         let template = tableEdit.generateJSON(tableEdit.tables);
         console.log('In Save template popup: ' + template['name']);
         $('#btnSaveTemplate').on('click', function () {

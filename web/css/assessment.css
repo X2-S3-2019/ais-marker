@@ -65,6 +65,9 @@
     background-color: rgb(228, 228, 228);
   }
 
+    .table th.danger {
+        background-color: rgb(247, 114, 114);
+    }
 .hidden-fields-container {
   margin-top: 1em;
   display: none;
