@@ -13,11 +13,15 @@
 <link rel="stylesheet" href="external_assets/css/fontawesome.min.css">
 <link rel="stylesheet" href="external_assets/css/all.min.css">
 <script type="text/javascript" src="external_assets/css/all.css"></script>
-<script type="text/javascript" src="external_assets/js/jquery-3.4.1.min.js"></script>
-<script type="text/javascript" src="external_assets/js/bootstrap.min.js"></script>
 <link rel="stylesheet" href="css/global.css">
 <link rel="stylesheet" href="css/main.css">
+<link rel="stylesheet" type="text/css" href="external_assets/css/introjs-rtl.min.css">
+<link rel="stylesheet" type="text/css" href="external_assets/css/introjs.min.css">
+<script type="text/javascript" src="external_assets/js/jquery-3.4.1.min.js"></script>
+<script type="text/javascript" src="external_assets/js/bootstrap.min.js"></script>
+<script type="text/javascript" src="/external_assets/js/intro.min.js"></script>
 <script type="text/javascript" src="/external_assets/js/jquery.tabledit.js"></script>
+<script type="text/javascript" src="/external_assets/js/js.cookie.min.js"></script>
 <script src="js/index.js"></script>
 
 <!-- Styles for Onboarding -->
@@ -88,10 +92,24 @@
     <div></div>
     <div>
       <span class="small-circle-bg menu-item small-icon">
-        <a class='fa fa-question-circle' href='quick-guide.html' title="How to Use"></a>
+        <a 
+        data-step=4
+        data-intro="Check the quick guidence"
+        data-position='left' 
+        class='fa fa-question-circle' 
+        href='quick-guide.html' 
+        title="How to Use"></a>
       </span>
       <span class="small-circle-bg menu-item small-icon">
-        <a class='fa fa-info' href='https://sites.google.com/view/evaluate-app' title="About" target='_blank'></a>
+        <a 
+        data-step=3
+        data-intro="Visit our official website for more information"
+        data-position='right' 
+        class='fa fa-info' 
+        href='https://sites.google.com/view/evaluate-app' 
+        title="About" 
+        target='_blank'>
+        </a>
       </span>
     </div>
 
@@ -102,20 +120,39 @@
   <!-- Main Menu buttons -->
 
   <div class="container text-center">
-    <div>
-      <button id="btnQuickStart" class="btn"><img src='imgs/quick start.png' /></button>
+    <div >
+      <button 
+      data-step=1 
+      data-intro="start evaluation here" 
+      data-position='right' 
+      id="btnQuickStart" 
+      class="btn">
+      <img src='imgs/quick start.png' />
+      </button>
     </div>
     <div class="footer">
       <hr>
-      <nav>
+      <nav 
+      data-step=2
+      data-intro="Manage all extral informations here. You can generate all the information in the 'quick start' page automaticallly, but you can only edit/delete the information in those pages" 
+      data-position='left' 
+      >
         <ul>
-          <li><a href="setup/courses.html">COURSES</a></li>
+          <li>
+            <a href="setup/courses.html">COURSES</a>
+          </li>
           <span class="line"></span>
-          <li><a href="setup/presentations.html">PRESENTATIONS</a></li>
+          <li>
+            <a href="setup/presentations.html">PRESENTATIONS</a>
+          </li>
           <span class="line"></span>
-          <li><a href="setup/students.html">STUDENTS</a></li>
+          <li>
+            <a  href="setup/students.html">STUDENTS</a>
+          </li>
           <span class="line"></span>
-          <li><a href="setup/config.html">CONFIGURATIONS</a></li>
+          <li>
+            <a href="setup/config.html">CONFIGURATIONS</a>
+          </li>
         </ul>
       </nav>
     </div>
@@ -170,8 +207,7 @@
 
     </div>
 
-    <script type="text/javascript" src="js/global.js"></script>
-
+    <script type="text/javascript" src="./js/global.js?t=1"></script>
 </body>
 <!-- This is Javascript for the onboarding carousel-->
 <script type="text/javascript">
@@ -183,6 +219,13 @@
       $('.carousel-control-next').hide(); return;
     }
   });
+  // for index page   
+  const isShowedIntroIndex = Cookies.get("isShowedIntroIndex");
+  if ( !isShowedIntroIndex ) {
+    introJs().setOption('showProgress', true).start().onskip(function() {
+        Cookies.set('isShowedIntroIndex', 1, { expires: 100, path: '' })
+    });
+  }
 </script>
 
 </html>

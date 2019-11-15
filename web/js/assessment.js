@@ -184,8 +184,11 @@ function initializeEvaluationPopup() {
     autocomplete(document.getElementById("txtStudentID"), arrStudentIDs);
     autocomplete(document.getElementById("txtCourse"), arrCourses);
 
-    // Show popup
-    $('#popupAddStudent').modal('show');
+    // Show popup, only when no need to show walkthrough
+    var isShowedIntroEvaluation = Cookies.get("isShowedIntroEvaluation");
+    if (isShowedIntroEvaluation) {
+        $('#popupAddStudent').modal('show');
+    }
 
     // When Show Additional Fields is clicked
     if (!linkAdditionalFieldsHasListener) {
