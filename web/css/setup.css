@@ -35,3 +35,11 @@
       color: grey;
       font-size: 1.5em;
   }
+
+  th {
+    width: 80px;
+  }
+
+button {
+  margin-right: 10px;
+}

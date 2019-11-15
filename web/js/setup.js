@@ -5,6 +5,8 @@
     courses.html, presentations.html and students.html
 */
 
+var hasListeners = false;
+
 $(document).ready(function () {
 
     let sPath = window.location.pathname;
@@ -79,12 +81,15 @@ function displayAllCourses() {
         });
     });
 
-    addClickListeners('Course');
+    if (!hasListeners) {
+        addClickListeners('Course');
+    }
+
 }
 
 function displayAllStudents() {
     $('#tblStudents tbody').empty()
-    
+
     students = eel.getStudents()(function (students) {
         students.forEach(function (row) {
             // row -> [0] = student_id, [1] = student_name
@@ -92,7 +97,10 @@ function displayAllStudents() {
         });
     });
 
-    addClickListeners('Student');
+    if (!hasListeners) {
+        addClickListeners('Student');
+    }
+
 }
 
 function displayAllPresentations(filter = 'None') {
@@ -117,7 +125,9 @@ function displayAllPresentations(filter = 'None') {
         });
     }
 
-    addClickListeners('Presentation');
+    if (!hasListeners) {
+        addClickListeners('Presentation');
+    }
 }
 
 function addActionButtons(table_id, row_id, row_head, row_name) {
@@ -131,8 +141,8 @@ function addActionButtons(table_id, row_id, row_head, row_name) {
 
     $('#' + table_id + ' tbody').append(
         '<tr data-id="' + row_id + '">' +
-        '<th scope="row">' + row_head + '</th>' +
-        '<td class="name">' + row_name + '</td>' +
+        '<th scope="row" title="' + row_head + '">' + CutString(row_head, 10) + '</th>' +
+        '<td class="name" title="' + row_name + '">' + CutString(row_name, 40) + '</td>' +
         '<td style="text-align: center"><div class="btn-group" style="padding-bottom: 10px">' +
         '<button class="link btn btn-primary ' + editBtnClass + ' edit-default"> <i class="fa fa-edit"></i> </button>' +
         '<button class="link btn btn-danger ' + deleteBtnClass + ' delete-default"><i class="fa fa-trash"></i></button></div>' +
@@ -145,26 +155,25 @@ function addActionButtons(table_id, row_id, row_head, row_name) {
 
 function addClickListeners(type) {
     let current_head, current_name; // Used to revert to old values when user clicks cancel
+    hasListeners = true;
+    console.log('Listeners attached: ' + hasListeners);
 
     $('body').on('click', '.btnEdit' + type, function (e) {
         let btn = $(this);
         let row = btn.parents('tr');
-        let name = row.children('td.name').html();
-        let head = row.children('th').html();
+        let name = row.children('td.name').attr("title");
+        let head = row.children('th').attr("title");
 
         if (btn.hasClass('edit-default')) {
             current_head = head;
             current_name = name;
-
             // Change text to input
             if (type == 'Presentation') {
-                row.children('th').html('<input type="date" class="form-control" value="' + head + '" />');
+                row.children('th').html('<input maxlength=10 type="date" class="form-control" value="' + head + '" />');
             } else if (type == 'Course') {
-                row.children('th').html('<input type="text" class="form-control" value="' + head + '" />');
+                row.children('th').html('<input maxlength=10 type="text" class="form-control" value="' + head + '" />');
             }
-
-            row.children('td.name').html('<input type="text" class="form-control" value="' + name + '" />');
-
+            row.children('td.name').html('<input maxlength=40 type="text" class="form-control" value="' + name + '"/>');
             btn.html('<i class="fa fa-times"></i>');
             btn.removeClass('edit-default');
             btn.addClass('edit-cancel');
@@ -188,19 +197,70 @@ function addClickListeners(type) {
         let row = btn.parents('tr');
         let id = row.attr('data-id');
         let new_name = row.find('td.name input').val();
-        let new_date = row.find('th input').val();
+        let new_head = row.find('th input').val();
 
-        // Save to database
-        eel.updatePresentation(id, new_name, new_date)(function () {
-            // Upon successful save, change input to text
-            row.children('th').html(new_date);
-            row.children('td.name').html(new_name);
-            // Enable delete button
-            row.find('.btnDelete' + type).attr('disabled', false);
+        console.log('Saving ' + new_name);
+        if ( new_name.length === 0 || new_head.length === 0 ) {
+            alert('invalid field, please check carefully!');
+            return;
+        }
 
-            row.find('.btnSave').addClass('d-none');
-            row.find('.btnEdit' + type).html('<i class="fa fa-edit"></i>');
-        });
+        switch (type) {
+            case 'Presentation':
+                // Save presentation to database
+                console.log('Saving presentation to database...');
+                eel.updatePresentation(id, new_name, new_head)(function () {
+                    // Upon successful save, change input to text
+                    row.children('th').html(new_head);
+                    row.children('th').attr("title", new_head);
+                    row.children('td.name').html(new_name);
+                    row.children('td.name').attr("title", new_name);
+                    // Enable delete button
+                    row.find('.btnDelete' + type).attr('disabled', false);
+                    row.find('.btnSave').addClass('d-none');
+                    row.find('.btnEdit' + type).html('<i class="fa fa-edit"></i>');
+                    row.find('.btnEdit' + type).addClass('edit-default');
+
+                });
+                break;
+            case 'Student':
+                // Save student to database
+                console.log('Saving student to database...');
+                eel.updateStudent(id, new_name)(function () {
+                    console.log('Student saved to database...');
+                    // Upon successful save, change input to text
+                    row.children('th').html(new_head);
+                    row.children('th').attr("title", new_head);
+                    row.children('td.name').html(new_name);
+                    row.children('td.name').attr("title", new_name);
+                    // Enable delete button
+                    row.find('.btnDelete' + type).attr('disabled', false);
+
+                    row.find('.btnSave').addClass('d-none');
+                    row.find('.btnEdit' + type).html('<i class="fa fa-edit"></i>');
+                    row.find('.btnEdit' + type).addClass('edit-default');
+                });
+                break;
+            case 'Course':
+                // Save presentation to database
+                console.log('Saving course to database...');
+                eel.updateCourse(id, new_head, new_name)(function () {
+                    // Upon successful save, change input to text
+                    console.log('Saving course to database...');
+                    row.children('th').html(new_head);
+                    row.children('th').attr("title", new_head);
+                    row.children('td.name').html(new_name);
+                    row.children('td.name').attr("title", new_name);
+                    // Enable delete button
+                    row.find('.btnDelete' + type).attr('disabled', false);
+
+                    row.find('.btnSave').addClass('d-none');
+                    row.find('.btnEdit' + type).html('<i class="fa fa-edit"></i>');
+                    row.find('.btnEdit' + type).addClass('edit-default');
+                });
+                break;
+        }
+
     });
 
     // Add listener to delete
@@ -244,7 +304,7 @@ function addClickListeners(type) {
 
                     row.find('.btnConfirm').addClass('d-none');
                     row.find('.btnDelete' + type).html('<i class="fa fa-trash"></i>');
-                    
+
                     location.reload();
                 })
                 break;
@@ -282,7 +342,7 @@ function populateCoursesDropdown() {
     eel.getCourses()(function (courses) {
         $('#ddlCourses').append('<option value="None">Select a course..</option>');
         courses.forEach(function (row) {
-            $('#ddlCourses').append('<option value="' + row[0] + '">' + row[1] + '(' + row[2] + ')</option>');
+            $('#ddlCourses').append('<option value="' + CutString(row[0], 100) + '">' + CutString(row[1], 100) + '(' + CutString(row[2], 100) + ')</option>');
         });
     });
 }
@@ -310,11 +370,11 @@ function addCourse() {
         return false;
     } else {
         console.log('Adding ' + course_code + 'with name ' + course_name);
-        eel.addCourse(course_code, course_name)(function(){
+        eel.addCourse(course_code, course_name)(function () {
             console.log('Course added');
             displayAllCourses();
         });
-        
+
         // Clear input fields
         $('#txtCourseCode').val('');
         $('#txtCourseName').val('');
@@ -323,7 +383,7 @@ function addCourse() {
 
 function addStudent() {
     let student_id, student_name;
-    
+
     $('input').removeClass('is-invalid');
     student_id = $('#txtStudentID').val();
     student_name = $('#txtStudentName').val();
@@ -343,10 +403,10 @@ function addStudent() {
         return false;
     } else {
         console.log('Adding ' + student_id + ' with name ' + student_name);
-        eel.addStudent(student_id, student_name)(function(){
+        eel.addStudent(student_id, student_name)(function () {
             displayAllStudents();
         });
-        
+
         // Clear input fields
         $('#txtStudentID').val('');
         $('#txtStudentName').val('');
@@ -381,10 +441,10 @@ function addPresentation() {
         return false;
     } else {
         console.log('Adding ' + presentation_name);
-        eel.addPresentation(course_id, presentation_name, presentation_date)(function(){
+        eel.addPresentation(course_id, presentation_name, presentation_date)(function () {
             displayAllPresentations(course_id);
         });
-        
+
         // Clear input fields
         $('#datePresentation').val('');
         $('#txtPresentationName').val('');

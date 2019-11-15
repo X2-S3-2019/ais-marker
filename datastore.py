@@ -281,7 +281,7 @@ class DBManager:
             print(Error)
             con.close()
 
-        crs.execute('UPDATE courses SET name = ? WHERE id = ?',
+        crs.execute('UPDATE students SET name = ? WHERE id = ?',
                     (student_name, student_id))
 
         updated = crs.rowcount
@@ -379,7 +379,7 @@ class DBManager:
             con.close()
 
         crs = con.cursor()
-
+ 
         crs.execute('INSERT INTO templates VALUES (?, ?, ?)',
                     (None, name, template_description))
         template_id = crs.lastrowid
@@ -529,7 +529,7 @@ class DBManager:
         crs = con.cursor()
 
         # Get user's Desktop path as default path, use light mode, always set path every presentation and always open document
-        default_path = os.path.expanduser("~\Desktop")
+        default_path = os.path.expanduser("~\Desktop\AIS_Evaluations")
         crs.execute('INSERT INTO settings VALUES (?, ?, ?, ?, ?, ?)',
                     (None, 1, default_path, False, False, False))
 

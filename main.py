@@ -32,6 +32,8 @@ def createTemplate(template_id):
     template_db = databaseManager.getTemplate(
         template_id)  # Get Default template
 
+    print(template_db)
+
     template = Template(template_db[0], template_db[1], template_db[2])
 
     group_criteria_db = databaseManager.getGroupCriteriaOf(template_db[0])
@@ -246,6 +248,11 @@ def createAssessmentResultDocument(header_info, results, template_id, openDocume
         # Get default directory from database
         path = databaseManager.getDefaultDirectory()
 
+        if not os.path.exists(path):
+            os.makedirs(path)
+
+        print(path)
+        
         assessmentDocument = AssessmentDocument(document_name)
         assessmentDocument.createResultsDocument(
             template, results, header_info, path)

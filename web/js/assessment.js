@@ -12,18 +12,17 @@ var arrStudentNames = [];
 var arrCourses = [];
 var arrPresentations = [];
 var arrTemplates = [];
-var template_id = -1;   // Initialize id; If no default is given, make user choose.
+var template_id = 1;   // Initialize id; If no default is given, make user choose.
 var isDragging = false;
+var linkAdditionalFieldsHasListener = false;
 
 $(document).ready(function () {
 
     let template_info = getTemplateInfo();
     console.log(template_info);
-    
-    if(template_info.hasOwnProperty('template_id')){
+
+    if (template_info.hasOwnProperty('template_id')) {
         template_id = template_info['template_id'];
-    } else {
-        template_id = -1;
     }
 
     getDataFromDatabase();
@@ -40,14 +39,27 @@ $(document).ready(function () {
         initializeChooseTemplatePopup();
     });
 
+    // Only number input for student ID input
+    $("#txtStudentID, .tableStudentID").keypress(function(e){
+        var keyCode = e.which;
+       /*
+         8 - (backspace)
+         32 - (space)
+         48-57 - (0-9)Numbers
+       */
+    
+       if ( (keyCode != 8 || keyCode ==32 ) && (keyCode < 48 || keyCode > 57)) { 
+         return false;
+       }
+     });
 });
 
 function initializeAssessment() {
     // If there's only one template (the Default AIS template), don't show the template popup
     // Check if user doesn't want to see the popup for choosing templates
-    
+
     if (arrTemplates.length > 1) {
-        if(template_id == -1){    // Using default value is disabled
+        if (template_id == -1) {    // Using default value is disabled
             initializeChooseTemplatePopup();
         } else {
             initializeEvaluationPopup();
@@ -120,7 +132,7 @@ function getDataFromDatabase() {
             arrTemplates.push(temp_template);
         });
         console.log('There are ' + arrTemplates.length + ' available');
-        
+
         popuplateChooseTemplateDropdown();
         initializeAssessment();
     });
@@ -176,13 +188,18 @@ function initializeEvaluationPopup() {
     $('#popupAddStudent').modal('show');
 
     // When Show Additional Fields is clicked
-    $('#linkShowAdditionalFields').click(function () {
-        if ($('#linkShowAdditionalFields').hasClass('hidden')) {
-            toggleAdditionalFields('Hidden');
-        } else if ($('#linkShowAdditionalFields').hasClass('shown')) {
-            toggleAdditionalFields('Shown');
-        }
-    });
+    if (!linkAdditionalFieldsHasListener) {
+        linkAdditionalFieldsHasListener = true;
+        $('#linkShowAdditionalFields').click(function () {
+            console.log('Showing additiona fields..');
+            if ($('#linkShowAdditionalFields').hasClass('hidden')) {
+                toggleAdditionalFields('Hidden');
+            } else if ($('#linkShowAdditionalFields').hasClass('shown')) {
+                toggleAdditionalFields('Shown');
+            }
+        });
+    }
+
 
     // Bring label from placeholder position to top
     $('.labeled-input-group input').blur(function () {
@@ -245,7 +262,7 @@ function initializeEvaluationPopup() {
     });
 }
 
-function getStudentName(){
+function getStudentName() {
     if ($('#txtStudentID').val() != '') {
         let studentID = $('#txtStudentID').val();
         for (i = 0; i < arrStudentNames.length; i++) {
@@ -450,7 +467,7 @@ var assessment = {
                         return;
                     }
 
-                    let newInfoHTML = '';
+                    let newInfoHTML = '<p>You have inputted new information. Would you like to save these info to the database?</p>';
                     // Show Save New Info popup
                     if (newInfo.hasOwnProperty('student_id')) {
                         newInfoHTML += '<h3>New Student</h3>';
@@ -521,6 +538,8 @@ var assessment = {
 
                     // If user decides not to save the new information, proceed to making the document.
                     $('#btnDiscard').click(function () {
+                        console.log('Discard button clicked');
+                        console.log(assessment.template);
                         $('#popupSaveNewInfo').modal('toggle');
                         assessment.createAssessmentDocument();
                     });
@@ -561,6 +580,7 @@ var assessment = {
     },
     createAssessmentDocument: function () {
         console.log('Creating document..');
+
         let header_info = assessment.header_info;
         console.log(header_info);
         eel.createAssessmentResultDocument(header_info, assessment.results, template_id, false)().then(function () {
