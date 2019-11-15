@@ -58,7 +58,14 @@ $(document).ready(function () {
         if (selectedSystem['radioID'] === "rdoCalculated") {
             console.log('Calculated score');
 
-            applyScoresToTable();
+            // Check if user wants to apply scoring system to all criteria
+            console.log('checkApplyAll is ' + $('#checkApplyAllScores').prop('checked'));
+            if($('#checkApplyAllScores').prop('checked')){
+                console.log('Checked apply to all');
+                applyScoresToTable(true);
+            } else {
+                applyScoresToTable(false);
+            }
         } else {
             // Check validity of custom scores
             let excellentScore = parseInt($('.preview-text.excellentScore').html());
@@ -83,9 +90,15 @@ $(document).ready(function () {
                 valid = false;
             }
 
-
             if (valid) {
-                applyScoresToTable();
+                console.log('Checkbox is checked: ' + $('#checkApplyAllScores').prop('checked'));
+                // Check if user wants to apply scoring system to all criteria
+                if($('#checkApplyAllScores').is(':checked')){
+                    applyScoresToTable(true);
+                } else {
+                    applyScoresToTable(false);
+                }
+                
                 // Summon the third and final walkthrough
                 if(showThirdWalkthrough){
                     showThirdWalkthrough = false;
@@ -214,11 +227,20 @@ var editWalkthrough = {
     }
 };
 
-function applyScoresToTable() {
+function applyScoresToTable(applyToAll = false) {
     let groupCriterion = $('#txtGroupCriterionID').val();
+    let tableSelection = '';
+    console.log('ApplyToAll is ' + applyToAll);
+
+    if(applyToAll){
+        tableSelection = 'table'
+    } else {
+        tableSelection = '#' + groupCriterion;
+    }
 
     // Append score to header
-    $('#' + groupCriterion + ' thead tr th .tabledit-span').each(function (index) {
+    $(tableSelection + ' thead tr th .tabledit-span').each(function (index) {
+        console.log(tableSelection);
         // console.log($(this).parent().attr('data-point-name') + ' with score ' + $(this).parent().attr('data-points') + ' index: ' + index);
         let data_point_name = $(this).parent().attr('data-point-name');
         let score = $('.preview-text.' + data_point_name.toLowerCase() + 'Score').html();
@@ -235,19 +257,19 @@ function applyScoresToTable() {
     let poorScore = $('.preview-text.poorScore').html();
 
     // Update Excellent score
-    $('#' + groupCriterion + ' tbody tr td[data-value="Excellent"]').each(function (index) {
+    $(tableSelection + ' tbody tr td[data-value="Excellent"]').each(function (index) {
         $(this).attr('data-score', excellentScore);
     });
     // Update Good score
-    $('#' + groupCriterion + ' tbody tr td[data-value="Good"]').each(function (index) {
+    $(tableSelection + ' tbody tr td[data-value="Good"]').each(function (index) {
         $(this).attr('data-score', goodScore);
     });
     // Update Fair score
-    $('#' + groupCriterion + ' tbody tr td[data-value="Fair"]').each(function (index) {
+    $(tableSelection + ' tbody tr td[data-value="Fair"]').each(function (index) {
         $(this).attr('data-score', fairScore);
     });
     // Update Poor score
-    $('#' + groupCriterion + ' tbody tr td[data-value="Poor"]').each(function (index) {
+    $(tableSelection + ' tbody tr td[data-value="Poor"]').each(function (index) {
         $(this).attr('data-score', poorScore);
     });
 
@@ -375,9 +397,9 @@ var tableEdit = {
 
             //initializeEditOrCopyPopup();
             if (!tableEdit.validateTemplateTables(tableEdit.tables)) {
-
                 return false;
             }
+
             $('#popupSaveTemplate').modal('show');
             tableEdit.initializeSaveTemplatePopup();
         })

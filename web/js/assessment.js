@@ -277,7 +277,7 @@ function initializeEvaluationPopup() {
             $('#popupAddStudent').modal('toggle');
             if(showSecondWalkthrough){
                 showSecondWalkthrough = false;
-                setTimeout(walkthrough.secondWalkthrough, 1000);
+                setTimeout(walkthrough.secondWalkthrough, 500);
                 showThirdWalkthrough = true;
             }
             
