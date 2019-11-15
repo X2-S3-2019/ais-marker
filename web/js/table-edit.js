@@ -119,7 +119,7 @@ $(document).ready(function () {
         calculateNewScores(calculated);
     });
 
-    $('#btnUseTemplate').click(function () {
+    $('.btnUseTemplate').click(function () {
         window.location.replace('assessment.html?template_id=' + template_id);
     });
 });
@@ -541,6 +541,8 @@ var tableEdit = {
                     template_id = new_template_id;
                     $('#popupSaveTemplate').modal('toggle');
                     $('#popupSuccessfulSave').modal('show');
+                    // Show use template icon
+                    $('#clipboadIcon').removeClass('d-none');
                 });
             }
         });

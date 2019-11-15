@@ -192,9 +192,10 @@ function initializeChooseTemplatePopup() {
     $('#popupChooseTemplate').modal('show');
 
     $('#btnApplyTemplate').click(function () {
-        createTemplateTable(template_id);
-        initializeEvaluationPopup();
-        initTableEdit();
+        window.location.replace('assessment.html?template_id=' + template_id);
+        // createTemplateTable(template_id);
+        // initializeEvaluationPopup();
+        // initTableEdit();
     })
 }
 
@@ -619,7 +620,7 @@ var assessment = {
         });
     },
     updateAssessmentScoreObject: function (e) {
-        $(e.target).parent().removeClass("table-danger");
+        $(e.target).parent().removeClass("table-active");
         let score = $(e.target).attr('data-score');
         let type = $(e.target).attr('data-type');
         let value = $(e.target).attr('data-value');
@@ -708,8 +709,8 @@ var assessment = {
             for (subcate in assessment.results['groupCriteria'][category]['criteria']) {
                 if (assessment.results['groupCriteria'][category]['criteria'][subcate] < 0) {
                     var tmp = $('tr[data-type="' + category + '.' + subcate + '"]');
-                    tmp.addClass("table-danger");
-                    let offset = tmp.offset().top - 50;
+                    tmp.addClass('table-active');
+                    let offset = tmp.offset().top - 55;
                     $('body, html').animate({
                         scrollTop: offset
                     });

@@ -24,6 +24,20 @@ $(document).ready(function () {
         initializePresentationsPage();
     }
 
+    // Only number input for student ID input
+    $(".numberOnly").keypress(function (e) {
+        var keyCode = e.which;
+        /*
+          8 - (backspace)
+          32 - (space)
+          48-57 - (0-9)Numbers
+        */
+
+        if ((keyCode != 8 || keyCode == 32) && (keyCode < 48 || keyCode > 57)) {
+            return false;
+        }
+    });
+
 });
 
 function initializePresentationsPage() {
@@ -169,11 +183,13 @@ function addClickListeners(type) {
             current_name = name;
             // Change text to input
             if (type == 'Presentation') {
-                row.children('th').html('<input maxlength=10 type="date" class="form-control" value="' + head + '" />');
+                row.children('th').html('<input type="date" class="form-control" value="' + head + '" />');
             } else if (type == 'Course') {
                 row.children('th').html('<input maxlength=10 type="text" class="form-control" value="' + head + '" />');
+            } else if(type == 'Student'){
+                row.children('th').html('<input maxlength=10 type="text" class="form-control numberOnly" value="' + head + '" />');
             }
-            row.children('td.name').html('<input maxlength=40 type="text" class="form-control" value="' + name + '"/>');
+            row.children('td.name').html('<input maxlength=60 type="text" class="form-control" value="' + name + '"/>');
             btn.html('<i class="fa fa-times"></i>');
             btn.removeClass('edit-default');
             btn.addClass('edit-cancel');
