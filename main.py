@@ -32,8 +32,6 @@ def createTemplate(template_id):
     template_db = databaseManager.getTemplate(
         template_id)  # Get Default template
 
-    print(template_db)
-
     template = Template(template_db[0], template_db[1], template_db[2])
 
     group_criteria_db = databaseManager.getGroupCriteriaOf(template_db[0])
@@ -61,14 +59,12 @@ def createTemplate(template_id):
 
 @eel.expose
 def getDefaultTemplateID():
-    print('Default template: ' + str(databaseManager.getDefaultTemplateID()))
     return databaseManager.getDefaultTemplateID()
 
 
 @eel.expose
 def addPresentation(course_id, name, date):
     presentation_id = databaseManager.addPresentation(course_id, name, date)
-    print('Added presentation with id ' + str(presentation_id))
 
     return presentation_id
 
@@ -81,7 +77,6 @@ def getPresentations():
 @eel.expose
 def updatePresentation(id, name, date):
     updated = databaseManager.updatePresentation(id, name, date)
-    print(updated)
 
 
 @eel.expose
@@ -97,8 +92,6 @@ def getAllPresentationsOfCourse(course_id):
 @eel.expose
 def addStudent(id, name):
     student_id = databaseManager.addStudent(id, name)
-    print('Added student with id ' + str(student_id))
-
     return student_id
 
 
@@ -120,8 +113,6 @@ def deleteStudent(id):
 @eel.expose
 def addCourse(code, name):
     course_id = databaseManager.addCourse(code, name)
-    print('Added course with id ' + str(course_id))
-
     return course_id
 
 
@@ -190,8 +181,6 @@ def saveJSONTemplateToDatabase(JSONTemplate):
 
     for group in JSONTemplate['groupCriteria']:
         group_name = group['name']
-        print(group_name)
-        print(groupIcon[group_name])
         group_criterion_id = databaseManager.addGroupCriterion(
             template_id, group['name'], groupIcon[group_name])
 
@@ -223,8 +212,7 @@ def getTemplateJSON(template_id):
 def openDocument(document_name):
     try:
         path = databaseManager.getDefaultDirectory()
-        print('Path: ' + path)
-        os.system('start {os.path.realpath(path)}')
+        os.system(f'start {os.path.realpath(path)}')
     except:
         print('There was an error.')
     # os.startfile(document_name + '.docx')
@@ -251,8 +239,6 @@ def createAssessmentResultDocument(header_info, results, template_id, openDocume
         if not os.path.exists(path):
             os.makedirs(path)
 
-        print(path)
-        
         assessmentDocument = AssessmentDocument(document_name)
         assessmentDocument.createResultsDocument(
             template, results, header_info, path)

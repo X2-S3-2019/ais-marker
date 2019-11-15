@@ -48,8 +48,6 @@ class DBManager:
         crs.execute('SELECT * FROM templates')
         results = crs.fetchone()
 
-        print('Templates ' + str(crs.rowcount))
-
         if results == None:
             print('Creating default template')
             self.createDefaultTemplate()
@@ -121,8 +119,6 @@ class DBManager:
         except Error:
             print(Error)
             con.close()
-
-        print(course_code)
 
         test = crs.execute(
             'SELECT id FROM courses WHERE code = ?', (course_code,))
@@ -551,8 +547,6 @@ class DBManager:
 
         con.close()
 
-        print(str(templateID[0]))
-
         return templateID[0]
 
     def getDefaultDirectory(self):
@@ -569,8 +563,6 @@ class DBManager:
         directory = crs.fetchone()
 
         con.close()
-
-        print(directory[0])
 
         return directory[0]
 
