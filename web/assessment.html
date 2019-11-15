@@ -31,6 +31,29 @@
             <a href="index.html" class="header-icon btnEditTemplate secondGuide stepTwo">
                 <i title="Edit Template" class="fas fa-file-invoice"></i>
             </a>
+            <div class="dropdown_container">
+                <a class="header-icon dropdown_trigger btnTimerSettings">
+                    <i title="Timer Settings" class="fas fa-stopwatch"></i>
+                </a>
+
+                <div class="dropdown_menu">
+                    <li class="text-center lead"><span class="timer-minutes">00</span>:<span
+                            class="timer-seconds">00</span></li>
+                    <li>
+                        <div class="text-center">
+                            <a class="btnStopTimer text-danger"><i class="fas fa-stop-circle"></i></a>
+                            <a class="btnPlayPauseTimer pause"><i class="fas fa-pause"></i></a>
+                        </div>
+                    </li>
+                    <li class="text-center"><button id="btnEditTimer" class="btn btn-primary"
+                            style="margin: 10px 0;">Adjust Time Limit</button></li>
+                    <li style="display: flex; align-items: center;">
+                        <input type="checkbox" id="checkAlertTimeLimit" checked />
+                        <label for="checkAlertTimeLimit" style="line-height: 15px; padding-left: 10px;">Alert me when
+                            limit is reached.</label>
+                    </li>
+                </div>
+            </div>
         </div>
 
         <div class="header-score-container secondGuide stepThree">
@@ -131,7 +154,8 @@
                         </div>
                     </div>
                     <br />
-                    <u id="linkShowAdditionalFields" class="black-link hidden firstGuide stepTwo">Show additional fields</u>
+                    <u id="linkShowAdditionalFields" class="black-link hidden firstGuide stepTwo">Show additional
+                        fields</u>
                     <br />
 
                     <div class="hidden-fields-container">
@@ -152,6 +176,11 @@
                                 <input type="text" class="modal-input" id="txtPresentation" maxlength="50" />
                                 <label for="txtPresentation">Presentation</label>
                             </div>
+                        </div>
+                        <div style="margin-top: 1em;">
+                            <!-- HACK -->
+                            Time Limit: <input type="number" max="120" min="3" value="15" class="txtTimeLimit"
+                                style="width: 3em; margin-left: 10px;" /> minutes
                         </div>
                     </div>
                 </div>
@@ -194,23 +223,21 @@
     </div>
 
     <!-- End of Successful Save Popup -->
+
+    <!-- Error Popup (also used as alert for time limit reached) -->
     <div class="modal fade" id="popupMessage" tabindex="-1" role="dialog">
         <div class="modal-dialog">
             <div class="modal-content">
                 <div class="modal-header">
-                    <h5 class="modal-title" id="modalTitle">Message</h5>
-
+                    <h5 class="modal-title">Message</h5>
                 </div>
                 <div class="modal-body">
-                    <p>Unknown error</p>
+                    <!-- Message here -->
                 </div>
                 <div class="modal-footer">
                     <button id="btnClose" class="btn btn-success" data-dismiss="modal">Close</button>
-
                 </div>
-
             </div>
-
         </div>
 
     </div>

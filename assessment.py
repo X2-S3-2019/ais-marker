@@ -112,6 +112,12 @@ class AssessmentDocument:
         score_header.add_run('Score: ' + str(results['assessmentTotalScore']) + ' over ' + str(results['assessmentPossibleTotalScore']) + ' (' + str(results['scorePercentage']) + '%)').bold = True
         score_header.alignment = WD_ALIGN_PARAGRAPH.RIGHT
 
+        # Add presentation duration
+        print(otherInfo['presentationDuration'])
+        duration_header = document.add_paragraph()
+        duration_header.add_run('Presentation duration: ' + otherInfo['presentationDuration'])
+        duration_header.alignment = WD_ALIGN_PARAGRAPH.RIGHT
+
         # TODO: Make this dynamic/customizable for each template
         # Add the student name, id and topic of presentation
         

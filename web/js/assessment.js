@@ -18,14 +18,22 @@ var arrTemplates = [];
 var template_id = 1;   // Initialize id; If no default is given, make user choose.
 var isDragging = false;
 var linkAdditionalFieldsHasListener = false;
+// Walkthrough-related variables
 var showSecondWalkthrough = false;
 var showThirdWalkthrough = false;
-var showFourthWalkthrough =false;
+var showFourthWalkthrough = false;
+// Timer-related variables
+var minutesLabel = $('.timer-minutes');
+var secondsLabel = $('.timer-seconds');
+var totalSeconds = 0;
+var timeLimit;
+var informedTimeLimit;
 
 $(document).ready(function () {
 
     let template_info = getTemplateInfo();
     console.log(template_info);
+    informedTimeLimit = false;
 
     if (template_info.hasOwnProperty('template_id')) {
         template_id = template_info['template_id'];
@@ -59,16 +67,106 @@ $(document).ready(function () {
         }
     });
 
-    $('#btnNextStudent').click(function(){
+    $('#btnNextStudent').click(function () {
         console.log('Next Student');
-        if(showFourthWalkthrough){
+        if (showFourthWalkthrough) {
             showFourthWalkthrough = false;
             setTimeout(walkthrough.fourthWalkthrough, 1000);
         }
-       
+
         $('#popupSuccessfulSave').modal('toggle');
     });
-});
+
+    // On click
+    $('.dropdown_menu').mouseleave(function () {
+        $(".dropdown_menu").css("display", "none");
+    });
+
+    // On hover
+    $('.dropdown_trigger').mouseenter(function () {
+        console.log('Dropdown hovered');
+        $(".dropdown_menu").css("display", "block");
+    });
+
+    $('.btnStopTimer').click(function () {
+        timer.stop();
+        $('.btnPlayPauseTimer').removeClass('pause');
+        $('.btnPlayPauseTimer').addClass('play');
+        $('.btnPlayPauseTimer').html('<i class="fas fa-play"></i>');
+    });
+
+    $('.btnPlayPauseTimer').click(function () {
+        if ($(this).hasClass('pause')) {
+            timer.pause();
+            $(this).removeClass('pause');
+            $(this).addClass('play');
+            $(this).html('<i class="fas fa-play"></i>');
+        } else if ($(this).hasClass('play')) {
+            timer.resume();
+            $(this).removeClass('play');
+            $(this).addClass('pause');
+            $(this).html('<i class="fas fa-pause"></i>');
+        }
+    });
+}); /* End of document.ready() */
+
+/* Timer functions */
+
+var timer = {
+    currentTime: 0,
+    timerID: 0,
+    start: function () {
+        this.currentTime = 0;
+        this.timerID = setInterval(this.setTime, 1000);
+    },
+    stop: function () {
+        window.clearTimeout(this.timerID);
+        this.currentTime = 0;
+        secondsLabel.html('00');
+        minutesLabel.html('00');
+        delete this.timerID;
+    },
+    pause: function () {
+        console.log('Pause');
+        clearInterval(this.timerID);
+    },
+    resume: function () {
+        console.log('Resume');
+        this.timerID = setInterval(this.setTime, 1000);
+
+    },
+    setTime: function () {
+        let minutesSpent = parseInt(timer.currentTime / 60);
+
+        ++timer.currentTime;
+        secondsLabel.html(pad(timer.currentTime % 60));
+        minutesLabel.html(pad(minutesSpent));
+
+        console.log('Minutes passed: ' + minutesSpent + ' of time limit ' + timeLimit);
+
+        if (minutesSpent == timeLimit) {
+            if ($('#checkAlertTimeLimit').is(':checked') && !informedTimeLimit) {
+                // Alert user
+                $('#popupMessage').find('.modal-title').text('Time Limit Reached');
+                $('#popupMessage').find('.modal-body').text('The presentation has reached the time limit. Please inform the presentor.');
+                $('#popupMessage').modal('show');
+                informedTimeLimit = true;
+            }
+        }
+    }
+};
+
+// This functions pads a zero on a one-digit time value (e.g. 00:01)
+function pad(val) {
+    var valString = val + '';
+    if (valString.length < 2) {
+        return '0' + valString;
+    } else {
+        return valString;
+    }
+}
+
+/* End of Timer functions */
 
 function initializeAssessment() {
     // If there's only one template (the Default AIS template), don't show the template popup
@@ -274,19 +372,28 @@ function initializeEvaluationPopup() {
 
             addHeaderDocument(student_id, student_name, course, presentation);
 
+            // Set time limit
+            console.log($('.txtTimeLimit').val());
+            timeLimit = parseInt($('.txtTimeLimit').val());
+
             $('#popupAddStudent').modal('toggle');
-            if(showSecondWalkthrough){
+
+            if (showSecondWalkthrough) {
                 showSecondWalkthrough = false;
                 setTimeout(walkthrough.secondWalkthrough, 500);
                 showThirdWalkthrough = true;
             }
-            
+
+
+            // Start timer presentation
+            timer.start();
         }
     });
 }
 
 function getStudentName() {
-    if ($('#txtStudentID').val() != '') {
+    // Find student name only if the ID is not empty and the student name has not been filled.
+    if ($('#txtStudentID').val() != '' && $('#txtStudentName').val() == '') {
         let studentID = $('#txtStudentID').val();
         for (i = 0; i < arrStudentNames.length; i++) {
             if (studentID == arrStudentNames[i]['id']) {
@@ -416,7 +523,7 @@ var walkthrough = {
         });
         intro.start();
     },
-    thirdWalkthrough : function(){
+    thirdWalkthrough: function () {
         var intro = introJs();
         intro.setOptions({
             steps: [
@@ -445,12 +552,12 @@ var walkthrough = {
             doneLabel: 'Got it'
         });
         intro.start();
-        introJs.fn.oncomplete(function() {
+        introJs.fn.oncomplete(function () {
             // Set localStorage so that walkthrough only appears once
             localStorage.setItem('finishedWalkthrough', true);
         });
-    }, 
-    fourthWalkthrough : function(){
+    },
+    fourthWalkthrough: function () {
         var intro = introJs();
         intro.setOptions({
             steps: [
@@ -472,7 +579,7 @@ var walkthrough = {
             skipLabel: 'Skip',
             exitOnOverlayClick: false
         });
-        intro.start();   
+        intro.start();
     }
 }
 
@@ -662,11 +769,11 @@ var assessment = {
 
                     $('#popupSaveNewInfo').modal('show');
 
-                    if(showThirdWalkthrough){
+                    if (showThirdWalkthrough) {
                         showThirdWalkthrough = false;
                         walkthrough.thirdWalkthrough();
                         showFourthWalkthrough = true;
-                    }                    
+                    }
 
                     $('#popupSaveNewInfo #btnSaveNewInfo').click(function () {
                         // Add new student
@@ -733,6 +840,32 @@ var assessment = {
         let today = new Date();
         let formatted_date = today.getDate() + "-" + today.getMonth() + "-" + today.getFullYear();
         assessment.header_info['presentationDate'] = formatted_date;
+
+        let minuteDuration = parseInt($('.timer-minutes').text());
+        let secondDuration = parseInt($('.timer-seconds').text());
+        let durationText = '';
+
+        if (minuteDuration > 0) {
+            if (minuteDuration == 1) {
+                durationText += minuteDuration + ' minute';
+            } else {
+                durationText += minuteDuration + ' minutes';
+            }
+        }
+
+        if (minuteDuration > 0 && secondDuration > 0) {
+            durationText += ' and ';
+        }
+
+        if (secondDuration > 0) {
+            if (secondDuration == 1) {
+                durationText += secondDuration + ' second';
+            } else {
+                durationText += secondDuration + ' seconds';
+            }
+        }
+
+        assessment.header_info['presentationDuration'] = durationText;
     },
     calculateScores: function () {
         let totalScore = 0;
@@ -759,6 +892,9 @@ var assessment = {
         console.log('Creating document..');
 
         let header_info = assessment.header_info;
+        // Stop timer
+        timer.stop();
+
         console.log(header_info);
         eel.createAssessmentResultDocument(header_info, assessment.results, template_id, false)().then(function () {
             // Show popup
@@ -964,10 +1100,10 @@ function createTemplateTable(template_id) {
 
         createScoreCards();
         console.log('Value of walkthrough ' + localStorage.getItem('finishedWalkthrough'));
-        if(localStorage.getItem('finishedWalkthrough') == null){
+        if (localStorage.getItem('finishedWalkthrough') == null) {
             walkthrough.firstWalkthrough();
             showSecondWalkthrough = true;
-        }        
+        }
     });
 
 }

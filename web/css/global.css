@@ -39,19 +39,19 @@ input {
 .small-icon a {
     line-height: 30px;
     font-size: 20px;
-  }
+}
 
 .app-title {
-  vertical-align: middle;
-  margin-left: 20px;
-  font-size: 25px;
-  font-weight: 700;
-  color: white;
+    vertical-align: middle;
+    margin-left: 20px;
+    font-size: 25px;
+    font-weight: 700;
+    color: white;
 }
 
 .small-circle-bg {
-  width: 30px;
-  height: 30px;
+    width: 30px;
+    height: 30px;
 }
 
 .three-col-spaced {
@@ -72,17 +72,17 @@ input {
     text-align: center;
     text-decoration: none;
     cursor: pointer;
-    border-radius: 50%;            
-  }
+    border-radius: 50%;
+}
 
 .menu-item a:hover {
     color: white;
     text-decoration: none;
     -webkit-transform: scale(1.1);
-        -ms-transform: scale(1.1);
-        transform: scale(1.1);
-        transition: 0.3s;
-  }
+    -ms-transform: scale(1.1);
+    transform: scale(1.1);
+    transition: 0.3s;
+}
 
 .small-padded {
     padding: 1em;
@@ -92,13 +92,47 @@ input {
     padding: 3em;
 }
 
-button:focus {outline:0;}
+button:focus {
+    outline: 0;
+}
 
 .disabled-highlight-table td {
-    -webkit-touch-callout: none; /* iOS Safari */
-  -webkit-user-select: none; /* Safari */
-  -khtml-user-select: none; /* Konqueror HTML */
-  -moz-user-select: none; /* Firefox */
-  -ms-user-select: none; /* Internet Explorer/Edge */
-  user-select: none; /* Non-prefixed version, currently supported by Chrome and Opera */
+    -webkit-touch-callout: none;
+    /* iOS Safari */
+    -webkit-user-select: none;
+    /* Safari */
+    -khtml-user-select: none;
+    /* Konqueror HTML */
+    -moz-user-select: none;
+    /* Firefox */
+    -ms-user-select: none;
+    /* Internet Explorer/Edge */
+    user-select: none;
+    /* Non-prefixed version, currently supported by Chrome and Opera */
+}
+
+.dropdown_container {
+    position: relative;
+    display: inline-block;
+}
+
+.dropdown_trigger {
+    display: block;
+}
+
+.dropdown_menu {
+    position: absolute;
+    display: none;
+    top: 100%;
+    background: #f1ebeb;
+    width: 200px;
+    list-style: none;
+    padding: 1em;
+    border: 1px solid #c5bfbf;
+    border-top: none;
+    box-shadow: 2px 2px 2px #c0baba;
+}
+
+.show_dropdown .dropdown_menu {
+    display: block;
 }
