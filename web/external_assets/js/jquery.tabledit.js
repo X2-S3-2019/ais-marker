@@ -283,6 +283,8 @@ if (typeof jQuery === 'undefined') {
                 var $tr = $(td).parent('tr');
                 // Enable identifier.
                 $tr.find('.tabledit-input.tabledit-identifier').prop('disabled', false);
+                $tr.find('.table-danger').removeClass('table-danger');
+                $tr.find('.danger').removeClass('danger');
                 // Hide span element.
                 $(td).find('.tabledit-span').hide();
                 // Get input element.
@@ -522,8 +524,13 @@ if (typeof jQuery === 'undefined') {
                     event.preventDefault();
 
                     var $td = $(this).parents('td');
+                    if ($td.parents('table').find('tbody tr').length != 1) {
+                        Delete.submit($td);
+                    } else {
+                        $('#popupMessage').modal('show');
+                    }
 
-                    Delete.submit($td);
+                    
 
                     event.handled = true;
                 }

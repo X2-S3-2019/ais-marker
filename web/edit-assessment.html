@@ -77,49 +77,65 @@
                 </div>
                 <div class="modal-body">
                     <input type="hidden" id="txtGroupCriterionID" />
-                    <div><input type="radio" class="radio-dropdown" id="rdoCalculated" name="rdoGroupScoreSystem" />
-                        <label for="rdoCalculated">Calculated</label></div>
+                    <div>
+                        <input type="radio" class="radio-dropdown" id="rdoCalculated" name="rdoGroupScoreSystem" />
+                        <label for="rdoCalculated">Calculated</label>
+                    </div>
                     <div id="divCalculated" class="div-dropdown">
                         <table>
                             <tr>
                                 <td><strong>Lowest Score</strong>:</td> <!-- Score of Poor -->
-                                <td><input id="txtLowestScore" type="number" min="0" max="100" value="0"
-                                        style="width: 50px" /></td>
+                                <td>
+                                    <input id="txtLowestScore" type="number" min="0" max="100" value="0"
+                                           style="width: 50px" />
+                                </td>
                             </tr>
                             <tr>
                                 <td><strong>Multiplier</strong>:</td>
-                                <td><input id="txtMultiplier" type="number" min="1" max="50" value="1"
-                                        style="width: 50px" /></td>
+                                <td>
+                                    <input id="txtMultiplier" type="number" min="1" max="50" value="1"
+                                           style="width: 50px" />
+                                </td>
                             </tr>
                         </table>
                     </div>
-                    <div><input type="radio" class="radio-dropdown" id="rdoCustom" name="rdoGroupScoreSystem" />
-                        <label for="rdoCustom">Custom</label></div>
+                    <div>
+                        <input type="radio" class="radio-dropdown" id="rdoCustom" name="rdoGroupScoreSystem" />
+                        <label for="rdoCustom">Custom</label>
+                    </div>
                     <div id="divCustom" class="div-dropdown">
                         <p><em>Note: Your points should follow correct order (highest to lowest)</em></p>
                         <table>
                             <tr>
                                 <td><strong>Excellent:</strong></td>
-                                <td><input id="txtExcellentScore" type="number" min="1" max="100" value="4"
-                                        style="width: 50px" /></td>
+                                <td>
+                                    <input id="txtExcellentScore" type="number" min="1" max="100" value="4"
+                                           style="width: 50px" />
+                                </td>
                                 <td><span class="score-error excellentScore">Should be higher than Good</span></td>
                             </tr>
                             <tr>
                                 <td><strong>Good:</strong></td>
-                                <td><input id="txtGoodScore" type="number" min="1" max="100" value="3"
-                                        style="width: 50px" /></td>
+                                <td>
+                                    <input id="txtGoodScore" type="number" min="1" max="100" value="3"
+                                           style="width: 50px" />
+                                </td>
                                 <td><span class="score-error goodScore">Should be higher than Fair</span></td>
                             </tr>
                             <tr>
                                 <td><strong>Fair:</strong></td>
-                                <td><input id="txtFairScore" type="number" min="1" max="100" value="2"
-                                        style="width: 50px" /></td>
+                                <td>
+                                    <input id="txtFairScore" type="number" min="1" max="100" value="2"
+                                           style="width: 50px" />
+                                </td>
                                 <td><span class="score-error fairScore">Should be higher than Poor</span></td>
                             </tr>
                             <tr>
                                 <td><strong>Poor:</strong></td>
-                                <td><input id="txtPoorScore" type="number" min="0" max="100" value="1"
-                                        style="width: 50px" /></td>
+                                <td>
+                                    <input id="txtPoorScore" type="number" min="0" max="100" value="1"
+                                           style="width: 50px" />
+                                </td>
                                 <td><span class="score-error poorScore"></span></td>
                             </tr>
                         </table>
@@ -148,7 +164,6 @@
     </div>
 
     <!-- End of Edit Score System Popup -->
-
     <!-- Choose Save Popup -->
 
     <div class="modal fade" id="popupSaveTemplate" tabindex="-1" role="dialog">
@@ -180,7 +195,6 @@
     </div>
 
     <!-- End of Save Template Popup -->
-
     <!-- Leaving without Saving Popup -->
 
     <div class="modal fade" id="popupLeaveWithoutSaving" tabindex="-1" role="dialog">
@@ -201,7 +215,6 @@
     </div>
 
     <!-- End of Leaving without Saving Popup -->
-
     <!-- Update or Create Copy Popup -->
 
     <div class="modal fade" id="popupUpdateOrCopy" tabindex="-1" role="dialog">
@@ -223,11 +236,10 @@
     </div>
 
     <!-- End of Update or Create a Copy Popup -->
-
     <!-- Successful Save Popup -->
 
     <div class="modal fade" id="popupSuccessfulSave" tabindex="-1" role="dialog" aria-labelledby="successfulSavePopup"
-        aria-hidden="true">
+         aria-hidden="true">
         <div class="modal-dialog">
             <div class="modal-content">
                 <div class="modal-header">
@@ -253,6 +265,22 @@
     </div>
 
     <!-- End of Successful Save Popup -->
+
+    <div class="modal fade" id="popupMessage" tabindex="-1" role="dialog">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="modalTitle">Message</h5>
+            </div>
+            <div class="modal-body">
+                <p>Delete the last criteria in a table is not allowed</p>
+            </div>
+            <div class="modal-footer">
+                <button id="btnClose" class="btn btn-success" data-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
+    </div>
 
     <script type="text/javascript" src="js/global.js"></script>
     <script type="text/javascript" src="js/table-edit.js"></script>
