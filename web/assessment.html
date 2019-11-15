@@ -9,11 +9,15 @@
     <link rel="stylesheet" href="external_assets/css/bootstrap4_3_1.min.css">
     <link rel="stylesheet" href="external_assets/css/fontawesome.min.css">
     <link rel="stylesheet" href="external_assets/css/all.min.css">
+    <link rel="stylesheet" type="text/css" href="external_assets/css/introjs-rtl.min.css">
+    <link rel="stylesheet" type="text/css" href="external_assets/css/introjs.min.css">
+    <link rel="stylesheet" href="css/global.css">
+    <link rel="stylesheet" href="css/assessment.css">
     <script type="text/javascript" src="external_assets/js/popper.min.js"></script>
     <script type="text/javascript" src="external_assets/js/jquery-3.4.1.min.js"></script>
     <script type="text/javascript" src="external_assets/js/bootstrap.min.js"></script>
-    <link rel="stylesheet" href="css/global.css">
-    <link rel="stylesheet" href="css/assessment.css">
+    <script type="text/javascript" src="/external_assets/js/js.cookie.min.js"></script>
+    <script type="text/javascript" src="/external_assets/js/intro.min.js"></script>
     <script type="text/javascript" src="external_assets/js/jquery.tabledit.js"></script>
 </head>
 
@@ -21,22 +25,52 @@
 
     <div class="header-container">
         <div>
-            <a href="index.html" class="header-icon btnNavigate"><i class="fas fa-home"></i></a>
-            <div class="header-icon btnEditTemplate"><i title="Edit Template" class="fas fa-file-invoice"></i></div>
+            <a 
+            data-step=1
+            data-intro="Click to go back index page"
+            data-position="right"
+            href="index.html" 
+            class="header-icon btnNavigate">
+            <i class="fas fa-home"></i>
+            </a>
+            <a 
+            data-step=2
+            data-intro="Click to change the evaluation template"
+            data-position="right"
+            href="index.html" 
+            class="header-icon btnEditTemplate" href="javascript:;">
+            <i title="Edit Template" class="fas fa-file-invoice"></i>
+            </a>
         </div>
 
-        <div class="header-score-container">
+        <div 
+        data-step=3
+        data-intro="Realtime score shows here"
+        data-position="bottom"
+        class="header-score-container">
             <!-- Dynamically populated in the back-end -->
         </div>
 
         <div class="header-icon-container">
-            <div class="header-icon btnSaveDocument"><i title="Save" class="fas fa-save"></i></div>
+            <a 
+            data-step=4
+            data-intro="Finish all the evaluation and save the scores to Word file."
+            data-position="left"
+            href="javascript:;" 
+            class="header-icon btnSaveDocument">
+            <i title="Save" class="fas fa-save"></i>
+            </a>
         </div>
 
     </div>
 
-    <div class="template-container">
-        <div class="document-header">
+    <div 
+    class="template-container">
+        <div 
+        data-step=5
+        data-intro="Basic information, only student id is required. Your new information will be store in the database as well. You can go to management page to manage them."
+        data-position="left"
+        class="document-header">
             <input type="hidden" class="tableCourseCode" />
             <table class="full-width-table">
                 <tr>
@@ -65,8 +99,20 @@
             <!-- Dynamically populated in the back-end -->
         </div>
         <div style="text-align: right; width: 100%;">
-            <a href="#" class="btn btn-secondary" onclick="window.location.reload();">Reset</a>
-            <button class="btnSaveDocument btn btn-primary">Finish Evaluation</button>
+            <a 
+            data-step=6
+            data-intro="Abandon all current marking result"
+            data-position="left"
+            href="javascript:;" class="btn btn-secondary" onclick="window.location.reload();">
+            Reset
+            </a>
+            <button 
+            data-step=7
+            data-intro="Save current result into Word file"
+            data-position="left"
+            class="btnSaveDocument btn btn-primary">
+            Finish Evaluation
+            </button>
         </div>
 
     </div>
@@ -225,7 +271,16 @@
     <!-- End of Save New Information Popup -->
 
     <script type="text/javascript" src="js/global.js"></script>
-    <script type="text/javascript" src="js/assessment.js"></script>
+    <script type="text/javascript" src="js/assessment.js?v=0.12"></script>
 </body>
+    <script type="text/javascript">
+    // for index page   
+    const isShowedIntroEvaluation = Cookies.get("isShowedIntroEvaluation");
+    if ( !isShowedIntroEvaluation ) {
+        introJs().setOption('showProgress', true).start().onskip(function() {
+            Cookies.set('isShowedIntroEvaluation', 1, { expires: 100, path: '' })
+        });
+    }
+    </script>
 
 </html>

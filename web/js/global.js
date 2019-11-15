@@ -1,6 +1,4 @@
 /* Contains scripts used all over the application */
-
-
 var CutString = function(string, maxlength) {
     if ( typeof string != "string" ) {
         return string;
@@ -13,7 +11,6 @@ var CutString = function(string, maxlength) {
 }
 
 $(document).ready(function(){
-
     $(window).bind('beforeunload', function(){
         var href = document.location.href;
         var lastPathSegment = href.substr(href.lastIndexOf('/') + 1);
