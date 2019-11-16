@@ -74,6 +74,8 @@ $(document).ready(function () {
             setTimeout(walkthrough.fourthWalkthrough, 1000);
         }
 
+        window.location.reload();
+
         $('#popupSuccessfulSave').modal('toggle');
     });
 
@@ -108,6 +110,19 @@ $(document).ready(function () {
             $(this).html('<i class="fas fa-pause"></i>');
         }
     });
+
+    $('#btnEditTimeLimit').click(function(){
+        // Place existing time limit to input's value
+        $('#popupAdjustTimeLimit .txtTimeLimit').val(timeLimit);
+        // Show Adjust Time Limit Popup
+        $('#popupAdjustTimeLimit').modal('show');
+    });
+
+    $('#popupAdjustTimeLimit #btnApplyNewTimeLimit').click(function(){
+        timeLimit = $('#popupAdjustTimeLimit .txtTimeLimit').val();
+        $('#popupAdjustTimeLimit').modal('toggle');
+    });
+
 }); /* End of document.ready() */
 
 /* Timer functions */
@@ -141,9 +156,7 @@ var timer = {
         ++timer.currentTime;
         secondsLabel.html(pad(timer.currentTime % 60));
         minutesLabel.html(pad(minutesSpent));
-
-        console.log('Minutes passed: ' + minutesSpent + ' of time limit ' + timeLimit);
-
+        
         if (minutesSpent == timeLimit) {
             if ($('#checkAlertTimeLimit').is(':checked') && !informedTimeLimit) {
                 // Alert user
@@ -492,6 +505,11 @@ var walkthrough = {
                     intro: "We'll get to templates later."
                 },
                 {
+                    element: document.querySelectorAll('.secondGuide.timerStep')[0],
+                    intro: "This shows the timer's settings.",
+                    position: 'bottom-middle-aligned'
+                },
+                {
                     element: document.querySelectorAll('.secondGuide.stepThree')[0],
                     intro: "This is the score board.",
                     position: 'bottom-middle-aligned'
@@ -523,6 +541,10 @@ var walkthrough = {
             doneLabel: 'Got it'
         });
         intro.start();
+        introJs.fn.oncomplete(function () {
+            // Set localStorage so that walkthrough only appears once
+            localStorage.setItem('finishedWalkthrough', true);
+        });
     },
     thirdWalkthrough: function () {
         var intro = introJs();
@@ -553,11 +575,8 @@ var walkthrough = {
             doneLabel: 'Got it'
         });
         intro.start();
-        introJs.fn.oncomplete(function () {
-            // Set localStorage so that walkthrough only appears once
-            localStorage.setItem('finishedWalkthrough', true);
-        });
     },
+    // FIX: This isn't showing since the btnNextStudent reloads the page and by that time it has registered that the user is done with the walkthrough
     fourthWalkthrough: function () {
         var intro = introJs();
         intro.setOptions({

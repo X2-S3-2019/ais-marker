@@ -32,7 +32,7 @@
                 <i title="Edit Template" class="fas fa-file-invoice"></i>
             </a>
             <div class="dropdown_container">
-                <a class="header-icon dropdown_trigger btnTimerSettings">
+                <a class="header-icon dropdown_trigger btnTimerSettings secondGuide timerStep">
                     <i title="Timer Settings" class="fas fa-stopwatch"></i>
                 </a>
 
@@ -45,7 +45,7 @@
                             <a class="btnPlayPauseTimer pause"><i class="fas fa-pause"></i></a>
                         </div>
                     </li>
-                    <li class="text-center"><button id="btnEditTimer" class="btn btn-primary"
+                    <li class="text-center"><button id="btnEditTimeLimit" class="btn btn-primary"
                             style="margin: 10px 0;">Adjust Time Limit</button></li>
                     <li style="display: flex; align-items: center;">
                         <input type="checkbox" id="checkAlertTimeLimit" checked />
@@ -241,6 +241,27 @@
         </div>
 
     </div>
+    <!-- End of Error Popup -->
+    <!-- Adjust Time Limit Popup -->
+    <div class="modal fade" id="popupAdjustTimeLimit" tabindex="-1" role="dialog">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Adjust Time Limit</h5>
+                </div>
+                <div class="modal-body">
+                        Time Limit: <input type="number" max="120" min="3" class="txtTimeLimit"
+                        style="width: 3em; margin-left: 10px;" /> minutes
+                </div>
+                <div class="modal-footer">
+                        <button class="btn btn-success" data-dismiss="modal">Cancel</button>
+                    <button id="btnApplyNewTimeLimit" class="btn btn-success">Apply</button>
+                </div>
+            </div>
+        </div>
+
+    </div>
+    <!-- End of Error Popup -->
     <!-- Save New Information Popup -->
 
     <div class="modal fade" id="popupSaveNewInfo" tabindex="-1" role="dialog" aria-labelledby="saveNewInfoPopup"
