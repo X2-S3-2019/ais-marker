@@ -24,29 +24,59 @@
 <body style="background-color: rgb(209, 201, 201);">
 
     <div class="header-container">
-        <div>
-            <a href="index.html" class="header-icon btnNavigate secondGuide stepOne">
+        <div class="left-menu-container">
+            <a href="index.html" role="button" class="header-icon btnNavigate secondGuide stepOne">
                 <i class="fas fa-home"></i>
             </a>
-            <a id="btnEditTemplate" class="header-icon btnEditTemplate secondGuide stepTwo">
-                <i title="Edit Template" class="fas fa-file-invoice"></i>
-            </a>
-            <div class="dropdown_container">
-                <a class="header-icon dropdown_trigger btnTimerSettings secondGuide timerStep">
+            <div class="dropdown_container" role="button">
+                <a role="button" class="header-icon btnEditTemplate secondGuide stepTwo dropdown_template_trigger ">
+                    <i title="Manage Template" class="fas fa-file-invoice"></i>
+                </a>
+                <div class="dropdown_menu dropdown_template_menu">
+                    <li style="display: flex; align-items: center;">
+                        <p>Current Template:
+                            <span class="small templateName">-</span></p>
+                    </li>
+                    <li><button id="btnChangeTemplate" class="btn btn-primary w-100">Change Template</button>
+                    </li>
+                    <li><button id="btnEditTemplate" class="btn btn-danger w-100" style="margin-top: 5px;">Edit
+                            Template</button>
+                    </li>
+                </div>
+            </div>
+            <div class="dropdown_container" role="button">
+                <a class="header-icon dropdown_directory_trigger">
+                    <i title="Choose Directory" class="fas fa-folder-open"></i>
+                </a>
+                <div class="dropdown_menu dropdown_directory_menu">
+                    <li style="display: flex; align-items: center;">
+                        <p>Current Directory:
+                            <span class="directoryPath">Directory</span></p>
+                    </li>
+                    <li><button id="btnChangeDirectory" class="btn btn-primary w-100">Change Directory</button>
+                    </li>
+                </div>
+            </div>
+            <div class="dropdown_container" role="button">
+                <a class="header-icon dropdown_timer_trigger btnTimerSettings secondGuide timerStep">
                     <i title="Timer Settings" class="fas fa-stopwatch"></i>
+                    <span class="small-timer white-bg">
+                        <span class="timer-minutes">00</span>:<span class="timer-seconds">00</span></span>
                 </a>
 
-                <div class="dropdown_menu">
-                    <li class="text-center lead"><span class="timer-minutes">00</span>:<span
-                            class="timer-seconds">00</span></li>
+                <div class="dropdown_menu dropdown_timer_menu">
+                    <li class="text-center lead"><span id="lblMinutes" class="timer-minutes">00</span>:
+                        <span id="lblSeconds" class="timer-seconds">00</span>
+                    </li>
                     <li>
                         <div class="text-center">
                             <a class="btnStopTimer text-danger"><i class="fas fa-stop-circle"></i></a>
-                            <a class="btnPlayPauseTimer pause"><i class="fas fa-pause"></i></a>
+                            <a class="btnPlayPauseTimer pause"><i class="fas fa-play"></i></a>
                         </div>
                     </li>
+                    <li class="lead text-danger text-center">Time Limit: <span class="lblTimeLimit">3</span> mins</li>
                     <li class="text-center"><button id="btnEditTimeLimit" class="btn btn-primary"
-                            style="margin: 10px 0;">Adjust Time Limit</button></li>
+                            style="margin: 5px 0;">Adjust Time Limit</button></li>
                     <li style="display: flex; align-items: center;">
                         <input type="checkbox" id="checkAlertTimeLimit" checked />
                         <label for="checkAlertTimeLimit" style="line-height: 15px; padding-left: 10px;">Alert me when
@@ -54,9 +84,28 @@
                     </li>
                 </div>
             </div>
-        </div>
+            <div class="dropdown_container" role="button">
+                <a role="button" class="header-icon dropdown_calculate_trigger">
+                    <i title="Calculate Score" class="fas fa-calculator"></i>
+                </a>
+                <div class="dropdown_menu dropdown_calculate_menu">
+                    <li style="display: flex; align-items: center;">
+                        <p>Perfect Marks: <span class="lblPerfectMarks">-</span></p>
+                    </li>
+                    <li>
+                        <input type="checkbox" id="checkNormalizeScore" /> <label for="checkNormalizeScore">Normalize
+                            score to</label>
+                    </li>
+                    <li class="text-center">
+                        <input type="number" style="width: 3em;" id="txtNormalizedScore" min=1 value="1" disabled />
+                        points
+                    </li>
+                </div>
+            </div>
+        </div> <!-- End of left menu button container -->
 
-        <div class="header-score-container secondGuide stepThree">
+
+        <div class="header-score-container secondGuide stepThree d-none">
             <!-- Dynamically populated in the back-end -->
         </div>
 
@@ -68,7 +117,7 @@
 
     </div>
 
-    <div class="template-container">
+    <div class="template-container ms-word-style">
         <div class="document-header secondGuide stepFour">
             <input type="hidden" class="tableCourseCode" />
             <table class="full-width-table">
@@ -98,6 +147,7 @@
         <div class="assessment-container">
             <!-- Dynamically populated in the back-end -->
         </div>
+        <br />
         <div style="text-align: right; width: 100%;">
             <a class="btn btn-secondary" onclick="window.location.reload();">Reset</a>
             <button class="btnSaveDocument btn btn-primary">Finish Evaluation</button>
@@ -154,8 +204,8 @@
                         </div>
                     </div>
                     <br />
-                    <u id="linkShowAdditionalFields" class="black-link hidden firstGuide stepTwo">Show additional
-                        fields</u>
+                    <button id="linkShowAdditionalFields" class="black-link hidden firstGuide stepTwo">Show additional
+                        fields</button>
                     <br />
 
                     <div class="hidden-fields-container">
@@ -179,14 +229,15 @@
                         </div>
                         <div style="margin-top: 1em;">
                             <!-- HACK -->
-                            Time Limit: <input type="number" max="120" min="3" value="15" class="txtTimeLimit"
+                            Time Limit: <input type="number" max="120" min="3" value="15" id="txtTimeLimit"
                                 style="width: 3em; margin-left: 10px;" /> minutes
                         </div>
                     </div>
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-block btn-primary firstGuide stepThree" id="btnEvaluate">
-                        <i class="fa fa-check"></i>
+                        <!-- <i class="fa fa-check"></i> -->
+                        Start Evaluation
                     </button>
                 </div>
             </div>
@@ -210,7 +261,22 @@
                         </div>
                         <div class="col-sm-8">
                             <p class="successSavePopupBody">Your evaluation was successfully saved.</p>
-                            <u id="linkOpenDocument" class="black-link">Open document folder</u>
+                            <p class="popup-icon-link" id="linkOpenDocument" role="button">
+                                <i class="fa fa-folder-open text-warning"></i>
+                                <span class="small">Open Folder</span>
+                            </p>
+                            <!-- <p class="popup-icon-link">
+                                <i id="linkExportPDF" class="fa fa-file-pdf text-danger"></i>
+                                <span class="small">Export PDF</span>
+                            </p>
+                            <p class="popup-icon-link">
+                                <i id="linkPrintDocument" class="fa fa-print text-secondary"></i>
+                                <span class="small">Print</span>
+                            </p>
+                            <p class="popup-icon-link">
+                                <i id="linkMailDocument" class="fa fa-envelope-open-text text-primary"></i>
+                                <span class="small">Email</span>
+                            </p> -->
                         </div>
                     </div>
                 </div>
@@ -250,11 +316,11 @@
                     <h5 class="modal-title">Adjust Time Limit</h5>
                 </div>
                 <div class="modal-body">
-                        Time Limit: <input type="number" max="120" min="3" class="txtTimeLimit"
+                    Time Limit: <input type="number" max="120" value="15" min="3" class="txtTimeLimit"
                         style="width: 3em; margin-left: 10px;" /> minutes
                 </div>
                 <div class="modal-footer">
-                        <button class="btn btn-success" data-dismiss="modal">Cancel</button>
+                    <button class="btn btn-success" data-dismiss="modal">Cancel</button>
                     <button id="btnApplyNewTimeLimit" class="btn btn-success">Apply</button>
                 </div>
             </div>
@@ -284,8 +350,11 @@
 
     <!-- End of Save New Information Popup -->
 
+    <!-- End of Modals -->
+
     <script type="text/javascript" src="js/global.js"></script>
     <script type="text/javascript" src="js/assessment.js?v=0.12"></script>
+    <script type="text/javascript" src="js/table-assess.js"></script>
 </body>
 <script type="text/javascript">
     // for index page   

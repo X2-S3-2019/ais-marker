@@ -5,12 +5,16 @@
 # For every criterion, there are fields.
 
 
-import json, os, sys
+import json
+import os
+import sys
 from docx import Document
 from docx.oxml.ns import nsdecls
 from docx.oxml import parse_xml
 from docx.enum.text import WD_ALIGN_PARAGRAPH
 from docx.shared import Pt
+from docx.shared import Cm
+
 
 class Field:
     def __init__(self, id, name, value, description, points):
@@ -19,6 +23,7 @@ class Field:
         self.value = value
         self.description = description
         self.points = points
+
 
 class Criterion:
     def __init__(self, id, name, description,  icon):
@@ -38,6 +43,7 @@ class Criterion:
         for i in self.fields:
             print(i.description)
 
+
 class GroupCriterion:
     def __init__(self, id, name, icon):
         self.id = id
@@ -47,11 +53,11 @@ class GroupCriterion:
 
     def addCriterion(self, criterion):
         self.criteria.append(criterion)
-    
+
     def printCriteria(self):
         for i in self.criteria:
             print(i.name + " from Group Criterion def")
-    
+
     def getCriteria(self):
         return self.criteria
 
@@ -64,11 +70,12 @@ class Template:
         self.id = id
         self.name = name
         self.description = description
-        self.groupCriteria = [] # If groupCriteria is null or empty, then the template only contains criteria without grouping
+        # If groupCriteria is null or empty, then the template only contains criteria without grouping
+        self.groupCriteria = []
 
     def addCriterion(self, criterion):
         self.criteria.append(criterion)
-    
+
     def addGroupCriterion(self, groupCriterion):
         self.groupCriteria.append(groupCriterion)
 
@@ -83,11 +90,11 @@ class Template:
 
     def getCriteria(self):
         return self.criteria
-    
+
     def printCriteria(self):
         for i in self.criteria:
             print(i.name)
-    
+
     def printGroupCriteria(self):
         for i in self.groupCriteria:
             print(i.name)
@@ -100,49 +107,90 @@ class AssessmentDocument:
     def openResultsDocument(self):
         os.startfile(self.document_name + '.docx')
 
-
     # Create document containing assessment results using a template
     # Add shading of selected marking
+
     def createResultsDocument(self, template, results, otherInfo, path):
         document = Document()
         print('Path: ' + path)
 
+        # Change the page margins to match Saghir's SOFT808
+        sections = document.sections
+        for section in sections:
+            section.top_margin = Cm(0.75)
+            section.bottom_margin = Cm(0.5)
+            section.left_margin = Cm(1.5)
+            section.right_margin = Cm(2)
+
         # Add the total score with percentage
-        score_header = document.add_paragraph()
-        score_header.add_run('Score: ' + str(results['assessmentTotalScore']) + ' over ' + str(results['assessmentPossibleTotalScore']) + ' (' + str(results['scorePercentage']) + '%)').bold = True
-        score_header.alignment = WD_ALIGN_PARAGRAPH.RIGHT
+        # print('Normalize score: ' + results['normalizedScore'])
+        # if results['normalizedScore'] != '':
+        #     score_header = document.add_paragraph()
+        #     score_header.add_run('Normalized Score: ' + str(results['normalizedScore']) + ' over ' + str(
+        #         results['normalizedPerfectScore']) + ' (' + str(results['scorePercentage']) + '%)').bold = True
+        #     score_header.alignment = WD_ALIGN_PARAGRAPH.RIGHT
+        # else:
+        #     score_header = document.add_paragraph()
+        #     score_header.add_run('Score: ' + str(results['assessmentTotalScore']) + ' over ' + str(
+        #     results['assessmentPossibleTotalScore']) + ' (' + str(results['scorePercentage']) + '%)').bold = True
+        #     score_header.alignment = WD_ALIGN_PARAGRAPH.RIGHT
+
+        studentScore = ''
+        perfectScore = ''
+        scorePercentage = str(results['scorePercentage'])
+        if results['normalizedScore'] != '':
+            studentScore = str(results['normalizedScore'])
+            perfectScore = str(results['normalizedPerfectScore'])
+        else:
+            studentScore = str(results['assessmentTotalScore'])
+            perfectScore = str(results['assessmentPossibleTotalScore'])
+
+        date_header = document.add_paragraph()
+        date_header.add_run(
+            'Presentation date: ' + otherInfo['presentationDate'])
+        date_header.alignment = WD_ALIGN_PARAGRAPH.RIGHT
 
         # Add presentation duration
         print(otherInfo['presentationDuration'])
-        duration_header = document.add_paragraph()
-        duration_header.add_run('Presentation duration: ' + otherInfo['presentationDuration'])
-        duration_header.alignment = WD_ALIGN_PARAGRAPH.RIGHT
+        if otherInfo['presentationDuration'] != '':
+            duration_header = document.add_paragraph()
+            duration_header.add_run(
+                'Presentation duration: ' + otherInfo['presentationDuration'])
+            duration_header.alignment = WD_ALIGN_PARAGRAPH.RIGHT
 
         # TODO: Make this dynamic/customizable for each template
         # Add the student name, id and topic of presentation
-        
-        table = document.add_table(1, 2)
+
+        table = document.add_table(1, 3)
 
         assessment_info_cells = table.rows[0].cells
         student_name_cell = assessment_info_cells[0]
-        student_name_cell.paragraphs[0].add_run("Student name: ").bold = True
-        student_name_cell.paragraphs[0].add_run(otherInfo['studentName']).underline = True
+        student_name_cell.paragraphs[0].add_run("Student name: ")
+        student_name_cell.paragraphs[0].add_run(
+            otherInfo['studentName']).bold = True
         student_id_cell = assessment_info_cells[1]
-        student_id_cell.paragraphs[0].add_run("Student ID: ").bold = True
-        student_id_cell.paragraphs[0].add_run(otherInfo['studentId']).underline = True
+        student_id_cell.paragraphs[0].add_run("Student ID: ")
+        student_id_cell.paragraphs[0].add_run(
+            otherInfo['studentId']).bold = True
+        student_marks_cell = assessment_info_cells[2]
+        student_marks_cell.paragraphs[0].add_run("Obtained Marks: ")
+        #student_marks_cell.paragraphs[0].add_run(studentScore + "/" + perfectScore + " (" + scorePercentage + "%)").bold = True
+        student_marks_cell.paragraphs[0].add_run(studentScore + "/" + perfectScore).bold = True
 
         table = document.add_table(1, 1)
         assessment_info_cells = table.rows[0].cells
         topic_of_presentation_cell = assessment_info_cells[0]
-        topic_of_presentation_cell.paragraphs[0].add_run("Topic of Presentation: ").bold = True
-        topic_of_presentation_cell.paragraphs[0].add_run(otherInfo['presentationTopic']).underline = True
+        topic_of_presentation_cell.paragraphs[0].add_run(
+            "Topic of Presentation: ")
+        topic_of_presentation_cell.paragraphs[0].add_run(
+            otherInfo['presentationTopic']).bold = True
 
         # Add a new line
         document.add_paragraph()
 
         # For each group criterion, create a table
         groupCriteria = template.getGroupCriteria()
-        for group in groupCriteria: 
+        for group in groupCriteria:
             table = document.add_table(1, 5, style='Table Grid')
             # Get the first row of the table, which contains the headers
             heading_cells = table.rows[0].cells
@@ -150,11 +198,12 @@ class AssessmentDocument:
             heading_cells[0].paragraphs[0].add_run(group.name).bold = True
             # Add value header
             first_criterion_fields = group.getFirstCriterion().getFields()
-            ##group.getFirstCriterion().printFields()
+            # group.getFirstCriterion().printFields()
             ctr = 1
             # For each field in the first criterion, add the value to header
             for field in first_criterion_fields:
-                heading_cells[ctr].paragraphs[0].add_run(str(field.points) + ' - ' + field.value).bold = True
+                heading_cells[ctr].paragraphs[0].add_run(
+                    str(field.points) + ' - ' + field.value).bold = True
                 ctr += 1
 
             # Used to access the results object
@@ -164,14 +213,15 @@ class AssessmentDocument:
             criteria = group.getCriteria()
             for criterion in criteria:
                 criterion_fields = criterion.getFields()
-                
+
                 ctr = 0
                 cells = table.add_row().cells
                 cells[ctr].text = criterion.name
 
                 # Used to access the results object
                 temp_words = criterion.name.split(' ')
-                data_type_criterion = temp_words[0].lower() + '_' + str(criterion.id)
+                data_type_criterion = temp_words[0].lower(
+                ) + '_' + str(criterion.id)
 
                 for field in criterion_fields:
                     ctr += 1
@@ -182,37 +232,39 @@ class AssessmentDocument:
                     score = results['groupCriteria'][data_type_group]['criteria'][data_type_criterion]
                     if (score == str(field.points)):
                         # Set a cell background (shading) color to RGB D9D9D9.
-                        shading_elm = parse_xml(r'<w:shd {} w:fill="D9D9D9"/>'.format(nsdecls('w')))
+                        shading_elm = parse_xml(
+                            r'<w:shd {} w:fill="D9D9D9"/>'.format(nsdecls('w')))
                         cells[ctr]._tc.get_or_add_tcPr().append(shading_elm)
 
             document.add_paragraph()
-            
-            groupTotal = document.add_paragraph('(' + group.name + ') ' + 'Total: ' + str(results['groupCriteria'][data_type_group]['groupTotalScore']) + ' / ' + str(results['groupCriteria'][data_type_group]['groupPossibleTotalScore']))
+
+            groupTotal = document.add_paragraph('(' + group.name + ') ' + 'Total: ' + str(
+                results['groupCriteria'][data_type_group]['groupTotalScore']) + ' / ' + str(results['groupCriteria'][data_type_group]['groupPossibleTotalScore']))
             groupTotal.alignment = WD_ALIGN_PARAGRAPH.RIGHT
 
             # Add a new line for every group criterion
             document.add_paragraph()
 
-        footer = document.add_paragraph().add_run('Adapted with enhancement from © 2004 National Council of Teachers of English/International Reading Association')
+        footer = document.add_paragraph().add_run(
+            'Adapted with enhancement from © 2004 National Council of Teachers of English/International Reading Association')
         font = footer.font
         font.size = Pt(8)
         font.italic = True
-        
+
         document.save(path + '/' + self.document_name + '.docx')
 
-        
 
 class TemplateDocument:
     def __init__(self, name):
         self.name = name
 
     def createTemplateDocument(self, template):
-        # Create a document with table 
+        # Create a document with table
         document = Document()
 
         # For each group criterion, create a table
         groupCriteria = template.getGroupCriteria()
-        for group in groupCriteria: 
+        for group in groupCriteria:
             table = document.add_table(1, 5, style='Table Grid')
             # Get the first row of the table, which contains the headers
             heading_cells = table.rows[0].cells
@@ -220,17 +272,18 @@ class TemplateDocument:
             heading_cells[0].paragraphs[0].add_run(group.name).bold = True
             # Add value header
             first_criterion_fields = group.getFirstCriterion().getFields()
-            ##group.getFirstCriterion().printFields()
+            # group.getFirstCriterion().printFields()
             ctr = 1
             # For each field in the first criterion, add the value to header
             for field in first_criterion_fields:
-                heading_cells[ctr].paragraphs[0].add_run(str(field.points) + ' - ' + field.value).bold = True
+                heading_cells[ctr].paragraphs[0].add_run(
+                    str(field.points) + ' - ' + field.value).bold = True
                 ctr += 1
 
             criteria = group.getCriteria()
             for criterion in criteria:
                 criterion_fields = criterion.getFields()
-                
+
                 ctr = 0
                 cells = table.add_row().cells
                 cells[ctr].text = criterion.name
@@ -242,7 +295,6 @@ class TemplateDocument:
             document.add_paragraph()
 
         document.save(self.name + '.docx')
-        
-    
+
     def openTemplateDocument(self):
         os.startfile(self.name + '.docx')

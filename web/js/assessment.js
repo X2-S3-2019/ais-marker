@@ -1,13 +1,10 @@
 /*
     assessment.js
 
-    File description: Contains functions related to assessment and navigation of assessment.html
+    File description: 
+    Contains functions related to assessment
+    Functions from this file are being used in table-assess.js
 
-    Developer's notes:
-    Walkthrough is only shown once. It is initialized after the table has been created.
-
-    TODO:
-    In initiliazeSelect, values are hard-coded (Excellent, Fair, Good, Poor). Make this dynamic.
 */
 
 var arrStudentIDs = [];
@@ -16,24 +13,27 @@ var arrCourses = [];
 var arrPresentations = [];
 var arrTemplates = [];
 var template_id = 1;   // Initialize id; If no default is given, make user choose.
-var isDragging = false;
+
+// UI component-related variable (usually from popups)
 var linkAdditionalFieldsHasListener = false;
+
 // Walkthrough-related variables
 var showSecondWalkthrough = false;
 var showThirdWalkthrough = false;
 var showFourthWalkthrough = false;
+
 // Timer-related variables
 var minutesLabel = $('.timer-minutes');
 var secondsLabel = $('.timer-seconds');
 var totalSeconds = 0;
 var timeLimit;
-var informedTimeLimit;
+var informedTimeLimit;  // Checks if the user has been alerted about time limit reached
 
 $(document).ready(function () {
 
     let template_info = getTemplateInfo();
     console.log(template_info);
-    informedTimeLimit = false;
+    informedTimeLimit = false;  // Time limit reached message has not been shown
 
     if (template_info.hasOwnProperty('template_id')) {
         template_id = template_info['template_id'];
@@ -41,53 +41,51 @@ $(document).ready(function () {
 
     getDataFromDatabase();
 
-    // When user wants to open recently created document
-    $('#linkOpenDocument').click(function () {
-        console.log('Link to open document is clicked');
-        eel.openDocument(assessment.documentName)(function () {
-            console.log('Document opened');
-        });
+    // Menu bar buttons
+    // Home button is just a link to index.html
+    // Choose Template button
+    $('#btnChangeTemplate').click(function () {
+        popups.chooseTemplate.init();
     });
 
-    $('.btnEditTemplate').click(function () {
-        initializeChooseTemplatePopup();
+    $('#btnEditTemplate').click(function () {
+        window.location.replace('edit-assessment.html?template_id=' + assessment.template.id + '&template_name=' + assessment.template.name);
     });
 
-    // Only number input for student ID input
-    $("#txtStudentID, .tableStudentID").keypress(function (e) {
-        var keyCode = e.which;
-        /*
-          8 - (backspace)
-          32 - (space)
-          48-57 - (0-9)Numbers
-        */
-
-        if ((keyCode != 8 || keyCode == 32) && (keyCode < 48 || keyCode > 57)) {
-            return false;
-        }
-    });
-
-    $('#btnNextStudent').click(function () {
-        console.log('Next Student');
-        if (showFourthWalkthrough) {
-            showFourthWalkthrough = false;
-            setTimeout(walkthrough.fourthWalkthrough, 1000);
-        }
-
-        window.location.reload();
-
-        $('#popupSuccessfulSave').modal('toggle');
-    });
-
-    // On click
-    $('.dropdown_menu').mouseleave(function () {
-        $(".dropdown_menu").css("display", "none");
+    $('.dropdown_template_menu').mouseleave(function () {
+        $(".dropdown_template_menu").css("display", "none");
     });
 
     // On hover
-    $('.dropdown_trigger').mouseenter(function () {
-        console.log('Dropdown hovered');
-        $(".dropdown_menu").css("display", "block");
+    $('.dropdown_directory_trigger').mouseenter(function () {
+        // Remove other dropdowns
+        $(".dropdown_menu").css("display", "none");
+        $(".dropdown_directory_menu").css("display", "block");
+    });
+
+    // Change Directory
+    $('.dropdown_directory_menu').mouseleave(function () {
+        $(".dropdown_directory_menu").css("display", "none");
+    });
+
+    // On hover
+    $('.dropdown_template_trigger').mouseenter(function () {
+        // Remove other dropdowns
+        $(".dropdown_menu").css("display", "none");
+        $(".dropdown_template_menu").css("display", "block");
+    });
+
+    // Timer button
+    // Timer button
+    $('.dropdown_timer_menu').mouseleave(function () {
+        $(".dropdown_timer_menu").css("display", "none");
+    });
+
+    // On hover
+    $('.dropdown_timer_trigger').mouseenter(function () {
+        // Remove other dropdowns
+        $(".dropdown_menu").css("display", "none");
+        $(".dropdown_timer_menu").css("display", "block");
     });
 
     $('.btnStopTimer').click(function () {
@@ -111,19 +109,77 @@ $(document).ready(function () {
         }
     });
 
-    $('#btnEditTimeLimit').click(function(){
-        // Place existing time limit to input's value
-        $('#popupAdjustTimeLimit .txtTimeLimit').val(timeLimit);
-        // Show Adjust Time Limit Popup
-        $('#popupAdjustTimeLimit').modal('show');
+    $('#btnEditTimeLimit').click(function () {
+        popups.adjustTimeLimit.init();
     });
 
-    $('#popupAdjustTimeLimit #btnApplyNewTimeLimit').click(function(){
-        timeLimit = $('#popupAdjustTimeLimit .txtTimeLimit').val();
-        $('#popupAdjustTimeLimit').modal('toggle');
+    // Calculate Score button
+    $('.dropdown_calculate_menu').mouseleave(function () {
+        $(".dropdown_calculate_menu").css("display", "none");
     });
 
+    // On hover
+    $('.dropdown_calculate_trigger').mouseenter(function () {
+        // Remove other dropdowns
+        $(".dropdown_menu").css("display", "none");
+        $(".dropdown_calculate_menu").css("display", "block");
+    });
+
+    $('#checkNormalizeScore').bind('change', function(){
+        $('#txtNormalizedScore').prop('disabled', false);
+    });
+
+
+    // TODO: Move this to successfulSave popup variable
+    // When user wants to open recently created document
+    $('#linkOpenDocument').click(function () {
+        console.log('Link to open document is clicked');
+        eel.openDocument(assessment.documentName)(function () {
+            console.log('Document opened');
+        });
+    });
+
+    $('#btnNextStudent').click(function () {
+        console.log('Next Student');
+        if (showFourthWalkthrough) {
+            showFourthWalkthrough = false;
+            setTimeout(walkthrough.fourthWalkthrough, 1000);
+        }
+
+        window.location.reload();
+
+        $('#popupSuccessfulSave').modal('toggle');
+    });
 }); /* End of document.ready() */
+
+// Once data from database has been store to arrays, initialize assessment.
+function initializeAssessment() {
+    // If there's only one template (the Default AIS template), don't show the template popup
+    // Check if user doesn't want to see the popup for choosing templates
+    if (arrTemplates.length > 1) {
+        // TODO: Implement enabling default template (?)
+        if (template_id == -1) {    // Using default value is disabled
+            initializeChooseTemplatePopup();
+        } else {
+            // initializeEvaluationPopup();
+            popups.evaluationInfo.init();
+            console.log('Creating table with id: ' + template_id);
+            tableAssess.createTemplateTable(template_id); // Use the given template
+
+            $('.templateName').html(getCurrentTemplateName());
+        }
+    } else {
+        //initializeEvaluationPopup();
+        popups.evaluationInfo.init();
+        // Use the default template
+        tableAssess.createTemplateTable(template_id); // Use the given template
+
+        $('.templateName').html(getCurrentTemplateName());
+    }
+
+    console.log('Template name: ' + getCurrentTemplateName());
+    restrictKeyboardInput();
+}
 
 /* Timer functions */
 
@@ -156,7 +212,7 @@ var timer = {
         ++timer.currentTime;
         secondsLabel.html(pad(timer.currentTime % 60));
         minutesLabel.html(pad(minutesSpent));
-        
+
         if (minutesSpent == timeLimit) {
             if ($('#checkAlertTimeLimit').is(':checked') && !informedTimeLimit) {
                 // Alert user
@@ -167,7 +223,11 @@ var timer = {
             }
         }
     }
-};
+}; /* End of Timer functions */
+
+/* Miscellaneous functions */
+/* These are functions that are used in various aspects of the application */
+/* Or simply a tool function */
 
 // This functions pads a zero on a one-digit time value (e.g. 00:01)
 function pad(val) {
@@ -179,75 +239,200 @@ function pad(val) {
     }
 }
 
-/* End of Timer functions */
+/* Pop up functions */
+/* Contains the different popups and their functions used during assessment */
+var popups = {
+    evaluationInfo: {
+        popup: $('#popupAddStudent'),
+        btnEvaluate: '#btnEvaluate',
+        linkAdditionalFields: '#linkShowAdditionalFields',
+        hiddenFieldContainer: $('.hidden-fields-container'),
+        txtStudentID: '#txtStudentID',
+        txtStudentName: '#txtStudentName',
+        txtCourse: '#txtCourse',
+        txtPresentation: '#txtPresentation',
+        txtTimeLimit: '#txtTimeLimit',
+        init: function () {
+            // Prevents the modal from being dismissed when user clicks anywhere else
+            this.popup.modal({ backdrop: 'static', keyboard: false });
 
-function initializeAssessment() {
-    // If there's only one template (the Default AIS template), don't show the template popup
-    // Check if user doesn't want to see the popup for choosing templates
 
-    if (arrTemplates.length > 1) {
-        if (template_id == -1) {    // Using default value is disabled
-            initializeChooseTemplatePopup();
-        } else {
-            initializeEvaluationPopup();
-            console.log('Creating table with id: ' + template_id);
-            createTemplateTable(template_id); // Use the given template
-        }
-    } else {
-        initializeEvaluationPopup();
-        createTemplateTable(1); // Use the default template
-    }
+            // Initialize autocomplete for student ID and course fields
+            autocomplete(document.getElementById("txtStudentID"), arrStudentIDs);
+            autocomplete(document.getElementById("txtCourse"), arrCourses);
 
-    initTableEdit();    // Initialize editing of template
-}
+            // Add listener to evaluate button
+            $(btnEvaluate).click(function () {
+                // Check if student ID was inputted
+                // Only the student ID is required
+                console.log('Evaluat button clicked');
+                if ($(txtStudentID).val() === '') {
+                    $(txtStudentID).css({ 'border-bottom': '1px solid red' });
+                    $(txtStudentID).next().css('color', 'red');
+                    $(txtStudentID).text('Student ID (Required)');
+                    $(txtStudentID).focus();
+                } else {
+                    $(txtStudentID).removeClass('is-invalid');
 
-function initializeChooseTemplatePopup() {
-    $('#popupChooseTemplate').modal('show');
+                    getStudentName();
 
-    $('#btnApplyTemplate').click(function () {
-        window.location.replace('assessment.html?template_id=' + template_id);
-        // createTemplateTable(template_id);
-        // initializeEvaluationPopup();
-        // initTableEdit();
-    })
-}
+                    let student_id = $(txtStudentID).val();
+                    let student_name = $(txtStudentName).val();
+                    let course = $(txtCourse).val();
+                    let presentation = $(txtPresentation).val();
 
-function popuplateChooseTemplateDropdown() {
-    let dropdownHTML = '';
-    console.log('Populating template dropdown..');
-    $('#ddlTemplates').append('<option value="None">Choose a template..</option>');
-    arrTemplates.forEach(function (template) {
-        console.log('Adding ' + template.name + ' to dropdown');
-        $('#ddlTemplates').append('<option value="' + template['id'] + '">' + template['name'] + '</option>');
-    });
+                    addHeaderDocument(student_id, student_name, course, presentation);
 
-    $('#ddlTemplates').change(function () {
-        let selectedValue = $('#ddlTemplates').find(':selected').val();
-        console.log('Dropdown changed..');
-        console.log('Selected value: ' + selectedValue);
+                    // Set time limit
+                    console.log('Time limit is ' + $(txtTimeLimit).val() + ' minutes');
+                    timeLimit = parseInt($(txtTimeLimit).val());
 
-        if (selectedValue != "None") {
-            template_id = selectedValue;
+                    popups.evaluationInfo.popup.modal('toggle');
 
-            // Look for the corresponding description through the array of templates
-            arrTemplates.forEach(function (template) {
-                if (template.id == selectedValue) {
-                    if (template.description != '') {
-                        $('#lblTemplateDescription').html(template.description);
-                    } else {
-                        $('#lblTemplateDescription').html('No description available.');
-                    }
-
-                    return;
+                    // Start timer presentation
+                    $('.lblTimeLimit').html(timeLimit);
+                    timer.start();
+                    // TODO: This code seems out of place. 
+                    $('.btnPlayPauseTimer').removeClass('play');
+                    $('.btnPlayPauseTimer').addClass('pause');
+                    $('.btnPlayPauseTimer').html('<i class="fas fa-pause"></i>');
                 }
             });
-        } else {
-            $('#ddlTemplates').addClass('is-invalid');
+
+            // TODO: Allow user to start evaluation with pressing Enter
+            $('body').on('keypress', function (e) {
+                if (e.which == 13) {
+                    console.log('You pressed enter');
+                }
+            });
+
+            // Bring label from placeholder position to top
+            $('.labeled-input-group input').blur(function () {
+                if ($('.labeled-input-group input').val() != '') {
+                    $(this).next().css({ 'top': '-10px', 'color': 'black', 'font-size': '12px' });
+                }
+            });
+
+            $(txtStudentID).on('input', function () {
+                if ($(txtStudentID).val() != '') {
+                    $(txtStudentID).css({ 'border-bottom': '1px solid grey' });
+                    $(txtStudentID).next().css('color', 'black');
+                    $(txtStudentID).next().text('Student ID');
+                }
+            });
+
+            // If student ID exists in the database, add the student name automatically
+            $(txtStudentID).blur(function () {
+                getStudentName();
+            });
+
+            // When Show Additional Fields is clicked
+            if (!linkAdditionalFieldsHasListener) { // Only add the listener once
+                // 'this' is referring to evaluationInfo
+                this.linkAdditionalFieldsHasListener = true;
+                $(this.linkAdditionalFields).click(function () {
+                    console.log('Showing additional fields..');
+                    // 'this' is refering the linkAdditionalFields object
+                    if ($(this).hasClass('hidden')) {
+                        toggleAdditionalFields('Hidden');
+                    } else if ($(this).hasClass('shown')) {
+                        toggleAdditionalFields('Shown');
+                    }
+                });
+            }
+
+            // Show popup
+            this.popup.modal('show');
+            // Focus on student ID
+            $(txtStudentID).focus();
+        },
+        toggleAdditionalFields: function (status) {
+            if (status === 'Hidden') {
+                $(linkAdditionalFields).text("Hide additional fields");
+                $(linkAdditionalFields).removeClass('hidden');
+                $(linkAdditionalFields).addClass('shown');
+
+                $(hiddenFieldContainer).show(500);
+            } else if (status === 'Shown') {
+                $(linkAdditionalFields).text("Show additional fields");
+                $(linkAdditionalFields).removeClass('shown');
+                $(linkAdditionalFields).addClass('hidden');
+
+                $(hiddenFieldContainer).hide(500);
+            }
         }
+    },
+    chooseTemplate: {
+        popup: $('#popupChooseTemplate'),
+        ddlTemplates: '#ddlTemplates',
+        btnApplyTemplate: '#btnApplyTemplate',
+        lblTemplateDescription: '#lblTemplateDescription',
+        init: function () {
+            this.populateDropdownTemplates();
 
+            $(ddlTemplates).change(function () {
+                let selectedValue = $(ddlTemplates).find(':selected').val();
 
-    });
-}
+                if (selectedValue != "None") {
+                    template_id = selectedValue;
+
+                    // Look for the corresponding description through the array of templates
+                    arrTemplates.forEach(function (template) {
+                        if (template.id == selectedValue) {
+                            if (template.description != '') {
+                                $(lblTemplateDescription).html(template.description);
+                            } else {
+                                $(lblTemplateDescription).html('No description available.');
+                            }
+                            return;
+                        }
+                    });
+                } else {
+                    $(ddlTemplates).addClass('is-invalid');
+                }
+            });
+
+            $(btnApplyTemplate).click(function () {
+                window.location.replace('assessment.html?template_id=' + template_id);
+            });
+
+            this.popup.modal('show');
+        },
+        populateDropdownTemplates: function () {
+            let dropdownHTML = '';
+            console.log('Populating template dropdown..');
+            $(ddlTemplates).append('<option value="None">Choose a template..</option>');
+            arrTemplates.forEach(function (template) {
+                console.log('Adding ' + template.name + ' to dropdown');
+                $(ddlTemplates).append('<option value="' + template['id'] + '">' + template['name'] + '</option>');
+            });
+        }
+    },
+    adjustTimeLimit: {
+        popup: $('#popupAdjustTimeLimit'),
+        txtTimeLimit: '.txtTimeLimit',
+        btnApplyNewTimeLimit: '#btnApplyNewTimeLimit',
+        init: function () {
+            // Set value to current time limit
+            $(txtTimeLimit).val(timeLimit);
+
+            $('#btnApplyNewTimeLimit').click(function () {
+                console.log('Apply new time limit');
+                timeLimit = $(txtTimeLimit).val();
+                popups.adjustTimeLimit.popup.modal('toggle');
+            });
+
+            this.popup.modal('show');
+        },
+    },
+    successfulDocumentSave: {
+        init: function () {
+            $('#popupSuccessfulSave').show();
+        }
+    },
+    saveNewInfo: {},
+    errorMessage: {}
+};
 
 
 function getDataFromDatabase() {
@@ -259,7 +444,6 @@ function getDataFromDatabase() {
             temp_template['description'] = row[2];
             arrTemplates.push(temp_template);
         });
-        popuplateChooseTemplateDropdown();
         initializeAssessment();
     });
 
@@ -306,9 +490,14 @@ function getTemplateInfo() {
     return params;
 }
 
+// TODO: Check if this can be DELETED
 function initializeEvaluationPopup() {
     autocomplete(document.getElementById("txtStudentID"), arrStudentIDs);
     autocomplete(document.getElementById("txtCourse"), arrCourses);
+    // TODO: Autocomplete for table fields doesn't work
+    // Add autocomplete for table fields
+    autocomplete(document.getElementsByClassName('tableStudentID')[0], arrStudentIDs);
+    autocomplete(document.getElementsByClassName('tableCourse')[0], arrCourses);
 
     // Show popup, only when no need to show walkthrough
     var isShowedIntroEvaluation = Cookies.get("isShowedIntroEvaluation");
@@ -420,7 +609,70 @@ function getStudentName() {
     }
 }
 
+function getCurrentTemplateName() {
+    let template_index = 0;
 
+    for (i = 0; i < arrTemplates.length; i++) {
+        if (template_id == arrTemplates[i]['id']) {
+            console.log('getCurrentTemplateName template_index: ' + i);
+            template_index = i;
+            break;
+        }
+    }
+    console.log('getCurrentTemplateName: ' + arrTemplates[template_index]['name']);
+
+    return arrTemplates[template_index]['name'];
+}
+
+function normalizeScore(studentScore) {
+    // Get perfect marks
+    let perfectScore = $('.lblPerfectMarks').text();
+    // Get intended normalized score
+    let normalizedPerfectScore;
+    let normalizer;
+    let normalizedScore;
+
+    if ($('#txtNormalizedScore').val() != '') {
+        normalizedPerfectScore = $('#txtNormalizedScore').val();
+    }
+
+    normalizer = (perfectScore / normalizedPerfectScore).toFixed(2);
+
+    console.log('Normalizer: ' + normalizer);
+
+    normalizedScore = (studentScore / normalizer).toFixed(2);
+
+    console.log('Normalized score: ' + normalizedScore);
+
+    return normalizedScore;
+}
+
+function restrictKeyboardInput() {
+    // Only number input for student ID input
+    $("#txtStudentID, .tableStudentID").keypress(function (e) {
+        var keyCode = e.which;
+        /*
+          8 - (backspace)
+          32 - (space)
+          48-57 - (0-9)Numbers
+        */
+
+        if ((keyCode != 8 || keyCode == 32) && (keyCode < 48 || keyCode > 57)) {
+            return false;
+        }
+    });
+
+    $("#txtStudentName, .tableStudentName").keypress(function (event) {
+        var inputValue = event.which;
+        // allow letters and whitespaces only.
+        console.log(inputValue);
+        if (!(inputValue >= 65 && inputValue <= 122) && (inputValue != 32 && inputValue != 0)) {
+            event.preventDefault();
+        }
+    });
+}
+
+// TODO: Check if this can be DELETED
 function toggleAdditionalFields(status) {
     if (status === 'Hidden') {
         $('#linkShowAdditionalFields').text("Hide additional fields");
@@ -445,8 +697,11 @@ function addHeaderDocument(student_id, student_name, course, presentation) {
     $('.tableStudentID').val(student_id);
     $('.tableStudentName').val(student_name);
     $('.tablePresentation').val(presentation);
+    $('.tableCourse').val(course);
     // Add the course code which is hidden
     $('.document-header .tableCourseCode').val(course);
+
+
 }
 
 var walkthrough = {
@@ -614,131 +869,7 @@ var assessment = {
     template: {},
     /* Functions */
     init: function () {
-        this.initializeSelect()
-    },
-    initializeSelect: function () {
-        let that = this;
-
-        $("td").mousedown(function (e) {
-            console.log()
-            isDragging = true;
-            assessment.updateAssessmentScoreObject(e);
-        });
-
-        $("body").mouseup(function (e) {
-            isDragging = false;
-        });
-
-        $('td').mouseover(function (e) {
-            //     $(this).parent()
-            //   .children(".selected")
-            //   .removeClass("selected");
-            if (isDragging) {
-                assessment.updateAssessmentScoreObject(e);
-            }
-        });
-    },
-    updateAssessmentScoreObject: function (e) {
-        $(e.target).parent().removeClass("table-active");
-        let score = $(e.target).attr('data-score');
-        let type = $(e.target).attr('data-type');
-        let value = $(e.target).attr('data-value');
-        let classname = "";
-        let tmp = type.split('.')
-
-        if (value == 'Excellent') {
-            classname = "table-success";
-        } else if (value == 'Good') {
-            classname = "table-primary";
-        } else if (value == 'Fair') {
-            classname = "table-warning";
-        } else if (value == 'Poor') {
-            classname = "table-danger";
-        }
-
-        $('td[data-type="' + type + '"]').removeClass();
-        $(e.target).addClass(classname);
-
-        assessment.results['groupCriteria'][tmp[0]]["criteria"][tmp[1]] = score;
-
-        // Update assessment scores
-        let groupTotalScore = 0;
-        let criteria = assessment.results['groupCriteria'][tmp[0]]["criteria"];
-
-        for (var key in criteria) {
-            /* Checks if the field has been selected. Else, ignore. */
-            if (criteria[key] >= 0) {
-                groupTotalScore += parseInt(criteria[key]);
-            }
-        }
-
-        assessment.results['groupCriteria'][tmp[0]]['groupTotalScore'] = groupTotalScore;
-
-        assessment.updateAssessmentScoresUI(tmp[0], groupTotalScore);
-    },
-    updateAssessmentScoresUI: function (type, score) {
-        /* This is only to update the scores in the user interface */
-
-        // Updating the individual score cards
-        $('.' + type).text(score);
-
-        // Update score card color based on percentage
-        // 50% below is red, 50% and above but below 74% is yellow, 75% above is green
-        let scorePercentage;
-
-        if (score > 0) {
-            scorePercentage = score / assessment.scoreCriteria["groupCriteria"][type]["possibleTotalScore"] * 100;
-        }
-
-        if (scorePercentage < 50) {
-            $('.' + type).parent('.small-score-card').css({ 'background': '#ff8686', 'color': '#a90000' });
-        } else if (scorePercentage >= 50 && scorePercentage < 74) {
-            $('.' + type).parent('.small-score-card').css({ 'background': '#fff086', 'color': '#a9a400' });
-        } else if (scorePercentage >= 75) {
-            $('.' + type).parent('.small-score-card').css({ 'background': '#88ff86', 'color': '#00a90d' });
-        }
-
-        // Update the total of score cards
-        let totalScore = 0;
-        let groupCriteria = assessment.results.groupCriteria;
-
-        for (var key in groupCriteria) {
-            totalScore += groupCriteria[key]["groupTotalScore"];
-        }
-
-        $('.total_score').text(totalScore);
-
-        if (totalScore > 0) // Prevent dividing by zero
-        {
-            scorePercentage = totalScore / assessment.scoreCriteria["totalPossibleScore"] * 100;
-        }
-
-        if (scorePercentage < 50) {
-            $('.total_score').parent('.small-score-card').css({ 'background': '#ff8686', 'color': '#a90000' });
-        } else if (scorePercentage >= 50 && scorePercentage < 74) {
-            $('.total_score').parent('.small-score-card').css({ 'background': '#fff086', 'color': '#a9a400' });
-        } else if (scorePercentage >= 75) {
-            $('.total_score').parent('.small-score-card').css({ 'background': '#88ff86', 'color': '#00a90d' });
-        }
-    },
-    checkOptions: function () {
-        var that = this;
-
-        for (category in assessment.results['groupCriteria']) {
-            for (subcate in assessment.results['groupCriteria'][category]['criteria']) {
-                if (assessment.results['groupCriteria'][category]['criteria'][subcate] < 0) {
-                    var tmp = $('tr[data-type="' + category + '.' + subcate + '"]');
-                    tmp.addClass('table-active');
-                    let offset = tmp.offset().top - 55;
-                    $('body, html').animate({
-                        scrollTop: offset
-                    });
-                    return false;
-                }
-            }
-        }
-
-        return true;
+        tableAssess.init();
     },
     enableSaveButton: function (results, template) {
         this.saveButton.click(function (e) {
@@ -746,7 +877,9 @@ var assessment = {
             var that = this;
 
             // Check if all fields are checked before generating a document 
-            let allAssessmentChecked = assessment.checkOptions();
+            let allAssessmentChecked;
+
+            allAssessmentChecked = tableAssess.checkOptions();
 
             if (allAssessmentChecked) {
 
@@ -861,9 +994,12 @@ var assessment = {
         let formatted_date = today.getDate() + "-" + today.getMonth() + "-" + today.getFullYear();
         assessment.header_info['presentationDate'] = formatted_date;
 
-        let minuteDuration = parseInt($('.timer-minutes').text());
-        let secondDuration = parseInt($('.timer-seconds').text());
+        let minuteDuration = parseInt($('#lblMinutes').text());
+        let secondDuration = parseInt($('#lblSeconds').text());
         let durationText = '';
+
+        console.log('Minute duration: ' + parseInt($('#lblMinutes').text()));
+        console.log('Minute duration: ' + parseInt($('#lblSeconds').text()));
 
         if (minuteDuration > 0) {
             if (minuteDuration == 1) {
@@ -914,6 +1050,15 @@ var assessment = {
         let header_info = assessment.header_info;
         // Stop timer
         timer.stop();
+
+        // Check if user checked Normalize scores
+        if ($('#checkNormalizeScore').prop('checked')) {
+            console.log('Normalize scores enabled');
+            assessment.results['normalizedScore'] = normalizeScore(parseInt(assessment.results['assessmentTotalScore']));
+            assessment.results['normalizedPerfectScore'] = $('#txtNormalizedScore').val();
+        } else {
+            assessment.results['normalizedScore'] = ''
+        }
 
         console.log(header_info);
         eel.createAssessmentResultDocument(header_info, assessment.results, template_id, false)().then(function () {
@@ -1005,128 +1150,12 @@ function createScoreCards() {
         '<span class="total_score"> 0</span>/<span  class="score-text">' + assessment.scoreCriteria['totalPossibleScore'] + '</span>' +
         '</div>';
 
+    // Set the perfect marks in the Calculate Menu button
+    $('.lblPerfectMarks').html(assessment.scoreCriteria['totalPossibleScore']);
+
     headerScoreContainer.html(scoreCardsHTML);
 }
 
-function createTemplateTable(template_id) {
-
-    // TODO: Add loader here
-
-    eel.getTemplateJSON(template_id)().then(function (templateJSON) {
-        /* Organize the JSON object */
-        let template = JSON.parse(templateJSON);
-        console.log('Creating template...');
-        console.log(template);
-
-        let templateHTML = '<div class="text-right"><button class="btn btn-danger edit-assesment mb-3 fourthGuide stepOne">Edit template</button></div>';
-        let group_keys = {};
-        let group_score_keys = {};
-
-        let totalPossibleScore = 0;
-
-        /* For each group criterion, create a table */
-        /* Developer's Notes: i is for groupCriteria, j is for first criterion fields, k is for criteria, l is for fields */
-        for (var i = 0; i < template.groupCriteria.length; i++) {
-            let groupCriteria = template.groupCriteria;
-
-            $('.assessment-container').data('id', template.id);
-            $('.assessment-container').data('name', template.name);
-
-            let htmlTable = '<table class="table disabled-highlight-table">';
-            /* Table Headers containing group criterion's name */
-            htmlTable += '<thead><tr>';
-            htmlTable += '<th scope="col" width="12%" data-name="' + groupCriteria[i].name.replace(/["]/g, '') + '" data-id="' + groupCriteria[i].id + '">' + groupCriteria[i].name + '</th>';
-
-            let first_criterion_fields = groupCriteria[i].criteria[0].fields;
-
-            /* Add value and points in header */
-            for (var j = 0; j < first_criterion_fields.length; j++) {
-                htmlTable += '<th scope="col" width="22%" data-points="' + first_criterion_fields[j].points + '" data-point-name="' + first_criterion_fields[j].value + '">' +
-                    first_criterion_fields[j].points + " - " + first_criterion_fields[j].value + '</th>';
-            }
-
-            htmlTable += '</tr></thead>';
-            htmlTable += '<tbody>';
-
-            /* Take the first word of group criterion, add _ and then the group criterion's id */
-            let temp_words = groupCriteria[i].name.split(" ");
-            let data_type_group = temp_words[0].toLowerCase() + "_" + groupCriteria[i].id;
-
-            let temp_score_keys = {};
-            temp_score_keys["icon"] = groupCriteria[i].icon;
-            temp_score_keys["name"] = groupCriteria[i].name;
-
-            let temp_keys = {};
-            let criteria_keys = {}; /* Temporary holder for results object's criteria */
-            let possible_total_score = 0;
-
-            for (var k = 0; k < groupCriteria[i].criteria.length; k++) {
-
-                let criteria = groupCriteria[i].criteria;
-
-                /* Take the first word of criterion, add _ and then the criterion's id */
-                temp_words = criteria[k].name.split(" ");
-                let data_type_criterion = temp_words[0].toLowerCase() + "_" + criteria[k].id;
-
-                criteria_keys[data_type_criterion] = -1; /* Initialize results. */
-
-                let data_type = data_type_group + '.' + data_type_criterion;
-
-                htmlTable += '<tr data-type="' + data_type + '"><th>' + criteria[k].name + '</th>';
-
-                // console.log('Index: ' + k + ' - ' + criteria[k].fields.length);
-                /* Add fields' descriptions */
-                for (var l = 0; l < criteria[k].fields.length; l++) {
-                    let fields = criteria[k].fields;
-
-
-                    htmlTable += '<td data-score="' + fields[l].points + '" data-type="' + data_type + '" data-value="'
-                        + fields[l].value + '" data-id="' + fields[l].id + '" data-name="' + fields[l].name + '">'
-                        + fields[l].description + '</td>';
-                }
-
-                possible_total_score += criteria[k].fields[0].points; // Get highest possible points
-
-                htmlTable += '</tr>';
-            }
-
-            // For assessment.results data object
-            temp_keys["groupTotalScore"] = 0;
-            temp_keys["groupPossibleTotalScore"] = possible_total_score;
-            temp_keys["criteria"] = criteria_keys;
-
-            group_keys[data_type_group] = temp_keys;
-
-            // For assessment.scoreCriteria data object
-            totalPossibleScore += possible_total_score;
-            temp_score_keys["highestFieldScore"] = groupCriteria[i].criteria[0].fields[0].points;
-            temp_score_keys["possibleTotalScore"] = possible_total_score;
-            group_score_keys[data_type_group] = temp_score_keys;
-
-            htmlTable += '</table><br />';
-
-            templateHTML += htmlTable;
-        }
-
-        assessment.scoreCriteria['groupCriteria'] = group_score_keys;
-        assessment.scoreCriteria['totalPossibleScore'] = totalPossibleScore;
-        assessment.results['groupCriteria'] = group_keys;
-
-        $('.assessment-container').html(templateHTML);
-
-        assessment.init();
-        assessment.template = template;
-        assessment.enableSaveButton(assessment.results, template.id);
-
-        createScoreCards();
-        console.log('Value of walkthrough ' + localStorage.getItem('finishedWalkthrough'));
-        if (localStorage.getItem('finishedWalkthrough') == null) {
-            walkthrough.firstWalkthrough();
-            showSecondWalkthrough = true;
-        }
-    });
-
-}
 
 function autocomplete(inp, arr) {
     /*the autocomplete function takes two arguments,
@@ -1223,11 +1252,4 @@ function autocomplete(inp, arr) {
     document.addEventListener("click", function (e) {
         closeAllLists(e.target);
     });
-}
-
-function initTableEdit() {
-
-    $(document).on('click', '.edit-assesment', function () {
-        window.location.replace('edit-assessment.html?template_id=' + assessment.template.id + '&template_name=' + assessment.template.name);
-    })
 }

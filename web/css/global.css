@@ -136,3 +136,21 @@ button:focus {
 .show_dropdown .dropdown_menu {
     display: block;
 }
+
+.black-link {
+    color: black;
+    cursor: pointer;
+    text-decoration: underline;
+    border: none;
+    background: none;
+    outline: initial;
+}
+
+p.popup-icon-link {
+    cursor: pointer;
+    margin-bottom: 5px;
+}
+
+p.popup-icon-link:hover span {
+    text-decoration: underline;
+}
