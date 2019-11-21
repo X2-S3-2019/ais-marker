@@ -1,141 +1,141 @@
 var groupUser = {
-	presentTationElm: $(".tablePresentation"),
-	presentTationData: "",
-	groupTable: $("#MembersOfGroup"),
-	groupData: {"number": "", members: [{"id": 1, "studentId": "", "studentName": ""}]},
-	groupNumber: $("#tableGroupNumber"),
-	addBtn: $("#new-student-line"),
-	startBtn: $("#start-envaluation"),
-	delBtns: $("button[data-action=del-student-line]"),
-	isediting: true,
-	init: function() {
-		if ( this.groupNumber.length == 0 ) {
-			return;
-		}
-		var that = this;
-		this.addBtn.click(function(){
-			that.addStudentLine();
-		});
-		this.registerDelStudentLine();
-		this.startBtn.click(function(){
-			if ( that.isediting == true ) {
-				that.finishGroupEditing();
-			} else {
-				that.unlockGroup();
-			}
-		});
-	},
-	getNextStudentID: function() {
-		return this.groupData.members.length + 1;
-	},
-	addStudentLine: function() {
-		var nextId = this.getNextStudentID();
-		if (nextId > 10) {
-			alert("the maximum group member is 10");
-			return;
-		}
-		this.hideDelBtn()
-		this.groupTable.find("tbody").append("<br />");
-		var html = 
-		'<tr data-student-id=' + nextId + '>' +
+    presentTationElm: $(".tablePresentation"),
+    presentTationData: "",
+    groupTable: $("#MembersOfGroup"),
+    groupData: { "number": "", members: [{ "id": 1, "studentId": "", "studentName": "" }] },
+    groupNumber: $("#tableGroupNumber"),
+    addBtn: $("#new-student-line"),
+    startBtn: $("#start-envaluation"),
+    delBtns: $("button[data-action=del-student-line]"),
+    isediting: true,
+    init: function () {
+        if (this.groupNumber.length == 0) {
+            return;
+        }
+        var that = this;
+        this.addBtn.click(function () {
+            that.addStudentLine();
+        });
+        this.registerDelStudentLine();
+        this.startBtn.click(function () {
+            if (that.isediting == true) {
+                that.finishGroupEditing();
+            } else {
+                that.unlockGroup();
+            }
+        });
+    },
+    getNextStudentID: function () {
+        return this.groupData.members.length + 1;
+    },
+    addStudentLine: function () {
+        var nextId = this.getNextStudentID();
+        if (nextId > 10) {
+            alert("the maximum group member is 10");
+            return;
+        }
+        this.hideDelBtn()
+        this.groupTable.find("tbody").append("<br />");
+        var html =
+            '<tr data-student-id=' + nextId + '>' +
             '<td>' +
-                'Stuent ' + nextId + ' ID:'+
-                '<input type="text" class="header-input border-bottom-only tableStudentID" maxlength=10 />' +
+            'Stuent ' + nextId + ' ID:' +
+            '<input type="text" class="header-input border-bottom-only tableStudentID" maxlength=10 />' +
             '</td>' +
             '<td>' +
-                'Stuent ' + nextId + ' Name:' +
-                '<input type="text" class="header-input border-bottom-only tableStudentName" maxlength=40 />' +
+            'Stuent ' + nextId + ' Name:' +
+            '<input type="text" class="header-input border-bottom-only tableStudentName" maxlength=40 />' +
             '</td>' +
             '<td><button class="btn btn-danger" data-action="del-student-line">Del</button></td>' +
-        '</tr>';
+            '</tr>';
         this.groupTable.find("tbody").append(html);
-        this.groupData.members.push({"id": nextId, "studentId": "", "studentName": ""});
+        this.groupData.members.push({ "id": nextId, "studentId": "", "studentName": "" });
         this.registerDelStudentLine();
-	},
-	registerDelStudentLine: function() {
-		var that = this;
-		$("button[data-action=del-student-line]").unbind();
-		$("button[data-action=del-student-line]").click(function() {
-			that.delStudentLine();
-		});
-	},
-	delStudentLine: function() {
-		this.groupData.members.pop();
-		this.groupTable.find("tbody").children("tr:last").remove();
-		this.groupTable.find("tbody").children("br:last").remove();
-		this.showDelBtn();
-	},
-	finishGroupEditing: function() {
-		this.presentTationData = this.presentTationElm.val();
-		var groupNumber = this.groupNumber.val();
-		if (groupNumber == "") {
-			alert("group number is required");
-			this.groupNumber.focus();
-			return;
-		}
-		var members = [];
-		var validation = true;
-		$("tr[data-student-id]").each(function(index, item) {
-			var tr = $(item);
-			var id = $(item).attr("data-student-id");
-			var studentNameElm = $(item).find(".tableStudentName");
-			var studentIdElem = $(item).find(".tableStudentID");
-			var studentName = studentNameElm.val();
-			var studentId = studentIdElem.val();
-			if ( studentId == "" ) {
-				alert("student id is required");
-				studentIdElem.focus();
-				validation = false;
-				return false;
-			}
-			if ( studentName == "" ) {
-				alert("student name is required");
-				studentNameElm.focus();
-				validation = false;
-				return false;
-			}
-			members.push({"id": id, "studentId": studentId, "studentName": studentName});
-		});
-		if ( !validation ) {
-			return false;
-		}
-		if ( members.length == 0 ) {
-			alert("this group is empty");
-			return false;
-		}
-		this.groupData = {};
-		this.groupData.number = groupNumber;
-		this.groupData.members = members;
-		this.lockGroup();
-		return true;
-	},
-	hideDelBtn: function() {
-		$("button[data-action=del-student-line]").hide();
-	},
-	showDelBtn: function() {
-		this.groupTable.find("tbody").children("tr:last").find("button[data-action=del-student-line]").show();
-	},
-	lockGroup: function() {
-		this.groupTable.find("tbody input").attr("disabled", true);
-		this.addBtn.addClass("disabled");
-		this.groupNumber.attr("disabled", true);
-		this.addBtn.attr("disabled", true);
-		this.startBtn.html("Return to Edit");
-		this.hideDelBtn();
-		this.isediting = false;
-	},
-	unlockGroup: function() {
-		this.groupTable.find("tbody input").attr("disabled", false);
-		this.addBtn.removeClass("disabled");
-		this.groupNumber.attr("disabled", false);
-		this.addBtn.attr("disabled", false);
-		this.startBtn.html("Start Evaluation");
-		this.showDelBtn();
-		this.isediting = true;
-	},
-	getGroupData: function() {
-		return this.groupData;
-	}
+    },
+    registerDelStudentLine: function () {
+        var that = this;
+        $("button[data-action=del-student-line]").unbind();
+        $("button[data-action=del-student-line]").click(function () {
+            that.delStudentLine();
+        });
+    },
+    delStudentLine: function () {
+        this.groupData.members.pop();
+        this.groupTable.find("tbody").children("tr:last").remove();
+        this.groupTable.find("tbody").children("br:last").remove();
+        this.showDelBtn();
+    },
+    finishGroupEditing: function () {
+        this.presentTationData = this.presentTationElm.val();
+        var groupNumber = this.groupNumber.val();
+        if (groupNumber == "") {
+            alert("group number is required");
+            this.groupNumber.focus();
+            return;
+        }
+        var members = [];
+        var validation = true;
+        $("tr[data-student-id]").each(function (index, item) {
+            var tr = $(item);
+            var id = $(item).attr("data-student-id");
+            var studentNameElm = $(item).find(".tableStudentName");
+            var studentIdElem = $(item).find(".tableStudentID");
+            var studentName = studentNameElm.val();
+            var studentId = studentIdElem.val();
+            if (studentId == "") {
+                alert("student id is required");
+                studentIdElem.focus();
+                validation = false;
+                return false;
+            }
+            if (studentName == "") {
+                alert("student name is required");
+                studentNameElm.focus();
+                validation = false;
+                return false;
+            }
+            members.push({ "id": id, "studentId": studentId, "studentName": studentName });
+        });
+        if (!validation) {
+            return false;
+        }
+        if (members.length == 0) {
+            alert("this group is empty");
+            return false;
+        }
+        this.groupData = {};
+        this.groupData.number = groupNumber;
+        this.groupData.members = members;
+        this.lockGroup();
+        return true;
+    },
+    hideDelBtn: function () {
+        $("button[data-action=del-student-line]").hide();
+    },
+    showDelBtn: function () {
+        this.groupTable.find("tbody").children("tr:last").find("button[data-action=del-student-line]").show();
+    },
+    lockGroup: function () {
+        this.groupTable.find("tbody input").attr("disabled", true);
+        this.addBtn.addClass("disabled");
+        this.groupNumber.attr("disabled", true);
+        this.addBtn.attr("disabled", true);
+        this.startBtn.html("Return to Edit");
+        this.hideDelBtn();
+        this.isediting = false;
+    },
+    unlockGroup: function () {
+        this.groupTable.find("tbody input").attr("disabled", false);
+        this.addBtn.removeClass("disabled");
+        this.groupNumber.attr("disabled", false);
+        this.addBtn.attr("disabled", false);
+        this.startBtn.html("Start Evaluation");
+        this.showDelBtn();
+        this.isediting = true;
+    },
+    getGroupData: function () {
+        return this.groupData;
+    }
 };
 
 
@@ -172,8 +172,8 @@ var informedTimeLimit;  // Checks if the user has been alerted about time limit 
 
 $(document).ready(function () {
 
-	groupUser.init();
-	tableAssessGroup.init();
+    groupUser.init();
+    tableAssessGroup.init();
 
     let template_info = getTemplateInfo();
     console.log(template_info);
@@ -269,7 +269,7 @@ $(document).ready(function () {
         $(".dropdown_calculate_menu").css("display", "block");
     });
 
-    $('#checkNormalizeScore').bind('change', function(){
+    $('#checkNormalizeScore').bind('change', function () {
         $('#txtNormalizedScore').prop('disabled', false);
     });
 
@@ -535,7 +535,7 @@ var popups = {
             });
 
             $(btnApplyTemplate).click(function () {
-                window.location.replace('assessment.html?template_id=' + template_id);
+                window.location.replace('assessment-group.html?template_id=' + template_id);
             });
 
             this.popup.modal('show');
@@ -1166,25 +1166,29 @@ var assessment = {
         assessment.header_info['presentationDuration'] = durationText;
     },
     calculateScores: function () {
-        let totalScore = 0;
+        let userIDs = Object.keys(tableAssessGroup.scoreData);
 
-        for (var group in assessment.results['groupCriteria']) {
-            totalScore += assessment.results['groupCriteria'][group].groupTotalScore;
-        }
+        userIDs.forEach(function(student_id)
+        {
+            let totalScore = 0;
+            console.log('Calculating scores for student id: ' + student_id);
+            for (var group in tableAssessGroup.scoreData[student_id]['groupCriteria']) {
+                totalScore += tableAssessGroup.scoreData[student_id]['groupCriteria'][group].groupTotalScore;
+            }
 
-        let possibleTotalScore = 0;
+            let possibleTotalScore = 0;
 
-        for (var group in assessment.results['groupCriteria']) {
-            possibleTotalScore += assessment.results['groupCriteria'][group].groupPossibleTotalScore;
-        }
+            for (var group in tableAssessGroup.scoreData[student_id]['groupCriteria']) {
+                possibleTotalScore += tableAssessGroup.scoreData[student_id]['groupCriteria'][group].groupPossibleTotalScore;
+            }
 
-        assessment.results['assessmentTotalScore'] = totalScore;
-        assessment.results['assessmentPossibleTotalScore'] = possibleTotalScore;
+            tableAssessGroup.scoreData[student_id]['assessmentTotalScore'] = totalScore;
+           // tableAssessGroup.scoreData[student_id]['assessmentPossibleTotalScore'] = possibleTotalScore;
 
-        let scorePercentage = totalScore / possibleTotalScore * 100;
-        assessment.results['scorePercentage'] = scorePercentage.toFixed(2);
+            let scorePercentage = totalScore / possibleTotalScore * 100;
+            tableAssessGroup.scoreData[student_id]['scorePercentage'] = scorePercentage.toFixed(2);
+        });
 
-        console.log(assessment.results);
     },
     createAssessmentDocument: function () {
         console.log('Creating document..');
@@ -1202,8 +1206,11 @@ var assessment = {
             assessment.results['normalizedScore'] = ''
         }
 
+        // Add the perfect score to data
+        tableAssessGroup.scoreData['perfectScore'] = assessment.scoreCriteria['totalPossibleScore'];
+
         console.log(header_info);
-        eel.createAssessmentResultDocument(header_info, assessment.results, template_id, false)().then(function () {
+        eel.createGroupAssessmentResultDocument(header_info, tableAssessGroup.groupData, tableAssessGroup.scoreData, template_id)().then(function () {
             // Show popup
             $('#popupSuccessfulSave').modal('show');
 
@@ -1303,7 +1310,7 @@ function autocomplete(inp, arr) {
     /*the autocomplete function takes two arguments,
     the text field element and an array of possible autocompleted values:*/
     var currentFocus;
-    if (!inp ) {
+    if (!inp) {
         return;
     }
     /*execute a function when someone writes in the text field:*/

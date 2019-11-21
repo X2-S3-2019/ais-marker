@@ -217,6 +217,25 @@ def openDocument(document_name):
         print('There was an error.')
     # os.startfile(document_name + '.docx')
 
+@eel.expose
+def createGroupAssessmentResultDocument(header_info, group_data, score_data, template_id):
+    document_name = group_data['number'] + \
+            ' (' + header_info['presentationDate'] + ')'
+
+    template = createTemplate(template_id)
+
+    path = ''
+    if path == '':
+        # Get default directory from database
+        path = databaseManager.getDefaultDirectory()
+
+        if not os.path.exists(path):
+            os.makedirs(path)
+
+        assessmentDocument = AssessmentDocument(document_name)
+        assessmentDocument.createGroupResultsDocument(
+            template, header_info, group_data, score_data, path)
+
 # Creates the document containing the results of the assessment
 @eel.expose
 def createAssessmentResultDocument(header_info, results, template_id, openDocument):
