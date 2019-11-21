@@ -2,7 +2,7 @@
 <html>
 
 <head>
-    <title>Individual Assessment</title>
+    <title>Group Assessment</title>
     <!-- Include eel.js - note this file doesn't exist in the 'web' directory -->
     <script type="text/javascript" src="/eel.js"></script>
     <link rel="shortcut icon" href="ais.ico" type="image/x-icon">
@@ -53,8 +53,7 @@
                         <p>Current Directory:
                             <span class="directoryPath">Directory</span></p>
                     </li>
-                    <li><button id="btnChangeDirectory" class="btn btn-primary w-100">Change Directory</button>
-                    </li>
+                    <li><button id="btnChangeDirectory" class="btn btn-primary w-100">Change Directory</button></li>
                 </div>
             </div>
             <div class="dropdown_container" role="button">
@@ -110,8 +109,8 @@
         </div>
 
         <div class="header-icon-container">
-            <a class="header-icon" href="./assessment-group.html">
-                <i title="Group" class="fas fa-users"></i>
+            <a class="header-icon" href="./assessment.html">
+                <i title="Group" class="fas fa-user"></i>
             </a>
             <a class="header-icon btnSaveDocument">
                 <i title="Save" class="fas fa-save"></i>
@@ -126,25 +125,36 @@
             <table class="full-width-table">
                 <tr>
                     <td>
-                        Student Name:
-                        <input type="text" class="header-input border-bottom-only tableStudentName" maxlength=40 />
+                        Topic of Presentation:
+                        <input type="text" class="header-input border-bottom-only tablePresentation" maxlength=40></span>
                     </td>
+                </tr>
+                <tr>
                     <td>
-                        Student ID:
-                        <input type="text" class="header-input border-bottom-only tableStudentID" maxlength=10 />
+                        Group Number:
+                        <input type="text" id="tableGroupNumber" class="header-input border-bottom-only" maxlength=40 required/>
                     </td>
                 </tr>
             </table>
             <br />
-            <table class="full-width-table">
-                <tr>
+            <table class="full-width-table" id="MembersOfGroup">
+                <tr data-student-id=1>
                     <td>
-                        Topic of Presentation:
-                        <input type="text" class="header-input border-bottom-only tablePresentation"
-                            maxlength=40></span>
+                        Stuent 1 ID:
+                        <input type="text" class="header-input border-bottom-only tableStudentID" maxlength=40 />
                     </td>
+                    <td>
+                        Stuent 1 Name:
+                        <input type="text" class="header-input border-bottom-only tableStudentName" maxlength=10 />
+                    </td>
+                    <td><button class="btn btn-danger" style="display: none" data-action="del-student-line">Del</button></td>
                 </tr>
             </table>
+            <br />
+            <button class="btn btn-success" id="new-student-line">Add Student</button>
+            <button class="btn btn-primary" id="start-envaluation" >Start Evaluation</button>
+            <br />
+            
         </div>
         <br />
         <div class="assessment-container">
@@ -191,7 +201,7 @@
     <!-- End of Successful Save Popup -->
     <!-- Evaluate Info Popup -->
 
-    <div class="modal fade" id="popupAddStudent" tabindex="-1" role="dialog" aria-labelledby="popupAddStudentTitle"
+    <div class="modal fade"  tabindex="-1" role="dialog" aria-labelledby="popupAddStudentTitle"
         aria-hidden="true">
         <div class="modal-dialog modal-dialog-centered" role="document">
             <div class="modal-content">
@@ -353,20 +363,36 @@
 
     <!-- End of Save New Information Popup -->
 
+
+    <!-- Save New Information Popup -->
+
+    <div class="modal fade" id="popupSelectStudent" tabindex="10" role="dialog">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="modalTitle">Plese Select Students?</h5>
+                </div>
+                <div id="studentsOptions" class="modal-body thirdGuide stepOne">
+                    <span> 
+                        <input type="checkbox" name="students" value=1>
+                        &nbsp;&nbsp;(1) StudentID: xxx; StudentName: xxxxxxx;
+                    </span>
+
+                </div>
+                <div class="modal-footer">
+                    <button id="canelSelectStudent" class="btn btn-secondary">Cancel</button>
+                    <button id="saveSelectStudent" class="btn btn-success">Select</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- End of Save New Information Popup -->
+
     <!-- End of Modals -->
 
     <script type="text/javascript" src="js/global.js"></script>
-    <script type="text/javascript" src="js/assessment.js?v=0.12"></script>
-    <script type="text/javascript" src="js/table-assess.js"></script>
+    <script type="text/javascript" src="js/assessment-group.js"></script>
+    <script type="text/javascript" src="js/table-assess-group.js"></script>
 </body>
-<script type="text/javascript">
-    // for index page   
-    // const isShowedIntroEvaluation = Cookies.get("isShowedIntroEvaluation");
-    // if (!isShowedIntroEvaluation) {
-    //     introJs().setOption('showProgress', true).start().onskip(function () {
-    //         Cookies.set('isShowedIntroEvaluation', 1, { expires: 100, path: '' })
-    //     });
-    // }
-</script>
-
 </html>

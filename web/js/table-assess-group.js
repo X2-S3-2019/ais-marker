@@ -4,17 +4,56 @@
     File description: Contains functions related manipulating UI components in table assess
 */
 
-var isDragging = false;
-
-$(document).ready(function () {
-    
-});
-
-var tableAssess = {
+var tableAssessGroup = {
+    selectUserModal: $("#popupSelectStudent"),
+    modalSelect: $("#saveSelectStudent"),
+    modalCancel: $("#canelSelectStudent"),
+    modalContent: $("#studentsOptions"),
+    groupData: {},
+    scoreData: {}, // {"1": result } ,
+    currentCell: null,
     init: function(){
+        var that = this;
+        this.modalCancel.click(function() {
+            that.selectUserModal.modal("hide");
+        });
+        this.modalSelect.click(function() {
+            var selectedIds = [];
+            that.modalContent.find("input[type=checkbox]:checked").each(function(index, item) {
+                selectedIds.push($(item).val());
+            });
+            that.updateAssessmentScoreObject(selectedIds, that.currentCell);
+        });
         this.initializeSelect();
     },
-    createTemplateTable: function(template_id){
+    generateModalContent: function(e) {
+        var that = this;
+        var groupData = groupUser.getGroupData();
+        var members = groupData.members;
+        if ( members.length === 0 ) {
+            return;
+        }
+        this.groupData = groupData;
+        let score = $(e.target).attr('data-score');
+        let type = $(e.target).attr('data-type');
+        let value = $(e.target).attr('data-value');
+        let tmp = type.split('.')
+        this.modalContent.html("");
+        for ( key in members ) {
+            var student = members[key];
+            var html = '<p>' + 
+                '<input type="checkbox" name="students" value=' + student.id + ' ';
+            if ( that.scoreData[student.id] && that.scoreData[student.id]["groupCriteria"][tmp[0]] && that.scoreData[student.id]["groupCriteria"][tmp[0]]["criteria"] &&  that.scoreData[student.id]["groupCriteria"][tmp[0]]["criteria"][tmp[1]] == score) {
+                html += "checked ";
+            }
+            html += '>' +
+                '&nbsp;&nbsp;(' + student.id + ') StudentID: ' + student.studentId + '; StudentName: ' + student.studentName + ';' +
+            '</p>';
+            that.modalContent.append(html);
+        }
+        this.selectUserModal.modal('show');
+    },
+    createTemplateTable: function(template_id) {
         // Remove emoji-specific styles 
         $('body').removeClass('emoji');
 
@@ -137,24 +176,15 @@ var tableAssess = {
     },
     initializeSelect: function(){   // Initializes the selection of table cells
         let that = this;
-
-        $("td").mousedown(function (e) {
-            console.log()
-            isDragging = true;
-            tableAssess.updateAssessmentScoreObject(e);
-        });
-
-        $("body").mouseup(function (e) {
-            isDragging = false;
-        });
-
-        $('td').mouseover(function (e) {
-            if (isDragging) {
-                tableAssess.updateAssessmentScoreObject(e);
+        $('.template-container').find("td[data-score]").mousedown(function (e) {
+            var status = groupUser.finishGroupEditing();
+            if ( status === true ) {
+                that.generateModalContent(e);
+                that.currentCell = e;
             }
         });
     },
-    updateAssessmentScoreObject: function (e) {
+    updateAssessmentScoreObject: function (selectedIds, e) {
         $(e.target).parent().removeClass("table-active");
         let score = $(e.target).attr('data-score');
         let type = $(e.target).attr('data-type');
@@ -164,36 +194,41 @@ var tableAssess = {
             return;
         }
         let tmp = type.split('.')
-
-        if (value == 'Excellent') {
-            classname = "table-success";
-        } else if (value == 'Good') {
-            classname = "table-primary";
-        } else if (value == 'Fair') {
-            classname = "table-warning";
-        } else if (value == 'Poor') {
-            classname = "table-danger";
-        }
-
-        $('td[data-type="' + type + '"]').removeClass();
-        $(e.target).addClass(classname);
-
-        assessment.results['groupCriteria'][tmp[0]]["criteria"][tmp[1]] = score;
-
-        // Update assessment scores
-        let groupTotalScore = 0;
-        let criteria = assessment.results['groupCriteria'][tmp[0]]["criteria"];
-
-        for (var key in criteria) {
-            /* Checks if the field has been selected. Else, ignore. */
-            if (criteria[key] >= 0) {
-                groupTotalScore += parseInt(criteria[key]);
+        for ( var k =0; k < selectedIds.length; k ++) {
+            var id = selectedIds[k];
+            var results = this.scoreData[id];
+            if ( !results ) {
+                results = $.extend(true, {}, assessment.results);
             }
+            results['groupCriteria'][tmp[0]]["criteria"][tmp[1]] = score;
+            let groupTotalScore = 0;
+            let criteria = results['groupCriteria'][tmp[0]]["criteria"];
+            for (var key in criteria) {
+                /* Checks if the field has been selected. Else, ignore. */
+                if (criteria[key] >= 0) {
+                    groupTotalScore += parseInt(criteria[key]);
+                }
+            }
+            results['groupCriteria'][tmp[0]]['groupTotalScore'] = groupTotalScore;
+            this.scoreData[id] = results;
+
+            // change text of the cell.
+            $(e.target).parent().children().each(function(index, item) {
+                let text = $(item).text();
+                text = text.replace("("+id+")", "");
+                $(item).text(text);
+            });
+            let text = $(e.target).text() + "("+id+")";
+            console.log(text);
+            $(e.target).text(text);
         }
+        // console.log('====', selectedIds, '====');
+        // console.log('====', this.currentCell, '====');
+        // console.log('====', this.scoreData, '====');
+        // this.updateAssessmentScoresUI(tmp[0], groupTotalScore);
+        this.selectUserModal.modal("hide");
 
-        assessment.results['groupCriteria'][tmp[0]]['groupTotalScore'] = groupTotalScore;
 
-        tableAssess.updateAssessmentScoresUI(tmp[0], groupTotalScore);
     },
     updateAssessmentScoresUI: function (type, score) {
         /* This is only to update the scores in the user interface */

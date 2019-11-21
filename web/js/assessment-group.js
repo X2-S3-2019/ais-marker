@@ -1,3 +1,145 @@
+var groupUser = {
+	presentTationElm: $(".tablePresentation"),
+	presentTationData: "",
+	groupTable: $("#MembersOfGroup"),
+	groupData: {"number": "", members: [{"id": 1, "studentId": "", "studentName": ""}]},
+	groupNumber: $("#tableGroupNumber"),
+	addBtn: $("#new-student-line"),
+	startBtn: $("#start-envaluation"),
+	delBtns: $("button[data-action=del-student-line]"),
+	isediting: true,
+	init: function() {
+		if ( this.groupNumber.length == 0 ) {
+			return;
+		}
+		var that = this;
+		this.addBtn.click(function(){
+			that.addStudentLine();
+		});
+		this.registerDelStudentLine();
+		this.startBtn.click(function(){
+			if ( that.isediting == true ) {
+				that.finishGroupEditing();
+			} else {
+				that.unlockGroup();
+			}
+		});
+	},
+	getNextStudentID: function() {
+		return this.groupData.members.length + 1;
+	},
+	addStudentLine: function() {
+		var nextId = this.getNextStudentID();
+		if (nextId > 10) {
+			alert("the maximum group member is 10");
+			return;
+		}
+		this.hideDelBtn()
+		this.groupTable.find("tbody").append("<br />");
+		var html = 
+		'<tr data-student-id=' + nextId + '>' +
+            '<td>' +
+                'Stuent ' + nextId + ' ID:'+
+                '<input type="text" class="header-input border-bottom-only tableStudentID" maxlength=10 />' +
+            '</td>' +
+            '<td>' +
+                'Stuent ' + nextId + ' Name:' +
+                '<input type="text" class="header-input border-bottom-only tableStudentName" maxlength=40 />' +
+            '</td>' +
+            '<td><button class="btn btn-danger" data-action="del-student-line">Del</button></td>' +
+        '</tr>';
+        this.groupTable.find("tbody").append(html);
+        this.groupData.members.push({"id": nextId, "studentId": "", "studentName": ""});
+        this.registerDelStudentLine();
+	},
+	registerDelStudentLine: function() {
+		var that = this;
+		$("button[data-action=del-student-line]").unbind();
+		$("button[data-action=del-student-line]").click(function() {
+			that.delStudentLine();
+		});
+	},
+	delStudentLine: function() {
+		this.groupData.members.pop();
+		this.groupTable.find("tbody").children("tr:last").remove();
+		this.groupTable.find("tbody").children("br:last").remove();
+		this.showDelBtn();
+	},
+	finishGroupEditing: function() {
+		this.presentTationData = this.presentTationElm.val();
+		var groupNumber = this.groupNumber.val();
+		if (groupNumber == "") {
+			alert("group number is required");
+			this.groupNumber.focus();
+			return;
+		}
+		var members = [];
+		var validation = true;
+		$("tr[data-student-id]").each(function(index, item) {
+			console.log(item, index);
+			var tr = $(item);
+			var id = $(item).attr("data-student-id");
+			var studentNameElm = $(item).find(".tableStudentName");
+			var studentIdElem = $(item).find(".tableStudentID");
+			var studentName = studentNameElm.val();
+			var studentId = studentIdElem.val();
+			if ( studentId == "" ) {
+				alert("student id is required");
+				studentIdElem.focus();
+				validation = false;
+				return false;
+			}
+			if ( studentName == "" ) {
+				alert("student name is required");
+				studentNameElm.focus();
+				validation = false;
+				return false;
+			}
+			members.push({"id": id, "studentId": studentId, "studentName": studentName});
+		});
+		if ( !validation ) {
+			return false;
+		}
+		if ( members.length == 0 ) {
+			alert("this group is empty");
+			return false;
+		}
+		this.groupData = {};
+		this.groupData.number = groupNumber;
+		this.groupData.members = members;
+		this.lockGroup();
+		return true;
+	},
+	hideDelBtn: function() {
+		$("button[data-action=del-student-line]").hide();
+	},
+	showDelBtn: function() {
+		this.groupTable.find("tbody").children("tr:last").find("button[data-action=del-student-line]").show();
+	},
+	lockGroup: function() {
+		this.groupTable.find("tbody input").attr("disabled", true);
+		this.addBtn.addClass("disabled");
+		this.groupNumber.attr("disabled", true);
+		this.addBtn.attr("disabled", true);
+		this.startBtn.html("Return to Edit");
+		this.hideDelBtn();
+		this.isediting = false;
+	},
+	unlockGroup: function() {
+		this.groupTable.find("tbody input").attr("disabled", false);
+		this.addBtn.removeClass("disabled");
+		this.groupNumber.attr("disabled", false);
+		this.addBtn.attr("disabled", false);
+		this.startBtn.html("Start Evaluation");
+		this.showDelBtn();
+		this.isediting = true;
+	},
+	getGroupData: function() {
+		return this.groupData;
+	}
+};
+
+
 /*
     assessment.js
 
@@ -30,6 +172,9 @@ var timeLimit;
 var informedTimeLimit;  // Checks if the user has been alerted about time limit reached
 
 $(document).ready(function () {
+
+	groupUser.init();
+	tableAssessGroup.init();
 
     let template_info = getTemplateInfo();
     console.log(template_info);
@@ -164,7 +309,7 @@ function initializeAssessment() {
             // initializeEvaluationPopup();
             popups.evaluationInfo.init();
             console.log('Creating table with id: ' + template_id);
-            tableAssess.createTemplateTable(template_id); // Use the given template
+            tableAssessGroup.createTemplateTable(template_id); // Use the given template
 
             $('.templateName').html(getCurrentTemplateName());
         }
@@ -172,7 +317,7 @@ function initializeAssessment() {
         //initializeEvaluationPopup();
         popups.evaluationInfo.init();
         // Use the default template
-        tableAssess.createTemplateTable(template_id); // Use the given template
+        tableAssessGroup.createTemplateTable(template_id); // Use the given template
 
         $('.templateName').html(getCurrentTemplateName());
     }
@@ -867,7 +1012,7 @@ var assessment = {
     template: {},
     /* Functions */
     init: function () {
-        tableAssess.init();
+        tableAssessGroup.init();
     },
     enableSaveButton: function (results, template) {
         this.saveButton.click(function (e) {
@@ -877,7 +1022,7 @@ var assessment = {
             // Check if all fields are checked before generating a document 
             let allAssessmentChecked;
 
-            allAssessmentChecked = tableAssess.checkOptions();
+            allAssessmentChecked = tableAssessGroup.checkOptions();
 
             if (allAssessmentChecked) {
 

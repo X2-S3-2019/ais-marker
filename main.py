@@ -212,7 +212,7 @@ def getTemplateJSON(template_id):
 def openDocument(document_name):
     try:
         path = databaseManager.getDefaultDirectory()
-        os.system(f'start {os.path.realpath(path)}')
+        # os.system(f'start {os.path.realpath(path)}')
     except:
         print('There was an error.')
     # os.startfile(document_name + '.docx')
@@ -263,4 +263,4 @@ if __name__ == '__main__':
     web_app_options = {'mode': "chrome-app", 'host': '127.0.0.1'}
 
     eel.init('web')
-    eel.start('index.html', size=(1000, 600), options=web_app_options)
+    eel.start('index.html', size=(1000, 600), disable_cache=True, options=web_app_options)
