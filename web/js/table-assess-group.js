@@ -219,7 +219,6 @@ var tableAssessGroup = {
                 $(item).text(text);
             });
             let text = $(e.target).text() + "("+id+")";
-            console.log(text);
             $(e.target).text(text);
         }
         // console.log('====', selectedIds, '====');
@@ -277,21 +276,30 @@ var tableAssessGroup = {
     },
     checkOptions: function () {
         var that = this;
-
-        for (category in assessment.results['groupCriteria']) {
-            for (subcate in assessment.results['groupCriteria'][category]['criteria']) {
-                if (assessment.results['groupCriteria'][category]['criteria'][subcate] < 0) {
-                    var tmp = $('tr[data-type="' + category + '.' + subcate + '"]');
-                    tmp.addClass('table-active');
-                    let offset = tmp.offset().top - 55;
-                    $('body, html').animate({
-                        scrollTop: offset
-                    });
-                    return false;
+        var groupResuts = tableAssessGroup.scoreData;
+        var groupData = groupUser.getGroupData();
+        if ( groupData.members.length > groupResuts.length ) {
+            alert('At least one of the student\'s evaluation is not finished yet.');
+            return false;
+        }
+        for ( id in groupResuts ) {
+            for (category in groupResuts[id]['groupCriteria']) {
+                console.log(category);
+                for (subcate in groupResuts[id]['groupCriteria'][category]['criteria']) {
+                    console.log(groupResuts[id], category, subcate);
+                    console.log(groupResuts[id]['groupCriteria'][category]['criteria'][subcate]);
+                    if (groupResuts[id]['groupCriteria'][category]['criteria'][subcate] < 0) {
+                        var tmp = $('tr[data-type="' + category + '.' + subcate + '"]');
+                        tmp.addClass('table-active');
+                        let offset = tmp.offset().top - 55;
+                        $('body, html').animate({
+                            scrollTop: offset
+                        });
+                        return false;
+                    }
                 }
             }
         }
-
         return true;
     },
 };

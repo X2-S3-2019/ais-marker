@@ -76,7 +76,6 @@ var groupUser = {
 		var members = [];
 		var validation = true;
 		$("tr[data-student-id]").each(function(index, item) {
-			console.log(item, index);
 			var tr = $(item);
 			var id = $(item).attr("data-student-id");
 			var studentNameElm = $(item).find(".tableStudentName");

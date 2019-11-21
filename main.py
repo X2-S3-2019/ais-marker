@@ -212,7 +212,7 @@ def getTemplateJSON(template_id):
 def openDocument(document_name):
     try:
         path = databaseManager.getDefaultDirectory()
-        # os.system(f'start {os.path.realpath(path)}')
+        os.system(f'start {os.path.realpath(path)}')
     except:
         print('There was an error.')
     # os.startfile(document_name + '.docx')
